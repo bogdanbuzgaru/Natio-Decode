@@ -1,0 +1,80 @@
+ WHAT TO TUNE (6 parameters)
+1. Hood Servo (4 values)
+
+MIN_HOOD_ANGLE = 40.0 (measure with protractor)
+MAX_HOOD_ANGLE = 60.0 (measure with protractor)
+MIN_SERVO_POSITION = 0.2 (servo position at min angle)
+MAX_SERVO_POSITION = 0.8 (servo position at max angle)
+
+2. Flywheel Speed (2 values)
+
+FLYWHEEL_SLOPE = 1.5 (from Excel chart)
+FLYWHEEL_INTERCEPT = 100.0 (from Excel chart)
+
+How to get these:
+
+Shoot at 6 different speeds (500, 700, 900, 1100, 1300, 1500 RPM)
+Measure range for each
+Calculate launch speed: sqrt(range × 386.1)
+Plot in Excel → add trendline → get equation y = mx + b
+
+
+🎮 HOW TO USE IN TELEOP
+Simple Version (copy-paste ready):
+java// 1. Create calculator (in runOpMode, before waitForStart)
+ShooterCalculations shooterCalcs = new ShooterCalculations(
+    40.0,   // MIN_HOOD_ANGLE - your value
+    60.0,   // MAX_HOOD_ANGLE - your value
+    0.2,    // MIN_SERVO_POSITION - your value
+    0.8,    // MAX_SERVO_POSITION - your value
+    1.5,    // FLYWHEEL_SLOPE - from Excel
+    100.0   // FLYWHEEL_INTERCEPT - from Excel
+);
+
+// 2. In your main loop:
+while (opModeIsActive()) {
+
+    // Get robot position from Pinpoint
+    double robotX = /* your pinpoint X */;
+    double robotY = /* your pinpoint Y */;
+    double robotVelX = /* your pinpoint velocity X */;
+    double robotVelY = /* your pinpoint velocity Y */;
+
+    // Calculate shooting parameters
+    ShooterCalculations.ShootingParameters params =
+        shooterCalcs.calculateShootingParameters(
+            robotX,              // inches
+            robotY,              // inches
+            robotVelX,           // in/s
+            robotVelY,           // in/s
+            72.0,                // goal X
+            72.0,                // goal Y
+            24.0,                // goal height
+            Math.toRadians(-45), // entry angle
+            Math.toRadians(40),  // min hood angle
+            Math.toRadians(60)   // max hood angle
+        );
+
+    // Apply to hardware
+    hoodServo.setPosition(params.hoodServoPosition);
+    flywheelMotor1.setVelocity(params.flywheelSpeed);
+    flywheelMotor2.setVelocity(params.flywheelSpeed);
+
+    // YOU control turret manually
+    double turretPos = 0.5 + gamepad1.left_stick_x * 0.5;
+    turretServo1.setPosition(turretPos);
+    turretServo2.setPosition(turretPos);
+}
+
+📦 FILES PROVIDED
+
+ShooterCalculations.java - The math (no bugs!)
+ShooterTeleOpSimple.java - Complete example OpMode
+SIMPLE_TUNING_GUIDE.md - Step-by-step calibration
+
+
+⏱️ TIME TO TUNE: ~50 minutes
+
+Hood calibration: 15 min
+Flywheel calibration: 30 min
+Goal setup: 5 min
