@@ -51,23 +51,6 @@ public class ShooterCalculations {
     // MAIN CALCULATION METHOD
     // ========================================================================
 
-    /**
-     * Calculate shooting parameters with velocity compensation.
-     * Returns hood servo position and flywheel speed.
-     * You handle turret aiming manually.
-     *
-     * @param robotX Robot X position on field (inches)
-     * @param robotY Robot Y position on field (inches)
-     * @param robotVelocityX Robot velocity in X direction (in/s)
-     * @param robotVelocityY Robot velocity in Y direction (in/s)
-     * @param goalX Goal X position on field (inches)
-     * @param goalY Goal Y position on field (inches)
-     * @param goalHeight Height of goal above launch point (inches)
-     * @param goalEntryAngle Desired trajectory angle at goal (radians, negative = downward)
-     * @param minClampAngle Minimum achievable hood angle (radians)
-     * @param maxClampAngle Maximum achievable hood angle (radians)
-     * @return ShootingParameters with hood and flywheel values
-     */
     public ShootingParameters calculateShootingParameters(
             double robotX,
             double robotY,
