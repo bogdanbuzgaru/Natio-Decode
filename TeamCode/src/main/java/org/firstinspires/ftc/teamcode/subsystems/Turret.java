@@ -26,4 +26,7 @@ public class Turret {
     public void update(){
         pinpoint.update();
     }
+    public Pose2D getPose(){
+        return pinpoint.getPosition();
+    }
 }
