@@ -8,25 +8,35 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 
 public class Turret {
-    private final Pose redGoal = new Pose(138, 138);
-    private final Pose blueGoal = redGoal.mirror();
-    private Servo turretServo1, turretServo2;
-    private GoBildaPinpointDriver pinpoint;
+    private Servo turretServo1, turretServo2, turretServo3;
+    private double difPos;
+    private double angle, lastAngle;
+
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
     }
-    public void init(double x, double y, double heading){
-        pinpoint.recalibrateIMU();
-        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading));
-    }
+
     public void update(){
-        pinpoint.update();
+        if(angle > 0){
+            turretServo1.setPosition(0.5 - angle / 197.25);
+            turretServo2.setPosition(0.5 - angle / 197.25);     //TODO implement Last angle to not trigger bugs at 180 and go further
+            turretServo3.setPosition(0.5 - angle / 197.25);
+        } else{
+            turretServo1.setPosition(0.5 + angle / 197.25);
+            turretServo2.setPosition(0.5 + angle / 197.25);
+            turretServo3.setPosition(0.5 + angle / 197.25);
+        }
     }
-    public Pose2D getPose(){
-        return pinpoint.getPosition();
+    public void setAngle(double angle) {
+        lastAngle = angle;
+        this.angle = angle;
+    }
+    public void setDifPos(double difPos) {
+        this.difPos = difPos;
     }
 }

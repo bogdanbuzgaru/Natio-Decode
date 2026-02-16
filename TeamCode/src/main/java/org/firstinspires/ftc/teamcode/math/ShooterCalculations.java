@@ -2,23 +2,14 @@ package org.firstinspires.ftc.teamcode.math;
 
 public class ShooterCalculations {
 
-    // Constants
     private static final double GRAVITY = 386.1; // in/s^2 (9.8 m/s^2 converted)
-
-    // Hood servo calibration (you'll need to measure these for your robot)
     private double minHoodAngle;  // degrees
     private double maxHoodAngle;  // degrees
     private double minServoPosition; // servo position at min angle
     private double maxServoPosition; // servo position at max angle
-
-    // Flywheel calibration coefficients (from Excel fitting)
-    // flywheelSpeed = a * launchSpeed + b
     private double flywheelSpeedSlope;     // coefficient 'a'
     private double flywheelSpeedIntercept;  // coefficient 'b'
 
-    /**
-     * Constructor with calibration parameters
-     */
     public ShooterCalculations(double minHoodAngle, double maxHoodAngle,
                                double minServoPosition, double maxServoPosition,
                                double flywheelSpeedSlope, double flywheelSpeedIntercept) {
@@ -30,9 +21,6 @@ public class ShooterCalculations {
         this.flywheelSpeedIntercept = flywheelSpeedIntercept;
     }
 
-    /**
-     * Result class for shooting parameters
-     */
     public static class ShootingParameters {
         public double launchAngle;         // radians
         public double launchSpeed;         // in/s
@@ -40,7 +28,6 @@ public class ShooterCalculations {
         public double flywheelSpeed;       // speed for both flywheel motors
         public double distanceToGoal;      // calculated distance (for telemetry)
 
-        // Turret aiming angles (FIELD-RELATIVE in radians)
         public double angleToGoal;         // Basic angle to goal (no velocity compensation)
         public double turretOffsetAngle;   // Velocity compensation offset to ADD
         public double targetTurretAngle;   // Final angle to aim at = angleToGoal + turretOffsetAngle
