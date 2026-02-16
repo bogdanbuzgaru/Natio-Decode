@@ -23,10 +23,10 @@ public class Shooter {
 
         lowerBarrier();
     }
-    public void lowerBarrier(){
+    public void lowerBarrier() {
         barrier.setPosition(0.0);
     }
-    public void raiseBarrier(){
+    public void raiseBarrier() {
         barrier.setPosition(1.0);
     }
 }

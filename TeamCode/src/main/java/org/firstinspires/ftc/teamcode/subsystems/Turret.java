@@ -15,18 +15,18 @@ public class Turret {
     private double difPos;
     private double angle, lastAngle;
 
-    public Turret(HardwareMap hardwareMap){
+    public Turret(HardwareMap hardwareMap) {
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
     }
 
-    public void update(){
-        if(angle > 0){
+    public void update() {
+        if(angle > 0) {
             turretServo1.setPosition(0.5 - angle / 197.25);
             turretServo2.setPosition(0.5 - angle / 197.25);     //TODO implement Last angle to not trigger bugs at 180 and go further
             turretServo3.setPosition(0.5 - angle / 197.25);
-        } else{
+        } else {
             turretServo1.setPosition(0.5 + angle / 197.25);
             turretServo2.setPosition(0.5 + angle / 197.25);
             turretServo3.setPosition(0.5 + angle / 197.25);

@@ -15,7 +15,7 @@ public class TeleOp extends OpMode {
     private List<Double> results = new ArrayList<>();
     private GoBildaPinpointDriver pinpoint;
 
-    public void init(){
+    public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         String[] vals = ReadWriteFile.readFile(file).split("\n");
         for (String val : vals) {
@@ -23,7 +23,7 @@ public class TeleOp extends OpMode {
         }
         System.out.println(results.toString());
     }
-    public void loop(){
+    public void loop() {
 
     }
 }

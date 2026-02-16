@@ -10,13 +10,13 @@ public class Intake {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void take(){
+    public void take() {
         intakeMotor.setPower(1);
     }
-    public void spit(){
+    public void spit() {
         intakeMotor.setPower(-1);
     }
-    public void stop(){
+    public void stop() {
         intakeMotor.setPower(0);
     }
 }

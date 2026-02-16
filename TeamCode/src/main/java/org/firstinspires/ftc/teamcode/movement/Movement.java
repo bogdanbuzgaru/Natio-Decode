@@ -13,7 +13,7 @@ public class Movement {
     private DcMotor leftRear;
     private DcMotor rightRear;
 
-    public Movement (HardwareMap hardwareMap){
+    public Movement (HardwareMap hardwareMap) {
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
         rightFront = hardwareMap.get(DcMotor.class, "frontRight");
         leftRear = hardwareMap.get(DcMotor.class, "backLeft");
@@ -26,7 +26,7 @@ public class Movement {
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void movementLoop (Gamepad gamepad){
+    public void movementLoop (Gamepad gamepad) {
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
         double heading = gamepad.right_stick_x;
@@ -43,7 +43,7 @@ public class Movement {
         leftRear.setPower(backLeftPower);
         rightRear.setPower(backRightPower);
     }
-    public void movementLoopSlow (Gamepad gamepad){
+    public void movementLoopSlow (Gamepad gamepad) {
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
         double heading = gamepad.right_stick_x;

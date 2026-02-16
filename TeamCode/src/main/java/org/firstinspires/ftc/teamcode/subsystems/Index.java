@@ -5,20 +5,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Index {
     private DcMotorEx indexMotor;
-    public Index (HardwareMap hardwareMap){
+    public Index (HardwareMap hardwareMap) {
         indexMotor = hardwareMap.get(DcMotorEx.class, "index");
         indexMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void feed(){
+    public void feed() {
         indexMotor.setPower(1);
     }
-    public void eject(){
+    public void eject() {
         indexMotor.setPower(-1);
     }
-    public void stop(){
+    public void stop() {
         indexMotor.setPower(0);
     }
-    public void slowFeed(){
+    public void slowFeed() {
         indexMotor.setPower(0.5);
     }
 }

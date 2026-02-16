@@ -19,7 +19,7 @@ public class Testing extends OpMode {
     private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
 
-    public void init(){
+    public void init() {
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
@@ -32,15 +32,17 @@ public class Testing extends OpMode {
     }
     public void loop(){
         pinpoint.update();
-        ShooterCalculations.ShootingParameters parameters
-                = shooterCalculations.calculateShootingParameters(pinpoint.getPosX(DistanceUnit.INCH),
-                pinpoint.getPosY(DistanceUnit.INCH),
-                pinpoint.getVelX(DistanceUnit.INCH),
-                pinpoint.getVelY(DistanceUnit.INCH),
-                138, 138,
-                45, Math.toRadians(-30),
-                Math.toRadians(30), Math.toRadians(45)
-                );
+        ShooterCalculations.ShootingParameters parameters = shooterCalculations.calculateShootingParameters(
+            pinpoint.getPosX(DistanceUnit.INCH),
+            pinpoint.getPosY(DistanceUnit.INCH),
+            pinpoint.getVelX(DistanceUnit.INCH),
+            pinpoint.getVelY(DistanceUnit.INCH),
+            138,
+            138,
+            45,
+            Math.toRadians(-30),
+            Math.toRadians(30), Math.toRadians(45)
+        );
         turret.setDifPos(parameters.getTurretOffsetDegrees());
         turret.setAngle(parameters.getTargetTurretDegrees() - pinpoint.getHeading(AngleUnit.DEGREES));
     }
