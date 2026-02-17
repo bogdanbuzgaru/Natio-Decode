@@ -9,7 +9,6 @@ public class ShooterCalculations {
     private double maxServoPosition; // servo position at max angle
     private double flywheelSpeedSlope;     // coefficient 'a'
     private double flywheelSpeedIntercept;  // coefficient 'b'
-    private double launchSpeedNew;
 
     public ShooterCalculations(double minHoodAngle, double maxHoodAngle,
                                double minServoPosition, double maxServoPosition,
@@ -105,7 +104,7 @@ public class ShooterCalculations {
         numerator = GRAVITY * xNew * xNew;
         denominator = 2.0 * cosAlphaNew * cosAlphaNew *
                 (xNew * tanAlphaNew - goalHeight);
-        launchSpeedNew = Math.sqrt(numerator / denominator);
+        double launchSpeedNew = Math.sqrt(numerator / denominator);
 
         double turretOffsetAngle = Math.atan(vTangential / vxCompensatedRadial);
 
@@ -113,7 +112,7 @@ public class ShooterCalculations {
         result.launchAngle = launchAngleNew;
         result.launchSpeed = launchSpeedNew;
         result.hoodServoPosition = calculateHoodServoPosition(launchAngleNew);
-        result.flywheelSpeed = calculateFlywheelSpeed();
+        result.flywheelSpeed = calculateFlywheelSpeed(launchSpeedNew);
         result.distanceToGoal = distanceToGoal;
 
 
@@ -133,7 +132,7 @@ public class ShooterCalculations {
         return clamp(position, 0.0, 1.0);
     }
 
-    private double calculateFlywheelSpeed(){
+    private double calculateFlywheelSpeed(double launchSpeedNew){
         // Linear relationship: flywheelSpeed = a * launchSpeed + b
         return flywheelSpeedSlope * launchSpeedNew + flywheelSpeedIntercept;
     }

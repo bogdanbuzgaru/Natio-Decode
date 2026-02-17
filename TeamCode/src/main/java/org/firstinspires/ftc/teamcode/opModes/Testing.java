@@ -42,7 +42,8 @@ public class Testing extends OpMode {
         }
 
         ShooterCalculations.ShootingParameters parameters
-                = shooterCalculations.calculateShootingParameters(pinpoint.getPosX(DistanceUnit.INCH),
+                = shooterCalculations.calculateShootingParameters(
+                pinpoint.getPosX(DistanceUnit.INCH),
                 pinpoint.getPosY(DistanceUnit.INCH),
                 pinpoint.getVelX(DistanceUnit.INCH),
                 pinpoint.getVelY(DistanceUnit.INCH),
@@ -54,7 +55,7 @@ public class Testing extends OpMode {
         turret.setAngle(parameters.getTargetTurretDegrees() - pinpoint.getHeading(AngleUnit.DEGREES));
         turret.update();
 
-        shooter.setTicks((int)parameters.getFlywheelSpeed());
+        shooter.setTicks(parameters.getFlywheelSpeed());
         shooter.update();
     }
 }
