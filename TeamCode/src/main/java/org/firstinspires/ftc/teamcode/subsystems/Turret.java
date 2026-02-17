@@ -20,7 +20,6 @@ public class Turret {
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
 
-
         turretServo1.setPosition(0.5);
         turretServo2.setPosition(0.5);
         turretServo3.setPosition(0.5);
@@ -36,6 +35,16 @@ public class Turret {
             turretServo2.setPosition(0.5 + angle / 197.25);
             turretServo3.setPosition(0.5 + angle / 197.25);
         }
+    }
+    public void goLeft(){
+        turretServo1.setPosition(0.3);
+        turretServo2.setPosition(0.3);
+        turretServo3.setPosition(0.3);
+    }
+    public void goRight(){
+        turretServo1.setPosition(0.7);
+        turretServo2.setPosition(0.7);
+        turretServo3.setPosition(0.7);
     }
     public void setAngle(double angle) {
         lastAngle = angle;

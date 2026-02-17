@@ -35,6 +35,10 @@ public class Testing extends OpMode {
 
         if(gamepad1.crossWasPressed()){
             shooter.raiseBarrier();
+        }else if(gamepad1.leftBumperWasPressed()){
+            turret.goLeft();
+        }else if(gamepad1.rightBumperWasPressed()){
+            turret.goRight();
         }
 
         ShooterCalculations.ShootingParameters parameters
