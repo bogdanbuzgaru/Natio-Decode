@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Shooter {
     private DcMotorEx flywheelMotor1, flywheelMotor2;
     private Servo barrier;
+    private int ticks;
+
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
@@ -22,6 +24,13 @@ public class Shooter {
         flywheelMotor1.setDirection(DcMotorEx.Direction.REVERSE);
 
         lowerBarrier();
+    }
+    public void update(){
+        flywheelMotor1.setTargetPosition(ticks);
+        flywheelMotor2.setTargetPosition(ticks);
+    }
+    public void setTicks(int ticks) {
+        this.ticks = ticks;
     }
     public void lowerBarrier(){
         barrier.setPosition(0.0);

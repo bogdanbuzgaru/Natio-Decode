@@ -32,6 +32,11 @@ public class Testing extends OpMode {
     }
     public void loop(){
         pinpoint.update();
+
+        if(gamepad1.crossWasPressed()){
+            shooter.raiseBarrier();
+        }
+
         ShooterCalculations.ShootingParameters parameters
                 = shooterCalculations.calculateShootingParameters(pinpoint.getPosX(DistanceUnit.INCH),
                 pinpoint.getPosY(DistanceUnit.INCH),
@@ -43,5 +48,9 @@ public class Testing extends OpMode {
                 );
         turret.setDifPos(parameters.getTurretOffsetDegrees());
         turret.setAngle(parameters.getTargetTurretDegrees() - pinpoint.getHeading(AngleUnit.DEGREES));
+        turret.update();
+
+        shooter.setTicks((int)parameters.getFlywheelSpeed());
+        shooter.update();
     }
 }

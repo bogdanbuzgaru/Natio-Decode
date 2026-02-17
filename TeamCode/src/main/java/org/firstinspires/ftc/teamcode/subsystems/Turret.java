@@ -19,6 +19,11 @@ public class Turret {
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
+
+
+        turretServo1.setPosition(0.5);
+        turretServo2.setPosition(0.5);
+        turretServo3.setPosition(0.5);
     }
 
     public void update(){
