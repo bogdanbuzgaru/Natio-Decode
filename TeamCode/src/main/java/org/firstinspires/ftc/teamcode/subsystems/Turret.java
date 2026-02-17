@@ -13,7 +13,10 @@ import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 public class Turret {
     private Servo turretServo1, turretServo2, turretServo3;
     private double difPos;
-    private double angle, lastAngle;
+    private double angle;
+    private double lastAngle;
+
+    private double heading;
 
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
@@ -25,12 +28,21 @@ public class Turret {
         turretServo3.setPosition(0.5);
     }
 
+    public void setHeading(double heading) {
+        this.heading = heading;
+    }
+    private boolean turnLeft(){
+        return heading < angle && heading > angle - 180;
+    }
+    private boolean turnRight(){
+        return heading > angle || heading < angle - 180;
+    }
     public void update(){
-        if(angle > 0){
+        if(turnLeft()){
             turretServo1.setPosition(0.5 - angle / 197.25);
             turretServo2.setPosition(0.5 - angle / 197.25);     //TODO implement Last angle to not trigger bugs at 180 and go further
             turretServo3.setPosition(0.5 - angle / 197.25);
-        } else{
+        } else if (turnRight()){
             turretServo1.setPosition(0.5 + angle / 197.25);
             turretServo2.setPosition(0.5 + angle / 197.25);
             turretServo3.setPosition(0.5 + angle / 197.25);
