@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
@@ -16,12 +17,14 @@ public class Testing extends OpMode {
     private Pose2D pose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
     private Turret turret;
     private Shooter shooter;
+    private Position posi;
     private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
 
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
+        posi = new Position(pose);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setPosition(pose);
 
@@ -32,7 +35,7 @@ public class Testing extends OpMode {
     }
     public void loop(){
         pinpoint.update();
-
+        posi.setPose(pinpoint.getPosition());
         if(gamepad1.crossWasPressed()){
             shooter.raiseBarrier();
         }else if(gamepad1.leftBumperWasPressed()){
