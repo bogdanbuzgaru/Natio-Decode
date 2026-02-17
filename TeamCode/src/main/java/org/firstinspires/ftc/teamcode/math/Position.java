@@ -20,20 +20,28 @@ public class Position {
         this.pose = pose;
         heading = pose.getHeading(AngleUnit.DEGREES);
     }
-    public double getMaxY(){
+    public Pose2D getMaxY(){
         double y = pose.getY(DistanceUnit.INCH);
-        return y * Math.abs((cos(Math.abs(heading) - 45) * l));
+        return new Pose2D(DistanceUnit.INCH, pose.getX(DistanceUnit.INCH),
+                y * Math.abs((cos(Math.abs(heading) - 45) * l)),
+                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
     }
-    public double getMaxX(){
+    public Pose2D getMaxX(){
         double x = pose.getX(DistanceUnit.INCH);
-        return x * Math.abs((cos(Math.abs(heading) - 45) * L));
+        return new Pose2D(DistanceUnit.INCH, x * Math.abs((cos(Math.abs(heading) - 45) * L)),
+                pose.getY(DistanceUnit.INCH),
+                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
     }
-    public double getMinX(){
+    public Pose2D getMinX(){
         double x = pose.getX(DistanceUnit.INCH);
-        return x * (-1) * Math.abs((cos(Math.abs(heading) - 45) * L));
+        return new Pose2D(DistanceUnit.INCH, x * (-1) * Math.abs((cos(Math.abs(heading) - 45) * L)),
+                pose.getY(DistanceUnit.INCH),
+                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
     }
-    public double getMinY(){
+    public Pose2D getMinY(){
         double y = pose.getY(DistanceUnit.INCH);
-        return y * (-1) * Math.abs((cos(Math.abs(heading) - 45) * l));
+        return new Pose2D(DistanceUnit.INCH, pose.getX(DistanceUnit.INCH),
+                y * (-1) * Math.abs((cos(Math.abs(heading) - 45) * l)),
+                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
     }
 }
