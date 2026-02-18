@@ -14,28 +14,27 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @TeleOp
 public class Testing extends OpMode {
-    private Pose2D pose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+    private Pose2D pose = new Pose2D(DistanceUnit.INCH, 7.8, 7, AngleUnit.DEGREES, 90);
     private Turret turret;
     private Shooter shooter;
-    private Position posi;
+    private Position pos;
     private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
 
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
-        posi = new Position(pose);
+        pos = new Position(pose);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setPosition(pose);
 
-//        shooterCalculations = new ShooterCalculations(30, 45,
-//                                                    0, 1,
-//                                                    0.12, 15
-//                                                        );
+        shooterCalculations = new ShooterCalculations(30, 45,
+                                                    0, 1,       //TODO MUST TUNE
+                                                    0.12, 15);
     }
     public void loop(){
         pinpoint.update();
-        posi.setPose(pinpoint.getPosition());
+        pos.setPose(pinpoint.getPosition());
         if(gamepad1.crossWasPressed()){
             shooter.raiseBarrier();
         }else if(gamepad1.leftBumperWasPressed()){
@@ -61,5 +60,11 @@ public class Testing extends OpMode {
 
         shooter.setTicks(parameters.getFlywheelSpeed());
         shooter.update();
+
+        telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("x", pinpoint.getPosX(DistanceUnit.INCH));
+        telemetry.addData("y", pinpoint.getPosY(DistanceUnit.INCH));
+        telemetry.addData("Can shoot close", pos.shootClose());
+        telemetry.addData("Can shoot high", pos.shootHigh());
     }
 }

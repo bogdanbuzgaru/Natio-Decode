@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.math;
 
 import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
