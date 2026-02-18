@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class Position {
     private Pose2D pose;
     private double heading;
-    private final double l = 13.2;  //tune
-    private final double L = 11.4;  //tune
+    private final double l = 12.8740157349;
+    private final double L = 14.4881889616;
     public Position (Pose2D pose){
         this.pose = pose;
     }
@@ -20,28 +20,35 @@ public class Position {
         this.pose = pose;
         heading = pose.getHeading(AngleUnit.DEGREES);
     }
-    public Pose2D getMaxY(){
+    private double distanceY(){
+        double currentHeading = Math.abs(heading);
+        if (currentHeading > 90){
+            currentHeading -= 90;
+        }
+        return 2 * l * cos(currentHeading);
+    }
+    private double distanceX(){
+        double currentHeading = Math.abs(heading);
+        if (currentHeading > 90){
+            currentHeading -= 90;
+        }
+        return L * cos(currentHeading + l * cos(90 - currentHeading));
+    }
+
+    public double getMaxY(){
         double y = pose.getY(DistanceUnit.INCH);
-        return new Pose2D(DistanceUnit.INCH, pose.getX(DistanceUnit.INCH),
-                y * Math.abs((cos(Math.abs(heading) - 45) * l)),
-                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
+        return y + distanceY() / 2;
     }
-    public Pose2D getMaxX(){
+    public double getMaxX(){
         double x = pose.getX(DistanceUnit.INCH);
-        return new Pose2D(DistanceUnit.INCH, x * Math.abs((cos(Math.abs(heading) - 45) * L)),
-                pose.getY(DistanceUnit.INCH),
-                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
+        return x + distanceX() / 2;
     }
-    public Pose2D getMinX(){
+    public double getMinX(){
         double x = pose.getX(DistanceUnit.INCH);
-        return new Pose2D(DistanceUnit.INCH, x * (-1) * Math.abs((cos(Math.abs(heading) - 45) * L)),
-                pose.getY(DistanceUnit.INCH),
-                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
+        return x - distanceX() / 2;
     }
-    public Pose2D getMinY(){
+    public double getMinY(){
         double y = pose.getY(DistanceUnit.INCH);
-        return new Pose2D(DistanceUnit.INCH, pose.getX(DistanceUnit.INCH),
-                y * (-1) * Math.abs((cos(Math.abs(heading) - 45) * l)),
-                AngleUnit.DEGREES, pose.getHeading(AngleUnit.DEGREES));
+        return y - distanceY() / 2;
     }
 }
