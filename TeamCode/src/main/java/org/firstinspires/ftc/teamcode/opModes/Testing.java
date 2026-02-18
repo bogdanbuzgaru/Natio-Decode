@@ -9,6 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
+import org.firstinspires.ftc.teamcode.subsystems.Index;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
@@ -18,12 +20,17 @@ public class Testing extends OpMode {
     private Turret turret;
     private Shooter shooter;
     private Position pos;
+    private Index index;
+    private Intake intake;
     private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
+    private double ticks = 100;
 
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
+        index = new Index(hardwareMap);
         pos = new Position(pose);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setPosition(pose);
@@ -37,12 +44,26 @@ public class Testing extends OpMode {
         pos.setPose(pinpoint.getPosition());
         if(gamepad1.crossWasPressed()){
             shooter.raiseBarrier();
-        }else if(gamepad1.leftBumperWasPressed()){
+        }
+        if(gamepad1.leftBumperWasPressed()){
             turret.goLeft();
         }else if(gamepad1.rightBumperWasPressed()){
             turret.goRight();
         }
-
+        if(gamepad1.right_trigger >= 0.01){
+            intake.take();
+            index.feed();
+        }
+        if(gamepad1.dpadDownWasPressed()){
+            intake.spit();
+            index.eject();
+        }
+        if(gamepad1.dpadLeftWasPressed()){
+            ticks -= 100;
+        }
+        if(gamepad1.dpadRightWasPressed()){
+            ticks += 100;
+        }
         ShooterCalculations.ShootingParameters parameters
                 = shooterCalculations.calculateShootingParameters(
                 pinpoint.getPosX(DistanceUnit.INCH),
