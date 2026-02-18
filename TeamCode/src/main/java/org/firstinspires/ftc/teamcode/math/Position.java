@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
 import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -24,14 +25,14 @@ public class Position {
         if (currentHeading > 90){
             currentHeading -= 90;           //incadrare in patrat
         }
-        return 2 * l * cos(currentHeading);
+        return l * cos(currentHeading) + L * sin(currentHeading);
     }
     private double distanceX(){
         double currentHeading = Math.abs(heading);
         if (currentHeading > 90){
             currentHeading -= 90;           //incadrare in patrat
         }
-        return L * cos(currentHeading + l * cos(90 - currentHeading));
+        return L * cos(currentHeading) + l * sin(currentHeading);
     }
     private double getMaxY(){
         double y = pose.getY(DistanceUnit.INCH);
