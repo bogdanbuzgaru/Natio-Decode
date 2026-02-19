@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Shooter {
     private DcMotorEx flywheelMotor1, flywheelMotor2;
-    private Servo barrier;
+    private Servo barrier, hood;
     private double ticks;
 
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
         barrier = hardwareMap.get(Servo.class, "barrier");
+        hood = hardwareMap.get(Servo.class, "hood");
 
         flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -33,9 +34,15 @@ public class Shooter {
         this.ticks = ticks;
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.0);
+        barrier.setPosition(0.3);
     }
     public void raiseBarrier(){
-        barrier.setPosition(1.0);
+        barrier.setPosition(0.7);
+    }
+    public void raiseHood(){
+        hood.setPosition(1);
+    }
+    public void lowerHood(){
+        hood.setPosition(0.29);
     }
 }

@@ -34,19 +34,19 @@ public class Position {
         }
         return L * cos(currentHeading) + l * sin(currentHeading);
     }
-    private double getMaxY(){
+    public double getMaxY(){
         double y = pose.getY(DistanceUnit.INCH);
         return y + distanceY() / 2;
     }
-    private double getMaxX(){
+    public double getMaxX(){
         double x = pose.getX(DistanceUnit.INCH);
         return x + distanceX() / 2;
     }
-    private double getMinX(){
+    public double getMinX(){
         double x = pose.getX(DistanceUnit.INCH);
         return x - distanceX() / 2;
     }
-    private double getMinY(){
+    public double getMinY(){
         double y = pose.getY(DistanceUnit.INCH);
         return y - distanceY() / 2;
     }
