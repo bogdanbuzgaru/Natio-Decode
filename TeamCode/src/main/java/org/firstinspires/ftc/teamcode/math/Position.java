@@ -56,11 +56,11 @@ public class Position {
                 && pose.getX(DistanceUnit.INCH) <= 72;          //The centre of the robot is on the left side of the triangle
     }
     private boolean isMinXClose(){
-        return (getMinX() >= 72 && pose.getY(DistanceUnit.INCH) >= 72)
+        return (getMinX() >= 72 && pose.getY(DistanceUnit.INCH) >= 72)          //TODO make it more up/down
                 && pose.getX(DistanceUnit.INCH) >= 72;          //The centre of the robot is on the right side of the triangle
     }
     private boolean isMaxYClose(){
-        return (getMaxY() >= 72 && pose.getX(DistanceUnit.INCH) >= 144 - getMaxY()
+        return (getMaxY() >= 72 && pose.getX(DistanceUnit.INCH) >= 144 - getMaxY()      //TODO make it more to the left/right
                 && pose.getX(DistanceUnit.INCH) <= getMaxY() );     //The centre of the robot is in the bottom of the triangle
     }
     //-----------------------FAR----------------------

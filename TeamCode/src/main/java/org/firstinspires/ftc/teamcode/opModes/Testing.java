@@ -46,14 +46,14 @@ public class Testing extends OpMode {
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
         pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,
-                        7.8, 7,
+                7.2440944808, 6.43700786745,
                         AngleUnit.DEGREES,
                         90
         ));
         pinpoint.recalibrateIMU();
 
         shooterCalculations = new ShooterCalculations(30, 45,
-                                                    0, 1,       //TODO MUST TUNE
+                                                    0.2, 1,       //TODO MUST TUNE
                                                     0.12, 15);
     }
     public void loop(){
@@ -99,6 +99,7 @@ public class Testing extends OpMode {
         turret.update();
 
         shooter.setTicks(parameters.getFlywheelSpeed());
+        shooter.setHoodPosition(parameters.getHoodServoPosition());
         shooter.update();
 
         telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));

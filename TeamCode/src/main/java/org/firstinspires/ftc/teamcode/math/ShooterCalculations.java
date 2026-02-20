@@ -50,6 +50,9 @@ public class ShooterCalculations {
         public double getTargetTurretDegrees() {
             return Math.toDegrees(targetTurretAngle);
         }
+        public double getHoodServoPosition(){
+            return hoodServoPosition;
+        }
     }
 
     public ShootingParameters calculateShootingParameters(
@@ -129,7 +132,7 @@ public class ShooterCalculations {
         double slope = (minServoPosition - maxServoPosition) / (minHoodAngle - maxHoodAngle);
         double position = slope * (angleDegrees - minHoodAngle) + minServoPosition;
 
-        return clamp(position, 0.0, 1.0);
+        return clamp(position, 0.2, 1.0);
     }
 
     private double calculateFlywheelSpeed(double launchSpeedNew){

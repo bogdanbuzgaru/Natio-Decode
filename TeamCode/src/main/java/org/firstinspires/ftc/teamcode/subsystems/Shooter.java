@@ -9,7 +9,7 @@ public class Shooter {
     private DcMotorEx flywheelMotor1, flywheelMotor2;
     private Servo barrier, hood;
     private double ticks;
-
+    private double hoodPosition;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
@@ -29,6 +29,7 @@ public class Shooter {
     public void update(){
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
+        hood.setPosition(hoodPosition);
     }
     public void setTicks(double ticks) {
         this.ticks = ticks;
@@ -44,5 +45,8 @@ public class Shooter {
     }
     public void lowerHood(){
         hood.setPosition(0.29);
+    }
+    public void setHoodPosition(double hoodPosition) {
+        this.hoodPosition = hoodPosition;
     }
 }
