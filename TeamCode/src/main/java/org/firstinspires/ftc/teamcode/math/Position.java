@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -84,5 +85,13 @@ public class Position {
     }
     public boolean shootHigh(){
         return isMinYFar() || isMaxXFar() || isMinXFar();
+    }
+    public double getHeading(){
+        return heading;
+    }
+    public double getTargetAngle(){
+        double h = heading;
+        double targetHead = Math.toDegrees(Math.atan2(144 - pose.getX(DistanceUnit.INCH), 144 - pose.getY(DistanceUnit.INCH)));
+        return Math.abs(h - targetHead);
     }
 }

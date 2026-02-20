@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,13 +9,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Position;
+import org.firstinspires.ftc.teamcode.math.Sensor;
 import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 import org.firstinspires.ftc.teamcode.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.Index;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
-
+@Configurable
 @TeleOp
 public class Testing extends OpMode {
     private Turret turret;
@@ -25,6 +27,7 @@ public class Testing extends OpMode {
     private Movement movement;
     private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
+    private Sensor sensor;
     private double ticks = 100;
 
     public void init(){
@@ -33,6 +36,7 @@ public class Testing extends OpMode {
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
         movement = new Movement(hardwareMap);
+        sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(new Pose2D(
                 DistanceUnit.INCH,
                 7.8, 7,
@@ -53,8 +57,8 @@ public class Testing extends OpMode {
         pinpoint.recalibrateIMU();
 
         shooterCalculations = new ShooterCalculations(30, 45,
-                                                    0.2, 1,       //TODO MUST TUNE
-                                                    0.12, 15);
+                                                    0.29, 1,       //TODO MUST TUNE
+                                                    1.2, 100);
     }
     public void loop(){
         pinpoint.update();
@@ -70,10 +74,15 @@ public class Testing extends OpMode {
             shooter.raiseHood();
             shooter.raiseBarrier();
         }
+        intake.take(gamepad1);
         if(gamepad1.right_trigger >= 0.1){
-            intake.take(gamepad1.right_trigger);
             index.feed(gamepad1.right_trigger);
-        }else if(gamepad1.dpadDownWasPressed()){
+        }
+        if(gamepad1.dpadDownWasPressed()){
+            intake.stop();
+            index.stop();
+        }
+        if(gamepad1.triangleWasPressed()){
             intake.spit();
             index.eject();
         }
@@ -95,13 +104,22 @@ public class Testing extends OpMode {
                 );
         turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
         turret.setDifPos(parameters.getTurretOffsetDegrees());
-        turret.setAngle(parameters.getTargetTurretDegrees() - pinpoint.getHeading(AngleUnit.DEGREES));
+        turret.setAngle(pos.getTargetAngle());
         turret.update();
 
-        shooter.setTicks(parameters.getFlywheelSpeed());
-        shooter.setHoodPosition(parameters.getHoodServoPosition());
+        shooter.setTicks(ticks);
+//        shooter.setHoodPosition(parameters.getHoodServoPosition());
         shooter.update();
-
+        telemetry.addData("Get turret angle", turret.getAngle());
+        telemetry.addData("Get angle ratio", turret.getAngleRatio());
+        telemetry.addData("Turns left", turret.turnLeft());
+        telemetry.addData("Turns right", turret.turnRight());
+        telemetry.addData("Target Turret Degrees", pos.getTargetAngle());
+        telemetry.addData("Target from parameters", parameters.getTargetTurretDegrees());
+        telemetry.addData("Offset movement prameters", parameters.getTurretOffsetDegrees());
+        telemetry.addData("Ticks", parameters.getFlywheelSpeed());
+        telemetry.addData("Is green", sensor.isGreen());
+        telemetry.addData("Is purple", sensor.isPurple());
         telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
         telemetry.addData("x", pinpoint.getPosX(DistanceUnit.INCH));
         telemetry.addData("y", pinpoint.getPosY(DistanceUnit.INCH));

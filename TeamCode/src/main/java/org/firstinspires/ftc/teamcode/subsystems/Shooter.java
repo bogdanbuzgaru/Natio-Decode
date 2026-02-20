@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -16,13 +17,12 @@ public class Shooter {
         barrier = hardwareMap.get(Servo.class, "barrier");
         hood = hardwareMap.get(Servo.class, "hood");
 
+        flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
+        flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+
         flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        flywheelMotor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        flywheelMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        flywheelMotor1.setDirection(DcMotorEx.Direction.REVERSE);
 
         lowerBarrier();
     }
@@ -35,10 +35,10 @@ public class Shooter {
         this.ticks = ticks;
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.3);
+        barrier.setPosition(0.4);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.7);
+        barrier.setPosition(0.3 );
     }
     public void raiseHood(){
         hood.setPosition(1);

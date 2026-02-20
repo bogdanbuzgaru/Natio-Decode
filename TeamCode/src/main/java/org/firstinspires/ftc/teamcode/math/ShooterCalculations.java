@@ -50,8 +50,21 @@ public class ShooterCalculations {
         public double getTargetTurretDegrees() {
             return Math.toDegrees(targetTurretAngle);
         }
+
         public double getHoodServoPosition(){
             return hoodServoPosition;
+        }
+
+        /**
+         * Get robot-relative turret angle (for when your turret is robot-relative).
+         * This properly handles negative headings and wraparound.
+         *
+         * @param robotHeadingDegrees Current robot heading in degrees
+         * @return Turret angle relative to robot in degrees, normalized to [-180, 180]
+         */
+        public double getTurretAngleRelativeDegrees(double robotHeadingDegrees) {
+            double relativeDegrees = getTargetTurretDegrees() - robotHeadingDegrees;
+            return normalizeAngleDegrees(relativeDegrees);
         }
     }
 
@@ -118,7 +131,6 @@ public class ShooterCalculations {
         result.flywheelSpeed = calculateFlywheelSpeed(launchSpeedNew);
         result.distanceToGoal = distanceToGoal;
 
-
         result.angleToGoal = angleToGoal;
         result.turretOffsetAngle = turretOffsetAngle;
         result.targetTurretAngle = angleToGoal + turretOffsetAngle;
@@ -132,13 +144,14 @@ public class ShooterCalculations {
         double slope = (minServoPosition - maxServoPosition) / (minHoodAngle - maxHoodAngle);
         double position = slope * (angleDegrees - minHoodAngle) + minServoPosition;
 
-        return clamp(position, 0.2, 1.0);
+        return clamp(position, 0.0, 1.0);
     }
 
     private double calculateFlywheelSpeed(double launchSpeedNew){
         // Linear relationship: flywheelSpeed = a * launchSpeed + b
         return flywheelSpeedSlope * launchSpeedNew + flywheelSpeedIntercept;
     }
+
     private double clamp(double value, double min, double max) {
         if (value < min) return min;
         if (value > max) return max;
@@ -149,5 +162,10 @@ public class ShooterCalculations {
         while (angle > Math.PI) angle -= 2 * Math.PI;
         while (angle < -Math.PI) angle += 2 * Math.PI;
         return angle;
+    }
+    public static double normalizeAngleDegrees(double degrees) {
+        while (degrees > 180) degrees -= 360;
+        while (degrees < -180) degrees += 360;
+        return degrees;
     }
 }
