@@ -62,36 +62,10 @@ public class Testing extends OpMode {
     }
     public void loop(){
         pinpoint.update();
-        pos.setPose(pinpoint.getPosition());
+        pos.update(pinpoint.getPosition());
         movement.movementLoop(gamepad1);
-        if(gamepad1.crossWasPressed()){
-            shooter.raiseBarrier();
-        }
-        if(gamepad1.leftBumperWasPressed()){
-            shooter.lowerHood();
-            shooter.lowerBarrier();
-        }else if(gamepad1.rightBumperWasPressed()){
-            shooter.raiseHood();
-            shooter.raiseBarrier();
-        }
         intake.take(gamepad1);
-        if(gamepad1.right_trigger >= 0.1){
-            index.feed(gamepad1.right_trigger);
-        }
-        if(gamepad1.dpadDownWasPressed()){
-            intake.stop();
-            index.stop();
-        }
-        if(gamepad1.triangleWasPressed()){
-            intake.spit();
-            index.eject();
-        }
-        if(gamepad1.dpadLeftWasPressed()){
-            ticks -= 100;
-        }
-        if(gamepad1.dpadRightWasPressed()){
-            ticks += 100;
-        }
+        index.feed(gamepad1);
         ShooterCalculations.ShootingParameters parameters
                 = shooterCalculations.calculateShootingParameters(
                 pinpoint.getPosX(DistanceUnit.INCH),

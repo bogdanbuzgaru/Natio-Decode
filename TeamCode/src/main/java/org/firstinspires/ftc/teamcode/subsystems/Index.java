@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Index {
@@ -11,14 +12,16 @@ public class Index {
         indexMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         indexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void feed(double val){
-        if(val > 0.1)
-            indexMotor.setPower(val);
+    public void feed(Gamepad gamepad){
+        if(gamepad.right_trigger > 0.01)
+            indexMotor.setPower(gamepad.right_trigger);
+        else if (gamepad.left_trigger > 0.01)
+            indexMotor.setPower(-gamepad.left_trigger);
         else
             stop();
     }
-    public void eject(){
-        indexMotor.setPower(-1);
+    public void autoFeed(){
+        indexMotor.setPower(1);
     }
     public void stop(){
         indexMotor.setPower(0);

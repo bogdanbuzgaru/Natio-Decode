@@ -14,11 +14,15 @@ public class Intake {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void take(Gamepad gamepad){
-        if(gamepad.right_trigger > 0.1) {
+        if(gamepad.right_trigger > 0.01)
             intakeMotor.setPower(gamepad.right_trigger);
-        }else{
-            intakeMotor.setPower(0);
-        }
+        else if (gamepad.left_trigger > 0.01)
+            intakeMotor.setPower(-gamepad.left_trigger);
+        else
+            stop();
+    }
+    public void autoTake(){
+        intakeMotor.setPower(1);
     }
     public void spit(){
         intakeMotor.setPower(-1);
