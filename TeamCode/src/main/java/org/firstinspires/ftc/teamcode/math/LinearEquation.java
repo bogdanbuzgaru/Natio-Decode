@@ -13,6 +13,11 @@ public class LinearEquation {
         calculate();
     }
 
+    public boolean areIntersecting (LinearEquation stationary, LinearEquation dynamic){
+
+        return true;
+    }
+
     public void calculate() {
         xCoeff = y1 - y2;
         yCoeff = x2 - x1;

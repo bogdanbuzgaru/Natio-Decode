@@ -94,34 +94,6 @@ public class Position {
                 getMinY(), getMaxX(),
                 pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal / sin(offsetOrdinate)));
     }
-    //-----------------------CLOSE----------------------
-    private boolean isMaxXClose(){
-        return (getMaxX() >= (144 - pose.getY(DistanceUnit.INCH)) && pose.getY(DistanceUnit.INCH) >= 72)
-                && pose.getX(DistanceUnit.INCH) <= 72;          //The centre of the robot is on the left side of the triangle
-    }
-    private boolean isMinXClose(){
-        return (getMinX() >= 72 && pose.getY(DistanceUnit.INCH) >= 72)          //TODO make it more up/down
-                && pose.getX(DistanceUnit.INCH) >= 72;          //The centre of the robot is on the right side of the triangle
-    }
-    private boolean isMaxYClose(){
-        return (getMaxY() >= 72 && pose.getX(DistanceUnit.INCH) >= 144 - getMaxY()      //TODO make it more to the left/right
-                && pose.getX(DistanceUnit.INCH) <= getMaxY() );     //The centre of the robot is in the bottom of the triangle
-    }
-    //-----------------------FAR----------------------
-    private boolean isMinYFar(){
-        return getMinY() <= 24 && pose.getX(DistanceUnit.INCH) >= 72 - (24 - getMinY())
-                && pose.getX(DistanceUnit.INCH) <= 72 + (24 - getMinY());       //Top of the far triangle
-    }
-    private boolean isMaxXFar(){
-        return getMaxX() >= 48 && pose.getY(DistanceUnit.INCH) <= 24
-                && getMaxX() - pose.getY(DistanceUnit.INCH) <= 48       //Left of the far triangle
-                && pose.getY(DistanceUnit.INCH) <= 72;
-    }
-    private boolean isMinXFar(){
-        return getMinX() <= 96 && pose.getY(DistanceUnit.INCH) <= 24
-                && getMinX() + pose.getY(DistanceUnit.INCH) <= 96       //Right of the far triangle
-                && pose.getY(DistanceUnit.INCH) >= 72;
-    }
     public boolean isCenterInBigTriangle(){
         return pose.getY(DistanceUnit.INCH) >= 72 &&
                 pose.getX(DistanceUnit.INCH) >= 144 - pose.getY(DistanceUnit.INCH) &&
@@ -133,10 +105,10 @@ public class Position {
                 pose.getX(DistanceUnit.INCH) <= 96 - pose.getY(DistanceUnit.INCH);
     }
     public boolean shootClose(){
-        return isMaxXClose() || isMaxYClose() || isMinXClose();
+        return isCenterInBigTriangle();
     }
     public boolean shootHigh(){
-        return isMinYFar() || isMaxXFar() || isMinXFar();
+        return isCenterInSmallTriangle();
     }
     public double getHeading(){
         return heading;
