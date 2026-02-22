@@ -12,18 +12,29 @@ public class LinearEquation {
         this.y2 = y2;
         calculate();
     }
-
-    public boolean areIntersecting (LinearEquation stationary, LinearEquation dynamic){
-
-        return true;
-    }
-
-    public void calculate() {
+    private void calculate() {
         xCoeff = y1 - y2;
         yCoeff = x2 - x1;
         constant = x1 * y2 - x2 * y1;
         slope = -xCoeff / yCoeff;
     }
+
+    public double getX1() {
+        return x1;
+    }
+
+    public double getY1() {
+        return y1;
+    }
+
+    public double getX2() {
+        return x2;
+    }
+
+    public double getY2() {
+        return y2;
+    }
+
     public double getSlope() {
         return slope;
     }

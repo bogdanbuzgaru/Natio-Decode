@@ -1,21 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 
 public class Turret {
     private Servo turretServo1, turretServo2, turretServo3;
     private double difPos;
-    private double angle;
+    private double targetAngle;
     private double lastAngle;
-
+    private double angle;
     private double heading;
     private final double ratio = 190.1785714285714;
 
@@ -33,20 +26,23 @@ public class Turret {
         this.heading = heading;
     }
     public boolean turnLeft(){
-        return heading < angle;
+        if(heading < 0){
+            return heading > angle - 180;
+        }
+        return heading < angle ;
     }
     public boolean turnRight(){
         return heading > angle || heading < angle - 180;
     }
     public void update(){
         if(turnLeft()){
-            turretServo1.setPosition(0.5 + 0.5 * Math.abs(angle / ratio));
-            turretServo2.setPosition(0.5 + 0.5 * Math.abs(angle / ratio)) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
-            turretServo3.setPosition(0.5 + 0.5 * Math.abs(angle / ratio));
+            turretServo1.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio));
+            turretServo2.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio)) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
+            turretServo3.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio));
         } else if (turnRight()){
-            turretServo1.setPosition(0.5 - 0.5 * Math.abs(angle / ratio));
-            turretServo2.setPosition(0.5 - 0.5 * Math.abs(angle / ratio));
-            turretServo3.setPosition(0.5 - 0.5 * Math.abs(angle / ratio));
+            turretServo1.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
+            turretServo2.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
+            turretServo3.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
         }
     }
     public void goLeft(){
@@ -60,18 +56,20 @@ public class Turret {
         turretServo3.setPosition(0.7);
     }
 
-    public double getAngle() {
-        return angle;
+    public double getTargetAngle() {
+        return targetAngle;
     }
     public double getAngleRatio() {
-        return angle / ratio;
+        return targetAngle / ratio;
     }
-
-    public void setAngle(double angle) {
-        lastAngle = angle;
+    public void setTargetAngle(double angle) {
+        lastAngle = this.targetAngle;
         if(angle > 180){
             angle = 360 - angle;
         }
+        this.targetAngle = angle;
+    }
+    public void setAngle(double angle) {
         this.angle = angle;
     }
     public void setDifPos(double difPos) {

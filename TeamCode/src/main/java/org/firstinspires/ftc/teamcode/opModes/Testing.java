@@ -78,14 +78,15 @@ public class Testing extends OpMode {
                 );
         turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
         turret.setDifPos(parameters.getTurretOffsetDegrees());
-        turret.setAngle(pos.getTargetAngle());
+        turret.setTargetAngle(pos.getTargetAngle());
+        turret.setAngle(pos.getAngle());
         turret.update();
 
         shooter.setTicks(ticks);
 //        shooter.setHoodPosition(parameters.getHoodServoPosition());
         shooter.update();
-        telemetry.addData("Get turret angle", turret.getAngle());
-        telemetry.addData("Get angle ratio", turret.getAngleRatio());
+        telemetry.addData("Get turret target angle", turret.getTargetAngle());
+        telemetry.addData("Get angle atan", pos.getAngle());
         telemetry.addData("Turns left", turret.turnLeft());
         telemetry.addData("Turns right", turret.turnRight());
         telemetry.addData("Target Turret Degrees", pos.getTargetAngle());

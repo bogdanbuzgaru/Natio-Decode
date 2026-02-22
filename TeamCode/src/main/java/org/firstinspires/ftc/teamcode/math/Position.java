@@ -19,11 +19,17 @@ public class Position {
     private final LinearEquation rightBigTriangle = new LinearEquation(130, 130, 72, 72);
     private final LinearEquation leftSmallTriangle = new LinearEquation(48, 0, 72, 24);
     private final LinearEquation rightSmallTriangle = new LinearEquation(72, 24, 96, 0);
-    private LinearEquation topLeft, topRight, bottomLeft, bottomRight;
+    private LinearEquation topLeft = new LinearEquation( 0, 0, 0, 0),
+            topRight = new LinearEquation(0, 0, 0, 0),
+            bottomLeft = new LinearEquation(0, 0, 0, 0),
+            bottomRight = new LinearEquation(0, 0, 0, 0);
     private double offsetAbscissa, offsetOrdinate;
 
     public Position (Pose2D pose){
         this.pose = pose;
+        heading = pose.getHeading(AngleUnit.DEGREES);
+        calculateOffsets();
+        calculateLinearEquations();
     }
 
     public void update(Pose2D pose) {
@@ -45,16 +51,16 @@ public class Position {
     private double distanceY(){
         double currentHeading = Math.abs(heading);
         if (currentHeading > 90){
-            currentHeading -= 90;           //incadrare in patrat
+            currentHeading = 180 - currentHeading;           //incadrare in patrat
         }
-        return l * cos(currentHeading) + L * sin(currentHeading);
+        return l * cos(Math.toRadians(currentHeading)) + L * sin(Math.toRadians(currentHeading));
     }
     private double distanceX(){
         double currentHeading = Math.abs(heading);
         if (currentHeading > 90){
-            currentHeading -= 90;           //incadrare in patrat
+            currentHeading = 180 - currentHeading;           //incadrare in patrat
         }
-        return L * cos(currentHeading) + l * sin(currentHeading);
+        return L * cos(Math.toRadians(currentHeading)) + l * sin(Math.toRadians(currentHeading));
     }
     public double getMaxY(){
         double y = pose.getY(DistanceUnit.INCH);
@@ -73,27 +79,55 @@ public class Position {
         return y - distanceY() / 2;
     }
     private void calculateOffsets() {
-        offsetAbscissa = Math.acos(getMaxX() / semiDiagonal);
-        offsetOrdinate = Math.acos(getMaxY() / semiDiagonal);
+        offsetAbscissa = Math.toDegrees(Math.acos((getMaxX() - pose.getX(DistanceUnit.INCH)) / semiDiagonal));
+        offsetOrdinate = Math.toDegrees(Math.acos((getMaxY() - pose.getY(DistanceUnit.INCH)) / semiDiagonal));
+    }
+    public double getHeading(){
+        return heading;
+    }
+    public double getAngle(){
+        return Math.toDegrees(Math.atan2(144 - pose.getY(DistanceUnit.INCH), 144 - pose.getX(DistanceUnit.INCH)));
+    }
+    public double getTargetAngle(){
+        double h = heading;
+        double targetHead = Math.toDegrees(Math.atan2(144 - pose.getY(DistanceUnit.INCH), 144 - pose.getX(DistanceUnit.INCH)));
+        if(Math.abs(h - targetHead) > 180){
+            return 360 - Math.abs(h - targetHead);
+        }
+        return Math.abs(h - targetHead);
     }
     //------------------LINEAR EQUATIONS------------------
     private void calculateLinearEquations() {
-        topLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal / sin(offsetAbscissa)),
+        topLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                  getMaxY(), getMinX(),
-                 pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal / sin(offsetOrdinate)));
+                 pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        topRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal / sin(offsetAbscissa)),
+        topRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMaxY(), getMaxX(),
-                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal / sin(offsetOrdinate)));
+                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        bottomLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal / sin(offsetAbscissa)),
+        bottomLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMinY(), getMinX(),
-                pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal / sin(offsetOrdinate)));
+                pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        bottomRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal / sin(offsetAbscissa)),
+        bottomRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMinY(), getMaxX(),
-                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal / sin(offsetOrdinate)));
+                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
     }
+    public boolean areIntersecting(LinearEquation first, LinearEquation second) {
+        if(Math.abs(first.getSlope() - second.getSlope()) < 1e-9){
+            return false;
+        }
+        double a = first.getxCoeff(), b = first.getyCoeff(), c = first.getConstant();
+        double alpha = second.getxCoeff(), beta = second.getyCoeff(), gamma = second.getConstant();
+        double x = (b * gamma - c * beta) / (a * beta - b * alpha);
+        double y = (c * alpha - a * gamma) / (a * beta - b * alpha);
+        return (x >= Math.min(first.getX1(), first.getX2()) && x <= Math.max(first.getX1(), first.getX2())) &&
+                (x >= Math.min(second.getX1(), second.getX2()) && x <= Math.max(second.getX1(), second.getX2())) &&
+                (y >= Math.min(first.getY1(), first.getY2()) && y <= Math.max(first.getY1(), first.getY2())) &&
+                (y >= Math.min(second.getY1(), second.getY2()) && y <= Math.max(second.getY1(), second.getY2()));
+    }
+
     public boolean isCenterInBigTriangle(){
         return pose.getY(DistanceUnit.INCH) >= 72 &&
                 pose.getX(DistanceUnit.INCH) >= 144 - pose.getY(DistanceUnit.INCH) &&
@@ -104,18 +138,22 @@ public class Position {
                 pose.getX(DistanceUnit.INCH) >= 48 + pose.getY(DistanceUnit.INCH) &&
                 pose.getX(DistanceUnit.INCH) <= 96 - pose.getY(DistanceUnit.INCH);
     }
+    private boolean isTangentToBigTriangle(){
+        return areIntersecting(topLeft, leftBigTriangle) || areIntersecting(topLeft, rightBigTriangle) ||
+                areIntersecting(topRight, leftBigTriangle) || areIntersecting(topRight, rightBigTriangle) ||
+                areIntersecting(bottomLeft, leftBigTriangle) || areIntersecting(bottomLeft, rightBigTriangle) ||
+                areIntersecting(bottomRight, leftBigTriangle) || areIntersecting(bottomRight, rightBigTriangle);
+    }
+    private boolean isTangentToSmallTriangle(){
+        return areIntersecting(bottomLeft, leftSmallTriangle) || areIntersecting(bottomLeft, rightSmallTriangle) ||
+                areIntersecting(bottomRight, leftSmallTriangle) || areIntersecting(bottomRight, rightSmallTriangle) ||
+                areIntersecting(topLeft, leftSmallTriangle) || areIntersecting(topLeft, rightSmallTriangle) ||
+                areIntersecting(topRight, leftSmallTriangle) || areIntersecting(topRight, rightSmallTriangle);
+    }
     public boolean shootClose(){
-        return isCenterInBigTriangle();
+        return isCenterInBigTriangle() || isTangentToBigTriangle();
     }
     public boolean shootHigh(){
-        return isCenterInSmallTriangle();
-    }
-    public double getHeading(){
-        return heading;
-    }
-    public double getTargetAngle(){
-        double h = heading;
-        double targetHead = Math.toDegrees(Math.atan2(144 - pose.getX(DistanceUnit.INCH), 144 - pose.getY(DistanceUnit.INCH)));
-        return Math.abs(h - targetHead);
+        return isCenterInSmallTriangle() || isTangentToSmallTriangle();
     }
 }
