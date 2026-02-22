@@ -80,7 +80,8 @@ public class Testing extends OpMode {
         turret.setDifPos(parameters.getTurretOffsetDegrees());
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setAngle(pos.getAngle());
-        turret.update();
+        if(pos.activateOrientation())
+            turret.update();
 
         shooter.setTicks(ticks);
 //        shooter.setHoodPosition(parameters.getHoodServoPosition());

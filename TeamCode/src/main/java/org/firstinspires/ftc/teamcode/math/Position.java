@@ -156,4 +156,9 @@ public class Position {
     public boolean shootHigh(){
         return isCenterInSmallTriangle() || isTangentToSmallTriangle();
     }
+    public boolean activateOrientation(){
+        double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));
+        double hypoLow = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), pose.getY(DistanceUnit.INCH));
+        return hypoHigh <= 86 || hypoLow <= 40;
+    }
 }
