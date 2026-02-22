@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
 import static java.lang.Math.cos;
+import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -13,6 +14,9 @@ public class Position {
     private int signOrdinate = 1, signAbscissa = 1;
     private final double l = 12.8740157349;     //inch
     private final double L = 14.4881889616;     //inch
+    private final double GRAVITY = 386.1;       //inch
+    private final double goalHeight = 45;     //inch
+    private final double goalEntryAngle = Math.toRadians(-30);
     private final double semiDiagonal = 9.69081911566; //inch
     private final double inRobotAngle = 83.2477481 ; //degrees
     private final LinearEquation leftBigTriangle = new LinearEquation(14, 130, 72, 72);
@@ -155,6 +159,34 @@ public class Position {
     }
     public boolean shootHigh(){
         return isCenterInSmallTriangle() || isTangentToSmallTriangle();
+    }
+    public double getOffetAngle(double robotVelocityX, double robotVelocityY){
+        double dx = 138 - pose.getX(DistanceUnit.INCH);
+        double dy = 138 - pose.getY(DistanceUnit.INCH);
+        double distanceToGoal = hypot(dy, dx);
+
+        double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
+        double cosAlpha = Math.cos(alpha);
+        double tanAlpha = Math.tan(alpha);
+
+        double numerator = GRAVITY * distanceToGoal * distanceToGoal;
+        double denominator = 2.0 * cosAlpha * cosAlpha * (distanceToGoal * tanAlpha - goalHeight);
+        double v0 = Math.sqrt(numerator / denominator);
+        double vx = v0 * Math.cos(alpha);
+
+        double angleToGoal = Math.atan2(dy, dx);
+        double robotSpeed = Math.sqrt(robotVelocityX * robotVelocityX + robotVelocityY * robotVelocityY);
+        double robotVelocityAngle = Math.atan2(robotVelocityY, robotVelocityX);
+
+        double deltaAngle = robotVelocityAngle - angleToGoal;
+        double vRadial = -Math.cos(deltaAngle) * robotSpeed;
+        double vTangential = Math.sin(deltaAngle) * robotSpeed;
+
+        double vxCompensatedRadial = vx + vRadial;
+
+        double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
+
+        return turretOffsetAngle;
     }
     public boolean activateOrientation(){
         double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));

@@ -10,6 +10,8 @@ public class Turret {
     private double lastAngle;
     private double angle;
     private double heading;
+    private double offsetAngle;
+
     private final double ratio = 190.1785714285714;
 
     public Turret(HardwareMap hardwareMap){
@@ -25,6 +27,7 @@ public class Turret {
     public void setHeading(double heading) {
         this.heading = heading;
     }
+
     private double error(){
         double error = heading - angle;
         if(error > 180){
@@ -41,14 +44,16 @@ public class Turret {
         return error() > 0;
     }
     public void update(){
+        double theAngle = targetAngle + offsetAngle;
         if(turnLeft()){
-            turretServo1.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio));
-            turretServo2.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio)) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
-            turretServo3.setPosition(0.5 + 0.5 * Math.abs(targetAngle / ratio));
+            double position = 0.5 + 0.5 * Math.abs(theAngle / ratio);
+            turretServo1.setPosition(position);
+            turretServo2.setPosition(position) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
+            turretServo3.setPosition(position);
         } else if (turnRight()){
-            turretServo1.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
-            turretServo2.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
-            turretServo3.setPosition(0.5 - 0.5 * Math.abs(targetAngle / ratio));
+            turretServo1.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
+            turretServo2.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
+            turretServo3.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
         }
     }
     public void goLeft(){
@@ -61,12 +66,15 @@ public class Turret {
         turretServo2.setPosition(0.7);
         turretServo3.setPosition(0.7);
     }
-
     public double getTargetAngle() {
         return targetAngle;
     }
+
     public double getAngleRatio() {
         return targetAngle / ratio;
+    }
+    public void setOffsetAngle(double offsetAngle) {
+        this.offsetAngle = offsetAngle;
     }
     public void setTargetAngle(double angle) {
         lastAngle = this.targetAngle;
