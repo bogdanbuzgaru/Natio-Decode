@@ -25,14 +25,20 @@ public class Turret {
     public void setHeading(double heading) {
         this.heading = heading;
     }
-    public boolean turnLeft(){
-        if(heading < 0){
-            return heading > angle - 180;
+    private double error(){
+        double error = heading - angle;
+        if(error > 180){
+            error -= 360;
+        } else if (error < -180){
+            error += 360;
         }
-        return heading < angle ;
+        return error;
+    }
+    public boolean turnLeft(){
+        return error() < 0;
     }
     public boolean turnRight(){
-        return heading > angle || heading < angle - 180;
+        return error() > 0;
     }
     public void update(){
         if(turnLeft()){
@@ -64,9 +70,10 @@ public class Turret {
     }
     public void setTargetAngle(double angle) {
         lastAngle = this.targetAngle;
-        if(angle > 180){
-            angle = 360 - angle;
-        }
+        if (angle > 180)
+            angle -= 360;
+        if (angle < -180)
+            angle += 360;
         this.targetAngle = angle;
     }
     public void setAngle(double angle) {
