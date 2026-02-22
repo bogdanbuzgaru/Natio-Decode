@@ -14,7 +14,7 @@ public class Position {
     private int signOrdinate = 1, signAbscissa = 1;
     private final double l = 12.8740157349;     //inch
     private final double L = 14.4881889616;     //inch
-    private final double GRAVITY = 386.1;       //inch
+    private final double GRAVITY = 386.1;       //inch / s^2
     private final double goalHeight = 45;     //inch
     private final double goalEntryAngle = Math.toRadians(-30);
     private final double semiDiagonal = 9.69081911566; //inch

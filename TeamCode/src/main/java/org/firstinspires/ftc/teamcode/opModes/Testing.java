@@ -25,7 +25,6 @@ public class Testing extends OpMode {
     private Index index;
     private Intake intake;
     private Movement movement;
-    private ShooterCalculations shooterCalculations;
     private GoBildaPinpointDriver pinpoint;
     private Sensor sensor;
     private double ticks = 100;
@@ -39,10 +38,10 @@ public class Testing extends OpMode {
         sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(new Pose2D(
                 DistanceUnit.INCH,
-                7.8, 7,
+                7.2440944808, 6.43700786745,
                 AngleUnit.DEGREES,
-                90));
-
+                90
+        ));
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(92.5, 141, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -56,9 +55,6 @@ public class Testing extends OpMode {
         ));
         pinpoint.recalibrateIMU();
 
-        shooterCalculations = new ShooterCalculations(30, 45,
-                                                    0.29, 1,       //TODO MUST TUNE
-                                                    1.2, 100);
     }
     public void loop(){
         pinpoint.update();
@@ -66,18 +62,8 @@ public class Testing extends OpMode {
         movement.movementLoop(gamepad1);
         intake.take(gamepad1);
         index.feed(gamepad1);
-        ShooterCalculations.ShootingParameters parameters
-                = shooterCalculations.calculateShootingParameters(
-                pinpoint.getPosX(DistanceUnit.INCH),
-                pinpoint.getPosY(DistanceUnit.INCH),
-                pinpoint.getVelX(DistanceUnit.INCH),
-                pinpoint.getVelY(DistanceUnit.INCH),
-                138, 138,
-                45, Math.toRadians(-30),
-                Math.toRadians(30), Math.toRadians(45)
-                );
+
         turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
-        turret.setDifPos(parameters.getTurretOffsetDegrees());
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
         turret.setAngle(pos.getAngle());
@@ -97,9 +83,6 @@ public class Testing extends OpMode {
         telemetry.addData("Turns left", turret.turnLeft());
         telemetry.addData("Turns right", turret.turnRight());
         telemetry.addData("Target Turret Degrees", pos.getTargetAngle());
-        telemetry.addData("Target from parameters", parameters.getTargetTurretDegrees());
-        telemetry.addData("Offset movement prameters", parameters.getTurretOffsetDegrees());
-        telemetry.addData("Ticks", parameters.getFlywheelSpeed());
         telemetry.addData("Is green", sensor.isGreen());
         telemetry.addData("Is purple", sensor.isPurple());
         telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
