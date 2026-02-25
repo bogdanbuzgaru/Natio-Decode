@@ -46,25 +46,26 @@ public class Turret {
     public void update(){
         double theAngle = targetAngle + offsetAngle;
         if(turnLeft()){
-            double position = 0.5 + 0.5 * Math.abs(theAngle / ratio);
+            double position = 0.5 + 0.5 * Math.abs(targetAngle / ratio);
             turretServo1.setPosition(position);
             turretServo2.setPosition(position) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
             turretServo3.setPosition(position);
         } else if (turnRight()){
-            turretServo1.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
-            turretServo2.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
-            turretServo3.setPosition(0.5 - 0.5 * Math.abs(theAngle / ratio));
+            double position = 0.5 - 0.5 * Math.abs(targetAngle / ratio);
+            turretServo1.setPosition(position);
+            turretServo2.setPosition(position) ;
+            turretServo3.setPosition(position);
         }
     }
     public void goLeft(){
-        turretServo1.setPosition(0.3);
-        turretServo2.setPosition(0.3);
-        turretServo3.setPosition(0.3);
+        turretServo1.setPosition(0);
+        turretServo2.setPosition(0);
+        turretServo3.setPosition(0);
     }
     public void goRight(){
-        turretServo1.setPosition(0.7);
-        turretServo2.setPosition(0.7);
-        turretServo3.setPosition(0.7);
+        turretServo1.setPosition(1);
+        turretServo2.setPosition(1);
+        turretServo3.setPosition(1);
     }
     public double getTargetAngle() {
         return targetAngle;
@@ -72,6 +73,9 @@ public class Turret {
 
     public double getAngleRatio() {
         return targetAngle / ratio;
+    }
+    public double getPosition(){
+        return turretServo1.getPosition();
     }
     public void setOffsetAngle(double offsetAngle) {
         this.offsetAngle = offsetAngle;

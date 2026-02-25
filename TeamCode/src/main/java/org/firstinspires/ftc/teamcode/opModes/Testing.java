@@ -63,6 +63,13 @@ public class Testing extends OpMode {
         intake.take(gamepad1);
         index.feed(gamepad1);
 
+        if(gamepad1.leftBumperWasPressed()){
+            turret.goLeft();
+        }
+        if(gamepad1.rightBumperWasPressed()){
+            turret.goRight();
+        }
+
         turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
@@ -83,6 +90,7 @@ public class Testing extends OpMode {
         telemetry.addData("Turns left", turret.turnLeft());
         telemetry.addData("Turns right", turret.turnRight());
         telemetry.addData("Target Turret Degrees", pos.getTargetAngle());
+        telemetry.addData("Turret position", turret.getPosition());
         telemetry.addData("Is green", sensor.isGreen());
         telemetry.addData("Is purple", sensor.isPurple());
         telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
