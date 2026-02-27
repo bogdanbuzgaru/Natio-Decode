@@ -35,16 +35,16 @@ public class Shooter {
         this.ticks = ticks;
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.4);
+        barrier.setPosition(0.6);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.3 );
+        barrier.setPosition(0.4);
     }
     public void raiseHood(){
         hood.setPosition(1);
     }
     public void lowerHood(){
-        hood.setPosition(0.29);
+        hood.setPosition(0.14);
     }
     public void setHoodPosition(double hoodPosition) {
         this.hoodPosition = hoodPosition;

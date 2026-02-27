@@ -82,7 +82,7 @@ public class Testing extends OpMode {
             shooter.lowerBarrier();
         }
 
-        shooter.setTicks(ticks);
+        shooter.setTicks(1400);
 //        shooter.setHoodPosition(parameters.getHoodServoPosition());
         shooter.update();
         telemetry.addData("Get turret target angle", turret.getTargetAngle());
