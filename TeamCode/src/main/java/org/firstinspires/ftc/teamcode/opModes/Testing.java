@@ -104,4 +104,102 @@ public class Testing extends OpMode {
         telemetry.addData("Min Y", pos.getMinY());
         telemetry.update();
     }
+    public void chooseAlliance(Gamepad gamepad){
+        if(gamepad.leftBumperWasPressed()){
+            blue = true;
+            red = false;
+        }else if (gamepad.rightBumperWasPressed()){
+            red = true;
+            blue = false;
+        }
+    }
+
+    public void resetPosition(Gamepad gamepad){
+        if(red){
+            if (gamepad.dpadUpWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        0
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadLeftWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        0
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadDownWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        0
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadRightWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        180
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.crossWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        90
+                ));
+                pinpoint.recalibrateIMU();
+            }
+        }else if(blue){
+            if (gamepad.dpadUpWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        180
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadLeftWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        180
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadDownWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        180
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.dpadRightWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        0
+                ));
+                pinpoint.recalibrateIMU();
+            }else if(gamepad.crossWasPressed()){
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.INCH,              //TODO tune
+                        7.2440944808, 6.43700786745,
+                        AngleUnit.DEGREES,
+                        90
+                ));
+                pinpoint.recalibrateIMU();
+            }
+        }
+    }
+
 }

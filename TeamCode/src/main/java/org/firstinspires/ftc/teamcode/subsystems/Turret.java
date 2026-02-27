@@ -86,8 +86,10 @@ public class Turret {
             angle -= 360;
         if (angle < -180)
             angle += 360;
-        this.targetAngle = angle;
-    }
+        if(Math.signum(lastAngle) != Math.signum(angle) && 180 - Math.abs(angle) < 8)
+            this.targetAngle = lastAngle + 180 - Math.abs(angle);
+        else
+            this.targetAngle = angle;    }
     public void setAngle(double angle) {
         this.angle = angle;
     }
