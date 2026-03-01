@@ -128,13 +128,21 @@ public class Testing extends OpMode {
         telemetry.addData("Min Y", pos.getMinY());
         telemetry.update();
     }
-
-    public void resetPosition(Gamepad gamepad){
+    private double actualPositionX(double value){
+        return value + 7.2440944808;       //2.48818898
+    }
+    private double actualPositionXBlue(double value){
+        return value - 7.2440944808;
+    }
+    private double actualPositionY(double value){
+        return value - (6.43700786745 + 0.236220472);
+    }
+    private void resetPosition(Gamepad gamepad){
         if(pos.isRed()){
             if (gamepad.dpadUpWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionX(120.000), actualPositionY(96.000),        //Up
                         AngleUnit.DEGREES,
                         0
                 ));
@@ -142,15 +150,15 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadLeftWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionX(0) + 2.48818898, Math.abs(actualPositionY(0)),    //opposite human player
                         AngleUnit.DEGREES,
-                        0
+                        180
                 ));
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadDownWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionX(120.000), actualPositionY(81.000),    //Up barrier
                         AngleUnit.DEGREES,
                         0
                 ));
@@ -158,17 +166,9 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadRightWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        144.000 - 9.7322834608, Math.abs(actualPositionY(0)),    //our human player
                         AngleUnit.DEGREES,
-                        180
-                ));
-                pinpoint.recalibrateIMU();
-            }else if(gamepad.crossWasPressed()){
-                pinpoint.setPosition(new Pose2D(
-                        DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
-                        AngleUnit.DEGREES,
-                        90
+                        0
                 ));
                 pinpoint.recalibrateIMU();
             }
@@ -176,7 +176,7 @@ public class Testing extends OpMode {
             if (gamepad.dpadUpWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionXBlue(24.000), actualPositionY(96.000),        //Up
                         AngleUnit.DEGREES,
                         180
                 ));
@@ -184,15 +184,15 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadLeftWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionXBlue(144) - 2.48818898, Math.abs(actualPositionY(0)),    //opposite human player
                         AngleUnit.DEGREES,
-                        180
+                        0
                 ));
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadDownWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        actualPositionX(24.000), actualPositionY(81.000),    //Up barrier
                         AngleUnit.DEGREES,
                         180
                 ));
@@ -200,17 +200,9 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadRightWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
+                        9.7322834608, Math.abs(actualPositionY(0)),    //our human player
                         AngleUnit.DEGREES,
-                        0
-                ));
-                pinpoint.recalibrateIMU();
-            }else if(gamepad.crossWasPressed()){
-                pinpoint.setPosition(new Pose2D(
-                        DistanceUnit.INCH,              //TODO tune
-                        7.2440944808, 6.43700786745,
-                        AngleUnit.DEGREES,
-                        90
+                        180
                 ));
                 pinpoint.recalibrateIMU();
             }
