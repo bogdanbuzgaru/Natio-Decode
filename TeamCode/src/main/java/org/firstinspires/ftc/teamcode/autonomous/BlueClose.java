@@ -38,10 +38,10 @@ public class BlueClose extends OpMode {
     public static class Paths {
         public ArrayList<PathChain> paths = new ArrayList<>();
         private double actualPositionX(double value){
-            return value + 7.2440944808;
+            return value + 9.7322834608;
         }
         private double actualPositionY(double value){
-            return value - 6.43700786745;
+            return value - 6.67322833945;
         }
         public Paths(Follower follower) {
             paths.add(follower.pathBuilder().addPath(

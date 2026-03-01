@@ -4,6 +4,8 @@ import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -28,6 +30,8 @@ public class Position {
             bottomLeft = new LinearEquation(0, 0, 0, 0),
             bottomRight = new LinearEquation(0, 0, 0, 0);
     private double offsetAbscissa, offsetOrdinate;
+    private boolean blue = false;
+    private boolean red = true;
 
     public Position (Pose2D pose){
         this.pose = pose;
@@ -90,11 +94,18 @@ public class Position {
         return heading;
     }
     public double getAngle(){
-        return Math.toDegrees(Math.atan2(144 - pose.getY(DistanceUnit.INCH), 144 - pose.getX(DistanceUnit.INCH)));
+        if(red)
+            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
+        else
+            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH)) + 14);
     }
     public double getTargetAngle(){
         double h = heading;
-        double targetHead = Math.toDegrees(Math.atan2(144 - pose.getY(DistanceUnit.INCH), 144 - pose.getX(DistanceUnit.INCH)));
+        double targetHead;
+        if(red)
+            targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
+        else
+            targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH))) + 14;
         if(Math.abs(h - targetHead) > 180){
             return 360 - Math.abs(h - targetHead);
         }
@@ -126,10 +137,10 @@ public class Position {
         double alpha = second.getxCoeff(), beta = second.getyCoeff(), gamma = second.getConstant();
         double x = (b * gamma - c * beta) / (a * beta - b * alpha);
         double y = (c * alpha - a * gamma) / (a * beta - b * alpha);
-        return (x >= Math.min(first.getX1(), first.getX2()) && x <= Math.max(first.getX1(), first.getX2())) &&
-                (x >= Math.min(second.getX1(), second.getX2()) && x <= Math.max(second.getX1(), second.getX2())) &&
-                (y >= Math.min(first.getY1(), first.getY2()) && y <= Math.max(first.getY1(), first.getY2())) &&
-                (y >= Math.min(second.getY1(), second.getY2()) && y <= Math.max(second.getY1(), second.getY2()));
+        return (x >= 1 + Math.min(first.getX1(), first.getX2()) && x <= 1 + Math.max(first.getX1(), first.getX2())) &&
+                (x >= 1 + Math.min(second.getX1(), second.getX2()) && x <= 1 + Math.max(second.getX1(), second.getX2())) &&
+                (y >= 1 + Math.min(first.getY1(), first.getY2()) && y <= 1 + Math.max(first.getY1(), first.getY2())) &&
+                (y >= 1 + Math.min(second.getY1(), second.getY2()) && y <= 1 + Math.max(second.getY1(), second.getY2()));
     }
 
     public boolean isCenterInBigTriangle(){
@@ -191,6 +202,23 @@ public class Position {
     public boolean activateOrientation(){
         double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));
         double hypoLow = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), pose.getY(DistanceUnit.INCH));
-        return hypoHigh <= 86 || hypoLow <= 40;
+        return hypoHigh <= 90 || hypoLow <= 50;
+    }
+    public void chooseAlliance(Gamepad gamepad){
+        if(gamepad.leftBumperWasPressed()){
+            blue = true;
+            red = false;
+        }else if (gamepad.rightBumperWasPressed()){
+            red = true;
+            blue = false;
+        }
+    }
+
+    public boolean isBlue() {
+        return blue;
+    }
+
+    public boolean isRed() {
+        return red;
     }
 }

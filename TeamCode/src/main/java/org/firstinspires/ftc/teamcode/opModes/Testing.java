@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,6 +30,9 @@ public class Testing extends OpMode {
     private Sensor sensor;
     private double ticks = 100;
 
+    private ShooterCalculations shooterCalculations;
+    private boolean manual = false;
+
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -42,8 +46,10 @@ public class Testing extends OpMode {
                 AngleUnit.DEGREES,
                 90
         ));
+        shooterCalculations = new ShooterCalculations(35, 45, 0.14,
+                1, 0.11, 40);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(92.5, 141, DistanceUnit.MM);
+        pinpoint.setOffsets(3.64173228, 5.5511811, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
@@ -56,17 +62,28 @@ public class Testing extends OpMode {
         pinpoint.recalibrateIMU();
 
     }
-    public void loop(){
+    public void loop() {
         pinpoint.update();
         pos.update(pinpoint.getPosition());
         movement.movementLoop(gamepad1);
         intake.take(gamepad1);
         index.feed(gamepad1);
+        pos.chooseAlliance(gamepad2);
+//        resetPosition(gamepad2);
+        ShooterCalculations.ShootingParameters parameters = shooterCalculations.calculateShootingParameters(
+                pinpoint.getPosX(DistanceUnit.INCH),
+                pinpoint.getPosY(DistanceUnit.INCH),
+                pinpoint.getVelX(DistanceUnit.INCH),
+                pinpoint.getVelY(DistanceUnit.INCH),
+                130, 130, 45,
+                Math.toRadians(-45),
+                Math.toRadians(35),
+                Math.toRadians(45));
 
-        if(gamepad1.leftBumperWasPressed()){
+        if (gamepad1.leftBumperWasPressed()) {
             turret.goLeft();
         }
-        if(gamepad1.rightBumperWasPressed()){
+        if (gamepad1.rightBumperWasPressed()) {
             turret.goRight();
         }
 
@@ -74,16 +91,17 @@ public class Testing extends OpMode {
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
         turret.setAngle(pos.getAngle());
-        if(pos.activateOrientation())
+        if (pos.activateOrientation() && !manual)
             turret.update();
-        if(pos.shootClose() || pos.shootHigh()){
+        if ((pos.shootClose() || pos.shootHigh()) && !manual) {
             shooter.raiseBarrier();
-        }else{
+        } else {
             shooter.lowerBarrier();
         }
-
-        shooter.setTicks(1400);
-//        shooter.setHoodPosition(parameters.getHoodServoPosition());
+        if (Math.abs(parameters.getFlywheelSpeed() - shooter.getTicks()) > 50) {
+            shooter.setHoodPosition(parameters.getHoodServoPosition());
+            shooter.setTicks(parameters.getFlywheelSpeed());
+        }
         shooter.update();
         telemetry.addData("Get turret target angle", turret.getTargetAngle());
         telemetry.addData("Get angle atan", pos.getAngle());
@@ -104,18 +122,9 @@ public class Testing extends OpMode {
         telemetry.addData("Min Y", pos.getMinY());
         telemetry.update();
     }
-    public void chooseAlliance(Gamepad gamepad){
-        if(gamepad.leftBumperWasPressed()){
-            blue = true;
-            red = false;
-        }else if (gamepad.rightBumperWasPressed()){
-            red = true;
-            blue = false;
-        }
-    }
 
     public void resetPosition(Gamepad gamepad){
-        if(red){
+        if(pos.isRed()){
             if (gamepad.dpadUpWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
@@ -157,7 +166,7 @@ public class Testing extends OpMode {
                 ));
                 pinpoint.recalibrateIMU();
             }
-        }else if(blue){
+        }else if(pos.isBlue()){
             if (gamepad.dpadUpWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
@@ -201,5 +210,4 @@ public class Testing extends OpMode {
             }
         }
     }
-
 }

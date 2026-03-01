@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -48,7 +49,7 @@ public class Turret {
         if(turnLeft()){
             double position = 0.5 + 0.5 * Math.abs(targetAngle / ratio);
             turretServo1.setPosition(position);
-            turretServo2.setPosition(position) ;     //TODO implement Last angle to not trigger bugs at 180 and go further
+            turretServo2.setPosition(position) ;
             turretServo3.setPosition(position);
         } else if (turnRight()){
             double position = 0.5 - 0.5 * Math.abs(targetAngle / ratio);

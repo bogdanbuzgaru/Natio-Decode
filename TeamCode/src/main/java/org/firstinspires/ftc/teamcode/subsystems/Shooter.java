@@ -11,6 +11,7 @@ public class Shooter {
     private Servo barrier, hood;
     private double ticks;
     private double hoodPosition;
+    private double targetHood;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
@@ -29,22 +30,24 @@ public class Shooter {
     public void update(){
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
-        hood.setPosition(hoodPosition);
+        hood.setPosition(targetHood);
     }
     public void setTicks(double ticks) {
         this.ticks = ticks;
+    }
+
+    public double getTicks() {
+        return ticks;
+    }
+    private void adaptiveHood(){
+        double error = flywheelMotor1.getVelocity() - ticks;
+        targetHood = hoodPosition + error * 0.001;
     }
     public void lowerBarrier(){
         barrier.setPosition(0.6);
     }
     public void raiseBarrier(){
         barrier.setPosition(0.4);
-    }
-    public void raiseHood(){
-        hood.setPosition(1);
-    }
-    public void lowerHood(){
-        hood.setPosition(0.14);
     }
     public void setHoodPosition(double hoodPosition) {
         this.hoodPosition = hoodPosition;
