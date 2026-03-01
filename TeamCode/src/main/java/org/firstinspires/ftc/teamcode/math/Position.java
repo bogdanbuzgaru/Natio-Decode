@@ -172,32 +172,61 @@ public class Position {
         return isCenterInSmallTriangle() || isTangentToSmallTriangle();
     }
     public double getOffetAngle(double robotVelocityX, double robotVelocityY){
-        double dx = 138 - pose.getX(DistanceUnit.INCH);
-        double dy = 138 - pose.getY(DistanceUnit.INCH);
-        double distanceToGoal = hypot(dy, dx);
+        if(red) {
+            double dx = 138 - pose.getX(DistanceUnit.INCH);
+            double dy = 138 - pose.getY(DistanceUnit.INCH);
+            double distanceToGoal = hypot(dy, dx);
 
-        double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
-        double cosAlpha = Math.cos(alpha);
-        double tanAlpha = Math.tan(alpha);
+            double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
+            double cosAlpha = Math.cos(alpha);
+            double tanAlpha = Math.tan(alpha);
 
-        double numerator = GRAVITY * distanceToGoal * distanceToGoal;
-        double denominator = 2.0 * cosAlpha * cosAlpha * (distanceToGoal * tanAlpha - goalHeight);
-        double v0 = Math.sqrt(numerator / denominator);
-        double vx = v0 * Math.cos(alpha);
+            double numerator = GRAVITY * distanceToGoal * distanceToGoal;
+            double denominator = 2.0 * cosAlpha * cosAlpha * (distanceToGoal * tanAlpha - goalHeight);
+            double v0 = Math.sqrt(numerator / denominator);
+            double vx = v0 * Math.cos(alpha);
 
-        double angleToGoal = Math.atan2(dy, dx);
-        double robotSpeed = Math.sqrt(robotVelocityX * robotVelocityX + robotVelocityY * robotVelocityY);
-        double robotVelocityAngle = Math.atan2(robotVelocityY, robotVelocityX);
+            double angleToGoal = Math.atan2(dy, dx);
+            double robotSpeed = Math.sqrt(robotVelocityX * robotVelocityX + robotVelocityY * robotVelocityY);
+            double robotVelocityAngle = Math.atan2(robotVelocityY, robotVelocityX);
 
-        double deltaAngle = robotVelocityAngle - angleToGoal;
-        double vRadial = -Math.cos(deltaAngle) * robotSpeed;
-        double vTangential = Math.sin(deltaAngle) * robotSpeed;
+            double deltaAngle = robotVelocityAngle - angleToGoal;
+            double vRadial = -Math.cos(deltaAngle) * robotSpeed;
+            double vTangential = Math.sin(deltaAngle) * robotSpeed;
 
-        double vxCompensatedRadial = vx + vRadial;
+            double vxCompensatedRadial = vx + vRadial;
 
-        double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
+            double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
 
-        return turretOffsetAngle;
+            return turretOffsetAngle;
+        }else{
+            double dx = 6 + pose.getX(DistanceUnit.INCH);
+            double dy = 138 - pose.getY(DistanceUnit.INCH);
+            double distanceToGoal = hypot(dy, dx);
+
+            double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
+            double cosAlpha = Math.cos(alpha);
+            double tanAlpha = Math.tan(alpha);
+
+            double numerator = GRAVITY * distanceToGoal * distanceToGoal;
+            double denominator = 2.0 * cosAlpha * cosAlpha * (distanceToGoal * tanAlpha - goalHeight);
+            double v0 = Math.sqrt(numerator / denominator);
+            double vx = v0 * Math.cos(alpha);
+
+            double angleToGoal = Math.atan2(dy, dx);
+            double robotSpeed = Math.sqrt(robotVelocityX * robotVelocityX + robotVelocityY * robotVelocityY);
+            double robotVelocityAngle = Math.atan2(robotVelocityY, robotVelocityX);
+
+            double deltaAngle = robotVelocityAngle - angleToGoal;
+            double vRadial = -Math.cos(deltaAngle) * robotSpeed;
+            double vTangential = Math.sin(deltaAngle) * robotSpeed;
+
+            double vxCompensatedRadial = vx + vRadial;
+
+            double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
+
+            return turretOffsetAngle;
+        }
     }
     public boolean activateOrientation(){
         double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));

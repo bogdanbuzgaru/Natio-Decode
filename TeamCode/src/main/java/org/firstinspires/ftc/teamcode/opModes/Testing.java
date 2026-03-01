@@ -47,7 +47,7 @@ public class Testing extends OpMode {
                 90
         ));
         shooterCalculations = new ShooterCalculations(35, 45, 0.14,
-                1, 0.11, 40);
+                1, 8.85, 332);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(3.64173228, 5.5511811, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -95,10 +95,16 @@ public class Testing extends OpMode {
             turret.update();
         if ((pos.shootClose() || pos.shootHigh()) && !manual) {
             shooter.raiseBarrier();
-        } else {
-            shooter.lowerBarrier();
         }
-        if (Math.abs(parameters.getFlywheelSpeed() - shooter.getTicks()) > 50) {
+        if(manual){
+            turret.goNeutral();
+            if(gamepad1.leftBumperWasPressed()){
+                shooter.raiseBarrier();
+            }else if (gamepad1.rightBumperWasPressed() || gamepad1.right_trigger > 0.01){
+                shooter.lowerBarrier();
+            }
+        }
+        if (Math.abs(parameters.getFlywheelSpeed() - shooter.getTicks()) > 49) {
             shooter.setHoodPosition(parameters.getHoodServoPosition());
             shooter.setTicks(parameters.getFlywheelSpeed());
         }

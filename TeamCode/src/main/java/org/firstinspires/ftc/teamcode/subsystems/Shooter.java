@@ -30,6 +30,7 @@ public class Shooter {
     public void update(){
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
+        adaptiveHood();
         hood.setPosition(targetHood);
     }
     public void setTicks(double ticks) {
@@ -41,7 +42,7 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = hoodPosition + error * 0.001;
+        targetHood = Math.min(hoodPosition + error * 0.001, 1);
     }
     public void lowerBarrier(){
         barrier.setPosition(0.6);

@@ -68,6 +68,11 @@ public class Turret {
         turretServo2.setPosition(1);
         turretServo3.setPosition(1);
     }
+    public void goNeutral(){
+        turretServo1.setPosition(0.5);
+        turretServo2.setPosition(0.5);
+        turretServo3.setPosition(0.5);
+    }
     public double getTargetAngle() {
         return targetAngle;
     }
