@@ -91,6 +91,11 @@ public class Testing extends OpMode {
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
         turret.setAngle(pos.getAngle());
+
+        if(gamepad1.triangleWasPressed()){
+            manual = !manual;
+        }
+
         if (pos.activateOrientation() && !manual)
             turret.update();
         if ((pos.shootClose() || pos.shootHigh()) && !manual) {
@@ -146,6 +151,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         0
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadLeftWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -154,6 +160,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         180
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadDownWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -162,6 +169,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         0
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadRightWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -170,6 +178,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         0
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }
         }else if(pos.isBlue()){
@@ -180,6 +189,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         180
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadLeftWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -188,6 +198,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         0
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadDownWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -196,6 +207,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         180
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }else if(gamepad.dpadRightWasPressed()){
                 pinpoint.setPosition(new Pose2D(
@@ -204,6 +216,7 @@ public class Testing extends OpMode {
                         AngleUnit.DEGREES,
                         180
                 ));
+                manual = false;
                 pinpoint.recalibrateIMU();
             }
         }
