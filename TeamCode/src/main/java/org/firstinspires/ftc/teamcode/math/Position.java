@@ -137,10 +137,10 @@ public class Position {
         double alpha = second.getxCoeff(), beta = second.getyCoeff(), gamma = second.getConstant();
         double x = (b * gamma - c * beta) / (a * beta - b * alpha);
         double y = (c * alpha - a * gamma) / (a * beta - b * alpha);
-        return (x >= 1 + Math.min(first.getX1(), first.getX2()) && x <= 1 + Math.max(first.getX1(), first.getX2())) &&
-                (x >= 1 + Math.min(second.getX1(), second.getX2()) && x <= 1 + Math.max(second.getX1(), second.getX2())) &&
-                (y >= 1 + Math.min(first.getY1(), first.getY2()) && y <= 1 + Math.max(first.getY1(), first.getY2())) &&
-                (y >= 1 + Math.min(second.getY1(), second.getY2()) && y <= 1 + Math.max(second.getY1(), second.getY2()));
+        return (x >= Math.min(first.getX1(), first.getX2()) && x <= Math.max(first.getX1(), first.getX2())) &&
+                (x >= Math.min(second.getX1(), second.getX2()) && x <=  Math.max(second.getX1(), second.getX2())) &&
+                (y >= Math.min(first.getY1(), first.getY2()) && y <=  Math.max(first.getY1(), first.getY2())) &&
+                (y >= Math.min(second.getY1(), second.getY2()) && y <= Math.max(second.getY1(), second.getY2()));
     }
 
     public boolean isCenterInBigTriangle(){
@@ -242,7 +242,14 @@ public class Position {
             blue = false;
         }
     }
-
+    public int getTicks(double slope, double extra){
+        double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
+        return (int)((int) slope * hypo + extra);
+    }
+    public int getTicksBlue(double slope, double extra){
+        double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
+        return (int)((int) slope * hypo + extra);
+    }
     public boolean isBlue() {
         return blue;
     }

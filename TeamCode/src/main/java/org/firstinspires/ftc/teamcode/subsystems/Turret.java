@@ -13,7 +13,7 @@ public class Turret {
     private double heading;
     private double offsetAngle;
 
-    private final double ratio = 190.1785714285714;
+    private final double ratio = 165.5;
 
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");

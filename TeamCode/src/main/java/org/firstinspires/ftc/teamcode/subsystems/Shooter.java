@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -34,7 +35,9 @@ public class Shooter {
         hood.setPosition(targetHood);
     }
     public void setTicks(double ticks) {
-        this.ticks = ticks;
+        if(Math.abs(this.ticks - ticks) >= 50){
+            this.ticks = ticks;
+        }
     }
 
     public double getTicks() {
@@ -42,7 +45,7 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = Math.min(hoodPosition + error * 0.001, 1);
+        targetHood = Math.min(ticks/2400 + Math.min(hoodPosition + error * 0.0005, 1), 1);
     }
     public void lowerBarrier(){
         barrier.setPosition(0.6);
@@ -50,7 +53,26 @@ public class Shooter {
     public void raiseBarrier(){
         barrier.setPosition(0.4);
     }
+    public void setTicks(Gamepad gamepad){
+        if(gamepad.dpadLeftWasPressed()){
+            ticks = 1456;
+            flywheelMotor1.setVelocity(ticks);
+            flywheelMotor2.setVelocity(ticks);
+        }else if(gamepad.circleWasPressed()){
+            ticks = 1619;
+            flywheelMotor1.setVelocity(ticks);
+            flywheelMotor2.setVelocity(ticks);
+        }else if(gamepad.dpadRightWasPressed()){
+            ticks = 2300;
+            flywheelMotor1.setVelocity(ticks);
+            flywheelMotor2.setVelocity(ticks);
+        }else if(gamepad.crossWasPressed()){
+            ticks = 1280;
+            flywheelMotor1.setVelocity(ticks);
+            flywheelMotor2.setVelocity(ticks);
+        }
+    }
     public void setHoodPosition(double hoodPosition) {
-        this.hoodPosition = hoodPosition;
+//        this.hoodPosition = hoodPosition;
     }
 }

@@ -29,9 +29,10 @@ public class Testing extends OpMode {
     private GoBildaPinpointDriver pinpoint;
     private Sensor sensor;
     private double ticks = 100;
-
+    private Sensor colorSensor, colorSensor2;
     private ShooterCalculations shooterCalculations;
     private boolean manual = false;
+    private boolean detects = false;
 
     public void init(){
         turret = new Turret(hardwareMap);
@@ -46,6 +47,9 @@ public class Testing extends OpMode {
                 AngleUnit.DEGREES,
                 90
         ));
+        colorSensor = new Sensor(hardwareMap, "colorSensor");
+        colorSensor2 = new Sensor(hardwareMap, "colorSensor2");
+
         shooterCalculations = new ShooterCalculations(35, 45, 0.14,
                 1, 8.85, 332);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
@@ -69,7 +73,7 @@ public class Testing extends OpMode {
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
-//        resetPosition(gamepad2);
+        resetPosition(gamepad2);
         ShooterCalculations.ShootingParameters parameters = shooterCalculations.calculateShootingParameters(
                 pinpoint.getPosX(DistanceUnit.INCH),
                 pinpoint.getPosY(DistanceUnit.INCH),
@@ -79,13 +83,6 @@ public class Testing extends OpMode {
                 Math.toRadians(-45),
                 Math.toRadians(35),
                 Math.toRadians(45));
-
-        if (gamepad1.leftBumperWasPressed()) {
-            turret.goLeft();
-        }
-        if (gamepad1.rightBumperWasPressed()) {
-            turret.goRight();
-        }
 
         turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
         turret.setTargetAngle(pos.getTargetAngle());
@@ -101,17 +98,41 @@ public class Testing extends OpMode {
         if ((pos.shootClose() || pos.shootHigh()) && !manual) {
             shooter.raiseBarrier();
         }
+        if(!pos.shootClose() && !pos.shootHigh()){
+            shooter.lowerBarrier();
+        }
+        boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
+        if(det && !detects){
+            if(gamepad1.isRumbling()){
+                detects = true;
+            }
+        }
+        if(detects && !det){
+            detects = false;
+        }
+        if(gamepad2.squareWasPressed()){
+            turret.goLeft();
+        }else if(gamepad2.circleWasPressed()){
+            turret.goRight();
+        }
         if(manual){
             turret.goNeutral();
+
             if(gamepad1.leftBumperWasPressed()){
                 shooter.raiseBarrier();
-            }else if (gamepad1.rightBumperWasPressed() || gamepad1.right_trigger > 0.01){
+            }else if (gamepad1.rightBumperWasPressed()){
                 shooter.lowerBarrier();
             }
         }
         if (Math.abs(parameters.getFlywheelSpeed() - shooter.getTicks()) > 49) {
             shooter.setHoodPosition(parameters.getHoodServoPosition());
-            shooter.setTicks(parameters.getFlywheelSpeed());
+            if(pos.isRed())
+                shooter.setTicks(pos.getTicks(8.8057, 1098));
+            else
+                shooter.setTicks(pos.getTicksBlue(8.8057, 1098));
+//            shooter.setTicks(gamepad1);
+
+
         }
         shooter.update();
         telemetry.addData("Get turret target angle", turret.getTargetAngle());
@@ -141,6 +162,10 @@ public class Testing extends OpMode {
     }
     private double actualPositionY(double value){
         return value - (6.43700786745 + 0.236220472);
+    }
+    private void rumble(){
+        gamepad1.rumble(650);
+        gamepad2.rumble(1000);
     }
     private void resetPosition(Gamepad gamepad){
         if(pos.isRed()){
