@@ -54,13 +54,13 @@ public class RedClose extends OpMode {
 
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(120.000 - 7.2440944808, 144.000 - 6.43700786745));
+        follower.setStartingPose(new Pose(120.000 - 9.7322834608, 144.000 - 6.67322833945));
         new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
-        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 7.2440944808, 144.000 - 6.43700786745, AngleUnit.DEGREES, 0  ));
+        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608, 144.000 - 6.67322833945, AngleUnit.DEGREES, 0  ));
         setUp();
         fsm.init();
     }
@@ -235,10 +235,10 @@ public class RedClose extends OpMode {
     public static class Paths {
         public static ArrayList<PathChain> paths = new ArrayList<>();
         private double actualPositionX(double value){
-            return value - 7.2440944808;
+            return value - 9.7322834608;
         }
         private double actualPositionY(double value){
-            return value - 6.43700786745;
+            return value - 6.67322833945;
         }
         public Paths(Follower follower) {
             paths.clear();
