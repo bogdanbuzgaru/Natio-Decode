@@ -71,7 +71,10 @@ public class BlueClose extends OpMode {
                 follower.getPose().getY(),
                 AngleUnit.DEGREES,
                 follower.getHeading()));
+        turret.setTargetAngle(position.getTargetAngle());
+        turret.setHeading(position.getHeading());
         turret.update();
+
         shooter.setTicks(position.getTicks(8.8057, 1098));
         shooter.update();
         fsm.update();
