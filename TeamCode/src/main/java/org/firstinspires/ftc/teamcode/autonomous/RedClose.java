@@ -113,6 +113,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
             follower.followPath(paths.SHOOT_FIRST);
             shooter.lowerBarrier();
+            return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
             intake.autoTake();
@@ -124,6 +125,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SECOND_ROW, () -> {
             follower.followPath(paths.SECOND_ROW);
             shooter.lowerBarrier();
+            return null;
         });
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
             intake.autoTake();
@@ -136,6 +138,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SHOOT_SECOND, () -> {
             follower.followPath(paths.SHOOT_SECOND);
             shooter.lowerBarrier();
+            return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
             intake.autoTake();
@@ -147,6 +150,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.GO_TO_GOAL, () -> {
             follower.followPath(paths.GO_TO_GOAL);
             shooter.lowerBarrier();
+            return null;
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
             intake.autoTake();
@@ -159,6 +163,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.GO_BACK, () -> {
             follower.followPath(paths.GO_BACK);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.GO_BACK, () -> {
             intake.autoTake();
@@ -171,6 +177,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SHOOT_THIRD, () -> {
             follower.followPath(paths.SHOOT_THIRD);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.SHOOT_THIRD, () -> {
             intake.autoTake();
@@ -182,6 +190,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.LAST_ROW, () -> {
             follower.followPath(paths.LAST_ROW);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.LAST_ROW, () -> {
             intake.autoTake();
@@ -194,6 +204,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SHOOT_LAST, () -> {
             follower.followPath(paths.SHOOT_LAST);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
             intake.autoTake();
@@ -206,6 +218,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.FIRST_ROW, () -> {
             follower.followPath(paths.FIRST_ROW);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
             intake.autoTake();
@@ -218,6 +232,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SHOOT, () -> {
             follower.followPath(paths.SHOOT);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
             intake.autoTake();
@@ -229,6 +245,8 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.PARK, () -> {
             follower.followPath(paths.PARK);
             shooter.lowerBarrier();
+            return null;
+
         });
         fsm.onStateUpdate(AutoState.PARK, () -> {
             intake.autoTake();
