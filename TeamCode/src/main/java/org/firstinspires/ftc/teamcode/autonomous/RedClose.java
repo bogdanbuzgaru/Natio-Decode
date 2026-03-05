@@ -60,29 +60,30 @@ public class RedClose extends OpMode {
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
-        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608, 144.000 - 6.67322833945, AngleUnit.DEGREES, 0  ));
-        setUp();
-        fsm.init();
+        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
+                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
     }
     public void start(){
         setUp();
         fsm.init();
+        follower.followPath(paths.paths.get(0));
         shooter.lowerBarrier();
     }
     public void loop(){
         follower.update();
+        fsm.update();
         position.update(new Pose2D(DistanceUnit.INCH,
                 follower.getPose().getX(),
                 follower.getPose().getY(),
                 AngleUnit.DEGREES,
                 follower.getHeading()));
+
         turret.setTargetAngle(position.getTargetAngle());
         turret.setHeading(position.getHeading());
         turret.update();
 
         shooter.setTicks(position.getTicks(8.8057, 1098));
         shooter.update();
-        fsm.update();
     }
     public void stop(){
         String xPose, yPose, heading;
