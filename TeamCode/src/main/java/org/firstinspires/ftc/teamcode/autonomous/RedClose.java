@@ -51,11 +51,11 @@ public class RedClose extends OpMode {
     private Follower follower;
     private boolean isShooting = false;
     private ElapsedTime pathTimer = new ElapsedTime();
-
+    private Paths paths;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(120.000 - 9.7322834608, 144.000 - 6.67322833945));
-        new Paths(follower);
+        paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
@@ -106,7 +106,7 @@ public class RedClose extends OpMode {
     }
     private void setUp(){
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
-            follower.followPath(Paths.paths.get(0));
+            follower.followPath(paths.paths.get(0));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
@@ -117,7 +117,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SECOND_ROW, () -> {
-            follower.followPath(Paths.paths.get(1));
+            follower.followPath(paths.paths.get(1));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
@@ -129,7 +129,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_SECOND, () -> {
-            follower.followPath(Paths.paths.get(2));
+            follower.followPath(paths.paths.get(2));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
@@ -140,7 +140,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.GO_TO_GOAL, () -> {
-            follower.followPath(Paths.paths.get(3));
+            follower.followPath(paths.paths.get(3));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
@@ -152,7 +152,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.GO_BACK, () -> {
-            follower.followPath(Paths.paths.get(4));
+            follower.followPath(paths.paths.get(4));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.GO_BACK, () -> {
@@ -164,7 +164,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_THIRD, () -> {
-            follower.followPath(Paths.paths.get(5));
+            follower.followPath(paths.paths.get(5));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_THIRD, () -> {
@@ -175,7 +175,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.LAST_ROW, () -> {
-            follower.followPath(Paths.paths.get(6));
+            follower.followPath(paths.paths.get(6));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.LAST_ROW, () -> {
@@ -187,7 +187,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_LAST, () -> {
-            follower.followPath(Paths.paths.get(7));
+            follower.followPath(paths.paths.get(7));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
@@ -199,7 +199,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.FIRST_ROW, () -> {
-            follower.followPath(Paths.paths.get(8));
+            follower.followPath(paths.paths.get(8));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
@@ -211,7 +211,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT, () -> {
-            follower.followPath(Paths.paths.get(9));
+            follower.followPath(paths.paths.get(9));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
@@ -222,7 +222,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.PARK, () -> {
-            follower.followPath(Paths.paths.get(10));
+            follower.followPath(paths.paths.get(10));
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.PARK, () -> {
