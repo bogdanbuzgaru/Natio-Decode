@@ -64,6 +64,11 @@ public class RedClose extends OpMode {
         setUp();
         fsm.init();
     }
+    public void start(){
+        setUp();
+        fsm.init();
+        shooter.lowerBarrier();
+    }
     public void loop(){
         follower.update();
         position.update(new Pose2D(DistanceUnit.INCH,
@@ -236,7 +241,7 @@ public class RedClose extends OpMode {
 
     }
     public static class Paths {
-        public static ArrayList<PathChain> paths = new ArrayList<>();
+        public ArrayList<PathChain> paths = new ArrayList<>();
         private double actualPositionX(double value){
             return value - 9.7322834608;
         }
