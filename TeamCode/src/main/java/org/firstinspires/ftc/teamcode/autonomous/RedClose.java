@@ -66,7 +66,6 @@ public class RedClose extends OpMode {
     public void start(){
         setUp();
         fsm.init();
-        follower.followPath(paths.paths.get(0));
         shooter.lowerBarrier();
     }
     public void loop(){
@@ -112,7 +111,7 @@ public class RedClose extends OpMode {
     }
     private void setUp(){
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
-            follower.followPath(paths.paths.get(0));
+            follower.followPath(paths.SHOOT_FIRST);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
@@ -123,7 +122,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SECOND_ROW, () -> {
-            follower.followPath(paths.paths.get(1));
+            follower.followPath(paths.SECOND_ROW);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
@@ -135,7 +134,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_SECOND, () -> {
-            follower.followPath(paths.paths.get(2));
+            follower.followPath(paths.SHOOT_SECOND);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
@@ -146,7 +145,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.GO_TO_GOAL, () -> {
-            follower.followPath(paths.paths.get(3));
+            follower.followPath(paths.GO_TO_GOAL);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
@@ -158,7 +157,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.GO_BACK, () -> {
-            follower.followPath(paths.paths.get(4));
+            follower.followPath(paths.GO_BACK);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.GO_BACK, () -> {
@@ -170,7 +169,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_THIRD, () -> {
-            follower.followPath(paths.paths.get(5));
+            follower.followPath(paths.SHOOT_THIRD);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_THIRD, () -> {
@@ -181,7 +180,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.LAST_ROW, () -> {
-            follower.followPath(paths.paths.get(6));
+            follower.followPath(paths.LAST_ROW);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.LAST_ROW, () -> {
@@ -193,7 +192,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT_LAST, () -> {
-            follower.followPath(paths.paths.get(7));
+            follower.followPath(paths.SHOOT_LAST);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
@@ -205,7 +204,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.FIRST_ROW, () -> {
-            follower.followPath(paths.paths.get(8));
+            follower.followPath(paths.FIRST_ROW);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
@@ -217,7 +216,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT, () -> {
-            follower.followPath(paths.paths.get(9));
+            follower.followPath(paths.SHOOT);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
@@ -228,14 +227,14 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.PARK, () -> {
-            follower.followPath(paths.paths.get(10));
+            follower.followPath(paths.PARK);
             shooter.lowerBarrier();
         });
         fsm.onStateUpdate(AutoState.PARK, () -> {
             intake.autoTake();
-            if(!follower.isBusy()) {
-                requestOpModeStop();
-            }
+//            if(!follower.isBusy()) {
+//                requestOpModeStop();
+//            }
             return null;
         });
 
@@ -243,6 +242,18 @@ public class RedClose extends OpMode {
     }
     public static class Paths {
         public ArrayList<PathChain> paths = new ArrayList<>();
+        public PathChain         SHOOT_FIRST;
+        public PathChain            SECOND_ROW;
+        public PathChain SHOOT_SECOND;
+        public PathChain       GO_TO_GOAL;
+        public PathChain      GO_BACK;
+        public PathChain     SHOOT_THIRD;
+        public PathChain    LAST_ROW;
+        public PathChain    SHOOT_LAST;
+        public PathChain    FIRST_ROW;
+        public PathChain    SHOOT;
+        public PathChain     PARK;
+
         private double actualPositionX(double value){
             return value - 9.7322834608;
         }
@@ -250,8 +261,7 @@ public class RedClose extends OpMode {
             return value - 6.67322833945;
         }
         public Paths(Follower follower) {
-            paths.clear();
-            paths.add(follower.pathBuilder().addPath(
+            SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(actualPositionX(120.000), actualPositionY(144.000)),
                                             new Pose(110.000, 130.000),
@@ -262,7 +272,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            SECOND_ROW = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(84.000, 84.000),
                                             new Pose(89.000, 74.000),
@@ -274,7 +284,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            SHOOT_SECOND = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(127.000, 60.000),
                                             new Pose(115.000, 60.000),
@@ -285,7 +295,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            GO_TO_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(84.000, 84.000),
                                             new Pose(91.000, 76.000),
@@ -297,7 +307,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            GO_BACK = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(129.000, 63.000),
                                             new Pose(129.500, 61.000),
@@ -308,7 +318,7 @@ public class RedClose extends OpMode {
             );
 
 
-            paths.add(follower.pathBuilder().addPath(
+            SHOOT_THIRD = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(130.000, 58.000),
                                             new Pose(130.000, 65.000),
@@ -320,7 +330,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            LAST_ROW = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(84.000, 84.000),
                                             new Pose(88.000, 68.000),
@@ -332,7 +342,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            SHOOT_LAST = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(134.000, 36.000),
                                             new Pose(120.000, 38.000),
@@ -344,7 +354,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            FIRST_ROW = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(84.000, 84.000),
                                             new Pose(100.000, 86.000),
@@ -355,7 +365,7 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            paths.add(follower.pathBuilder().addPath(
+            SHOOT = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(128.000, 84.000),
                                             new Pose(114.000, 82.000),
@@ -365,7 +375,7 @@ public class RedClose extends OpMode {
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()
             );
-            paths.add(follower.pathBuilder().addPath(
+            PARK = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(84.000, 84.000),
                                             new Pose(100.000, 87.000),
