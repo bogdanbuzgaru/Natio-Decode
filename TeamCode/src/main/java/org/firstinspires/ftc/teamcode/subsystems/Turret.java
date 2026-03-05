@@ -30,7 +30,7 @@ public class Turret {
     }
 
     private double error(){
-        double error = heading - angle;
+        double error = heading - angle + offsetAngle;
         if(error > 180){
             error -= 360;
         } else if (error < -180){
@@ -57,16 +57,6 @@ public class Turret {
             turretServo2.setPosition(position) ;
             turretServo3.setPosition(position);
         }
-    }
-    public void goLeft(){
-        turretServo1.setPosition(0);
-        turretServo2.setPosition(0);
-        turretServo3.setPosition(0);
-    }
-    public void goRight(){
-        turretServo1.setPosition(1);
-        turretServo2.setPosition(1);
-        turretServo3.setPosition(1);
     }
     public void goNeutral(){
         turretServo1.setPosition(0.5);

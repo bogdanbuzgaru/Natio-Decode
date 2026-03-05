@@ -45,7 +45,7 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = Math.min(ticks/2400 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+        targetHood = Math.min(ticks/3100 + Math.min(hoodPosition + error * 0.0005, 1), 1);
     }
     public void lowerBarrier(){
         barrier.setPosition(0.6);

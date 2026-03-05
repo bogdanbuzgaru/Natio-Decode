@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.math.Sensor;
 import org.firstinspires.ftc.teamcode.math.ShooterCalculations;
 import org.firstinspires.ftc.teamcode.movement.Movement;
+import org.firstinspires.ftc.teamcode.statemachine.StateMachine;
 import org.firstinspires.ftc.teamcode.subsystems.Index;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
@@ -20,6 +21,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 @Configurable
 @TeleOp
 public class Testing extends OpMode {
+    private enum State{
+        E_BILE,
+        NU_E_BILE
+    }
     private Turret turret;
     private Shooter shooter;
     private Position pos;
@@ -33,6 +38,7 @@ public class Testing extends OpMode {
     private ShooterCalculations shooterCalculations;
     private boolean manual = false;
     private boolean detects = false;
+    private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
 
     public void init(){
         turret = new Turret(hardwareMap);
@@ -64,16 +70,20 @@ public class Testing extends OpMode {
                         90
         ));
         pinpoint.recalibrateIMU();
-
+        setUp();
     }
     public void loop() {
         pinpoint.update();
         pos.update(pinpoint.getPosition());
+        fsm.update();
         movement.movementLoop(gamepad1);
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
         resetPosition(gamepad2);
+
+        pos.whereToShoot(gamepad1);     //TODO new added
+
         ShooterCalculations.ShootingParameters parameters = shooterCalculations.calculateShootingParameters(
                 pinpoint.getPosX(DistanceUnit.INCH),
                 pinpoint.getPosY(DistanceUnit.INCH),
@@ -84,10 +94,6 @@ public class Testing extends OpMode {
                 Math.toRadians(35),
                 Math.toRadians(45));
 
-        turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
-        turret.setTargetAngle(pos.getTargetAngle());
-        turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
-        turret.setAngle(pos.getAngle());
 
         if(gamepad1.triangleWasPressed()){
             manual = !manual;
@@ -101,20 +107,7 @@ public class Testing extends OpMode {
         if(!pos.shootClose() && !pos.shootHigh()){
             shooter.lowerBarrier();
         }
-        boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
-        if(det && !detects){
-            if(gamepad1.isRumbling()){
-                detects = true;
-            }
-        }
-        if(detects && !det){
-            detects = false;
-        }
-        if(gamepad2.squareWasPressed()){
-            turret.goLeft();
-        }else if(gamepad2.circleWasPressed()){
-            turret.goRight();
-        }
+
         if(manual){
             turret.goNeutral();
 
@@ -126,33 +119,40 @@ public class Testing extends OpMode {
         }
         if (Math.abs(parameters.getFlywheelSpeed() - shooter.getTicks()) > 49) {
             shooter.setHoodPosition(parameters.getHoodServoPosition());
-            if(pos.isRed())
+            if(pos.isRed()) {
                 shooter.setTicks(pos.getTicks(8.8057, 1098));
-            else
+                turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
+                turret.setTargetAngle(pos.getTargetAngle());
+                turret.setOffsetAngle(pos.offsetAngleRed(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH), pos.getTicks(8.8057, 1098)));
+            }
+            else {
                 shooter.setTicks(pos.getTicksBlue(8.8057, 1098));
-//            shooter.setTicks(gamepad1);
-
-
+                turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
+                turret.setTargetAngle(pos.getTargetAngle());
+                turret.setOffsetAngle(pos.offsetAngleBlue(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH), pos.getTicks(8.8057, 1098)));
+            }
         }
         shooter.update();
-        telemetry.addData("Get turret target angle", turret.getTargetAngle());
-        telemetry.addData("Get angle atan", pos.getAngle());
-        telemetry.addData("Turns left", turret.turnLeft());
-        telemetry.addData("Turns right", turret.turnRight());
-        telemetry.addData("Target Turret Degrees", pos.getTargetAngle());
-        telemetry.addData("Turret position", turret.getPosition());
-        telemetry.addData("Is green", sensor.isGreen());
-        telemetry.addData("Is purple", sensor.isPurple());
-        telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("x", pinpoint.getPosX(DistanceUnit.INCH));
-        telemetry.addData("y", pinpoint.getPosY(DistanceUnit.INCH));
-        telemetry.addData("Can shoot close", pos.shootClose());
-        telemetry.addData("Can shoot high", pos.shootHigh());
-        telemetry.addData("Max X", pos.getMaxX());
-        telemetry.addData("Max Y", pos.getMaxY());
-        telemetry.addData("Min X", pos.getMinX());
-        telemetry.addData("Min Y", pos.getMinY());
-        telemetry.update();
+    }
+    private void setUp(){
+        fsm.onStateEnter(State.NU_E_BILE, () -> {return null;});
+        fsm.onStateUpdate(State.NU_E_BILE, () -> {
+            boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
+            if(det){
+                gamepad1.rumble(700);
+                return State.E_BILE;
+            }
+            return null;
+        });
+        fsm.onStateEnter(State.E_BILE, () -> {return null;});
+        fsm.onStateUpdate(State.E_BILE, () -> {
+            boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
+            if(!det){
+                return State.NU_E_BILE;
+            }
+            return null;
+        });
+        fsm.init();
     }
     private double actualPositionX(double value){
         return value + 7.2440944808;       //2.48818898

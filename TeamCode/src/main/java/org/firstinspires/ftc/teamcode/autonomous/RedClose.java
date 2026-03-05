@@ -23,7 +23,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import java.io.File;
-import java.util.ArrayList;
 
 @Autonomous
 public class RedClose extends OpMode {
@@ -54,7 +53,7 @@ public class RedClose extends OpMode {
     private Paths paths;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(120.000 - 9.7322834608, 144.000 - 6.67322833945));
+        follower.setStartingPose(new Pose(120.000 - 9.7322834608, 140.000 - 6.67322833945));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -75,7 +74,7 @@ public class RedClose extends OpMode {
                 follower.getPose().getX(),
                 follower.getPose().getY(),
                 AngleUnit.DEGREES,
-                follower.getHeading()));
+                Math.toDegrees(follower.getHeading())));
 
         turret.setTargetAngle(position.getTargetAngle());
         turret.setHeading(position.getHeading());
@@ -259,18 +258,17 @@ public class RedClose extends OpMode {
 
     }
     public static class Paths {
-        public ArrayList<PathChain> paths = new ArrayList<>();
-        public PathChain         SHOOT_FIRST;
-        public PathChain            SECOND_ROW;
+        public PathChain SHOOT_FIRST;
+        public PathChain SECOND_ROW;
         public PathChain SHOOT_SECOND;
-        public PathChain       GO_TO_GOAL;
-        public PathChain      GO_BACK;
-        public PathChain     SHOOT_THIRD;
-        public PathChain    LAST_ROW;
-        public PathChain    SHOOT_LAST;
-        public PathChain    FIRST_ROW;
-        public PathChain    SHOOT;
-        public PathChain     PARK;
+        public PathChain GO_TO_GOAL;
+        public PathChain GO_BACK;
+        public PathChain SHOOT_THIRD;
+        public PathChain LAST_ROW;
+        public PathChain SHOOT_LAST;
+        public PathChain FIRST_ROW;
+        public PathChain SHOOT;
+        public PathChain PARK;
 
         private double actualPositionX(double value){
             return value - 9.7322834608;
@@ -281,7 +279,7 @@ public class RedClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(actualPositionX(120.000), actualPositionY(144.000)),
+                                            new Pose(actualPositionX(120.000), actualPositionY(140.000)),
                                             new Pose(110.000, 130.000),
                                             new Pose(95.000, 105.000),
                                             new Pose(84.000, 84.000)

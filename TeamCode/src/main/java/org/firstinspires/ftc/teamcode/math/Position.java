@@ -32,7 +32,7 @@ public class Position {
     private double offsetAbscissa, offsetOrdinate;
     private boolean blue = false;
     private boolean red = true;
-
+    private boolean shootClose = true;
     public Position (Pose2D pose){
         this.pose = pose;
         heading = pose.getHeading(AngleUnit.DEGREES);
@@ -244,11 +244,22 @@ public class Position {
     }
     public int getTicks(double slope, double extra){
         double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
-        return (int)((int) slope * hypo + extra);
+        if(shootClose)
+            return Math.min((int)((int) slope * hypo + extra), 1600);
+        return Math.max((int)((int) slope * hypo + extra + 270), 2167);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
-        return (int)((int) slope * hypo + extra);
+        if(shootClose)
+            return Math.min((int)((int) slope * hypo + extra), 1600);       //TODO tune 1600
+        return Math.max((int)((int) slope * hypo + extra + 270), 2167);
+    }
+    public void whereToShoot(Gamepad gamepad){
+        if(gamepad.dpadLeftWasPressed()){
+            shootClose = true;
+        }else if(gamepad.dpadRightWasPressed()){
+            shootClose = false;
+        }
     }
     public boolean isBlue() {
         return blue;
@@ -256,5 +267,38 @@ public class Position {
 
     public boolean isRed() {
         return red;
+    }
+    public double offsetAngleRed(double robotVelocityX, double robotVelocityY, double vx) {
+        double dx = 130 - pose.getX(DistanceUnit.INCH);
+        double dy = 130 - pose.getY(DistanceUnit.INCH);
+        double robotToGoalTheta = Math.atan2(dy, dx);
+
+        double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);
+        double robotVelocityTheta = Math.atan2(robotVelocityY, robotVelocityX);
+
+        double coordinateTheta = robotVelocityTheta - robotToGoalTheta;
+        double parallelComponent     = -Math.cos(coordinateTheta) * robotSpeed;
+        double perpendicularComponent =  Math.sin(coordinateTheta) * robotSpeed;
+
+        double ivr = vx + parallelComponent;
+
+        return Math.toDegrees(Math.atan2(perpendicularComponent, ivr));
+    }
+    public double offsetAngleBlue(double robotVelocityX, double robotVelocityY, double vx) {
+
+        double dx = pose.getX(DistanceUnit.INCH) - 14;
+        double dy = 130 - pose.getY(DistanceUnit.INCH);
+        double robotToGoalTheta = Math.atan2(dy, dx);
+
+        double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);
+        double robotVelocityTheta = Math.atan2(robotVelocityY, robotVelocityX);
+
+        double coordinateTheta = robotVelocityTheta - robotToGoalTheta;
+        double parallelComponent     = -Math.cos(coordinateTheta) * robotSpeed;
+        double perpendicularComponent =  Math.sin(coordinateTheta) * robotSpeed;
+
+        double ivr = vx + parallelComponent;
+
+        return Math.toDegrees(Math.atan2(perpendicularComponent, ivr));
     }
 }
