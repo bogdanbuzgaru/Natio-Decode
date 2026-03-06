@@ -1,18 +1,26 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.pid.PIDController;
+import org.firstinspires.ftc.teamcode.pid.SimpleMotorFeedforward;
 
 public class Shooter {
     private DcMotorEx flywheelMotor1, flywheelMotor2;
     private Servo barrier, hood;
-    private double ticks;
+    private double ticks = 1530;
     private double hoodPosition;
     private double targetHood;
+    private PIDController p = new PIDController(kp, 0, 0);
+    public static  double ks = 0.0747, kv = 0.00008118565, ka = 0.01, kp = 0.01, velocity, nominalVoltage = 10.7;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
@@ -32,7 +40,6 @@ public class Shooter {
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
-        hood.setPosition(targetHood);
     }
     public void setTicks(double ticks) {
         if(Math.abs(this.ticks - ticks) >= 50){
@@ -45,13 +52,13 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = Math.min(ticks/3100 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+        targetHood = Math.min(ticks/2600 + Math.min(hoodPosition + error * 0.0005, 1), 1);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.6);
+        barrier.setPosition(0.3);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.4);
+        barrier.setPosition(0.2);
     }
     public void setTicks(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){

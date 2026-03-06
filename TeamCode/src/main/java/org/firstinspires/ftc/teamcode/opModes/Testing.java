@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -16,6 +19,7 @@ import org.firstinspires.ftc.teamcode.movement.Movement;
 import org.firstinspires.ftc.teamcode.statemachine.StateMachine;
 import org.firstinspires.ftc.teamcode.subsystems.Index;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 @Configurable
@@ -39,13 +43,18 @@ public class Testing extends OpMode {
     private boolean manual = false;
     private boolean detects = false;
     private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
-
+    private Lift lift;
+    private boolean park = true;
+    private ElapsedTime leftBumperHoldTimer = new ElapsedTime();
+    private boolean leftBumperWasPressed = false;
+    private static final double HOLD_TIME_SECONDS = 0.5;
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
         movement = new Movement(hardwareMap);
+        lift = new Lift(hardwareMap);
         sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(new Pose2D(
                 DistanceUnit.INCH,
@@ -73,6 +82,7 @@ public class Testing extends OpMode {
         setUp();
     }
     public void loop() {
+
         pinpoint.update();
         pos.update(pinpoint.getPosition());
         fsm.update();
@@ -93,17 +103,26 @@ public class Testing extends OpMode {
                 Math.toRadians(-45),
                 Math.toRadians(35),
                 Math.toRadians(45));
-
+        if(gamepad1.dpadDownWasPressed()){
+            if(park){
+                lift.lift();
+            }else{
+                lift.lower();
+            }
+            park = !park;
+        }
 
         if(gamepad1.triangleWasPressed()){
             manual = !manual;
         }
-
+        if(isLeftBumperHeld(0.006)){
+            shooter.raiseBarrier();
+        }else{
+            shooter.lowerBarrier();
+        }
         if (pos.activateOrientation() && !manual)
             turret.update();
-        if ((pos.shootClose() || pos.shootHigh()) && !manual) {
-            shooter.raiseBarrier();
-        }
+
         if(!pos.shootClose() && !pos.shootHigh()){
             shooter.lowerBarrier();
         }
@@ -163,9 +182,25 @@ public class Testing extends OpMode {
     private double actualPositionY(double value){
         return value - (6.43700786745 + 0.236220472);
     }
-    private void rumble(){
-        gamepad1.rumble(650);
-        gamepad2.rumble(1000);
+    private boolean isLeftBumperHeld(double holdTimeSeconds) {
+        if (gamepad1.left_bumper) {
+            // Button is currently pressed
+            if (!leftBumperWasPressed) {
+                // Button just pressed, start timer
+                leftBumperHoldTimer.reset();
+                leftBumperWasPressed = true;
+            }
+
+            // Check if held long enough
+            if (leftBumperHoldTimer.seconds() >= holdTimeSeconds) {
+                return true;
+            }
+        } else {
+            // Button released, reset state
+            leftBumperWasPressed = false;
+        }
+
+        return false;
     }
     private void resetPosition(Gamepad gamepad){
         if(pos.isRed()){

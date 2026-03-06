@@ -89,6 +89,16 @@ public class Turret {
     public void setAngle(double angle) {
         this.angle = angle;
     }
+    public void setAuto(){
+        turretServo1.setPosition(0.5 + 0.11765);
+        turretServo2.setPosition(0.5 + 0.11765);
+        turretServo3.setPosition(0.5 + 0.11765);
+    }
+    public void setAutoBlue(){
+        turretServo1.setPosition(0.5 - 0.11765);
+        turretServo2.setPosition(0.5 - 0.11765);
+        turretServo3.setPosition(0.5 - 0.11765);
+    }
     public void setDifPos(double difPos) {
         this.difPos = difPos;
     }
