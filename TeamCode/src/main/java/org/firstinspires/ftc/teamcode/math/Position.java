@@ -277,7 +277,7 @@ public class Position {
         double robotVelocityTheta = Math.atan2(robotVelocityY, robotVelocityX);
 
         double coordinateTheta = robotVelocityTheta - robotToGoalTheta;
-        double parallelComponent     = -Math.cos(coordinateTheta) * robotSpeed;
+        double parallelComponent = -Math.cos(coordinateTheta) * robotSpeed;
         double perpendicularComponent =  Math.sin(coordinateTheta) * robotSpeed;
 
         double ivr = vx + parallelComponent;

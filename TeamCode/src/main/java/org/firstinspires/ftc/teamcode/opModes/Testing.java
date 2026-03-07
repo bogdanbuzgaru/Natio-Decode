@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.MotionDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.math.Sensor;
@@ -38,7 +40,7 @@ public class Testing extends OpMode {
     private GoBildaPinpointDriver pinpoint;
     private Sensor sensor;
     private double ticks = 100;
-    private Sensor colorSensor, colorSensor2;
+    private RevColorSensorV3 colorSensor, colorSensor2;
     private ShooterCalculations shooterCalculations;
     private boolean manual = false;
     private boolean detects = false;
@@ -47,7 +49,7 @@ public class Testing extends OpMode {
     private boolean park = true;
     private ElapsedTime leftBumperHoldTimer = new ElapsedTime();
     private boolean leftBumperWasPressed = false;
-    private static final double HOLD_TIME_SECONDS = 0.5;
+    private ElapsedTime timer = new ElapsedTime();
     public void init(){
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -62,8 +64,10 @@ public class Testing extends OpMode {
                 AngleUnit.DEGREES,
                 90
         ));
-        colorSensor = new Sensor(hardwareMap, "colorSensor");
-        colorSensor2 = new Sensor(hardwareMap, "colorSensor2");
+        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
+        colorSensor.enableLed(true);
+        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
+        colorSensor2.enableLed(true);
 
         shooterCalculations = new ShooterCalculations(35, 45, 0.14,
                 1, 8.85, 332);
@@ -115,7 +119,7 @@ public class Testing extends OpMode {
         if(gamepad1.triangleWasPressed()){
             manual = !manual;
         }
-        if(isLeftBumperHeld(0.006)){
+        if(isLeftBumperHeld(0.0006)){
             shooter.raiseBarrier();
         }else{
             shooter.lowerBarrier();
@@ -126,7 +130,6 @@ public class Testing extends OpMode {
         if(!pos.shootClose() && !pos.shootHigh()){
             shooter.lowerBarrier();
         }
-
         if(manual){
             turret.goNeutral();
 
@@ -153,21 +156,34 @@ public class Testing extends OpMode {
         }
         shooter.update();
     }
+
     private void setUp(){
-        fsm.onStateEnter(State.NU_E_BILE, () -> {return null;});
+        fsm.onStateEnter(State.NU_E_BILE, () -> {
+            timer.reset();
+            return null;});
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
-            if(det){
-                gamepad1.rumble(700);
-                return State.E_BILE;
+            if (timer.milliseconds() >= 300) {
+                double distance = colorSensor.getDistance(DistanceUnit.CM);
+                boolean ballPresent = !Double.isNaN(distance) && distance < 5.2;
+                if(ballPresent){
+                    gamepad1.rumble(700);
+                    return State.E_BILE;
+                }
+                timer.reset();
+                return null;
             }
             return null;
         });
         fsm.onStateEnter(State.E_BILE, () -> {return null;});
         fsm.onStateUpdate(State.E_BILE, () -> {
-            boolean det = colorSensor.isGreen() || colorSensor2.isGreen() || colorSensor.isPurple() || colorSensor2.isPurple();
-            if(!det){
-                return State.NU_E_BILE;
+            if (timer.milliseconds() >= 300) {
+                double distance = colorSensor.getDistance(DistanceUnit.CM);
+                boolean ballAbsent = Double.isNaN(distance) || distance > 5.8;
+                if(ballAbsent){
+                    return State.NU_E_BILE;
+                }
+                timer.reset();
+                return null;
             }
             return null;
         });
@@ -182,6 +198,7 @@ public class Testing extends OpMode {
     private double actualPositionY(double value){
         return value - (6.43700786745 + 0.236220472);
     }
+
     private boolean isLeftBumperHeld(double holdTimeSeconds) {
         if (gamepad1.left_bumper) {
             // Button is currently pressed

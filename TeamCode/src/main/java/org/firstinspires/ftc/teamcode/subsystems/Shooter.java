@@ -55,10 +55,10 @@ public class Shooter {
         targetHood = Math.min(ticks/2600 + Math.min(hoodPosition + error * 0.0005, 1), 1);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.3);
+        barrier.setPosition(0.53);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.2);
+        barrier.setPosition(0.3);
     }
     public void setTicks(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){

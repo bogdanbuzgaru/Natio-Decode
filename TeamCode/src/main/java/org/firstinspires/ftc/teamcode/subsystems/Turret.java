@@ -13,7 +13,7 @@ public class Turret {
     private double heading;
     private double offsetAngle;
 
-    private final double ratio = 165.5;
+    private final double ratio = 192.8571428571429;
 
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
@@ -47,12 +47,12 @@ public class Turret {
     public void update(){
         double theAngle = targetAngle + offsetAngle;
         if(turnLeft()){
-            double position = 0.5 + 0.5 * Math.abs(targetAngle / ratio);
+            double position = 0.5 + 0.5 * Math.abs(theAngle / ratio);
             turretServo1.setPosition(position);
             turretServo2.setPosition(position) ;
             turretServo3.setPosition(position);
         } else if (turnRight()){
-            double position = 0.5 - 0.5 * Math.abs(targetAngle / ratio);
+            double position = 0.5 - 0.5 * Math.abs(theAngle / ratio);
             turretServo1.setPosition(position);
             turretServo2.setPosition(position) ;
             turretServo3.setPosition(position);
@@ -85,7 +85,8 @@ public class Turret {
         if(Math.signum(lastAngle) != Math.signum(angle) && 180 - Math.abs(angle) < 8)
             this.targetAngle = lastAngle + 180 - Math.abs(angle);
         else
-            this.targetAngle = angle;    }
+            this.targetAngle = angle;
+    }
     public void setAngle(double angle) {
         this.angle = angle;
     }
