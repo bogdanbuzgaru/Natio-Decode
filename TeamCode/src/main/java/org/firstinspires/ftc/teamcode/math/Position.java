@@ -246,13 +246,13 @@ public class Position {
         double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);
-        return Math.max((int)((int) slope * hypo + extra + 270), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 390), 2167);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);       //TODO tune 1600
-        return Math.max((int)((int) slope * hypo + extra + 270), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 390), 2167);
     }
     public void whereToShoot(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){
