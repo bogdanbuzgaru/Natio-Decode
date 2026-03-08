@@ -3,140 +3,260 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * 3-servo turret with PD control and LUT-based angle→position mapping.
+ *
+ * Adapted from the proven motor-based turret that uses PD + LUT.
+ * Instead of driving a motor with power, we compute a target servo
+ * position from a lookup table and approach it with a PD-controlled
+ * step each loop cycle for smooth, responsive, jitter-free motion.
+ *
+ * Tuning guide (all constants are at the top):
+ *   kP_SERVO  – proportional gain on position error (start 0.35, raise for snappier)
+ *   kD_SERVO  – derivative gain (start 0.01, raise if overshooting)
+ *   DEADZONE_DEG – ignore angles smaller than this (prevents micro-jitter)
+ *   MAX_STEP  – largest servo-position jump per loop (limits speed, prevents slam)
+ *   POSITION_WRITE_THRESHOLD – skip USB write if change is smaller than this
+ */
 public class Turret {
+
     private Servo turretServo1, turretServo2, turretServo3;
-    private double difPos;
-    private double targetAngle;
-    private double heading;
-    private double offsetAngle;
 
-    // Full servo travel (0→1) spans this many degrees of turret rotation.
-    // Derived from hardware gearing: 270° physical × (gear ratio) ≈ 192.86°.
-    private final double ratio = 192.8571428571429;
+    // ── Inputs (set by callers each loop) ──────────────────────────────────
+    private double targetAngle;   // signed degrees from Position.getTargetAngle()
+    private double heading;       // robot heading in degrees
+    private double offsetAngle;   // motion-compensation offset in degrees
+    private double difPos;        // kept for API compatibility
 
-    // Servo offset for pre-defined auto positions (≈ 22.7°, or ~11.8% of travel).
+    // ── PD gains for servo position control ────────────────────────────────
+    /** Proportional gain on (targetPos − currentPos).  0.35 is a good start. */
+    private static final double kP_SERVO = 0.35;
+    /** Derivative gain — dampens oscillation.  Increase if turret overshoots. */
+    private static final double kD_SERVO = 0.01;
+
+    // ── Limits ─────────────────────────────────────────────────────────────
+    /** Ignore turret corrections smaller than this (degrees). */
+    private static final double DEADZONE_DEG = 0.8;
+    /** Max servo-position change per loop cycle (limits slew rate). */
+    private static final double MAX_STEP = 0.025;
+    /** Clamp combined turret angle to this range (degrees). */
+    private static final double MAX_TURRET_ANGLE = 140.0;
+    /** Only push a new position to the servos when the delta exceeds this. */
+    private static final double POSITION_WRITE_THRESHOLD = 0.003;
+
+    // ── Auto-position offset (for autonomous pre-aim) ──────────────────────
     private static final double AUTO_OFFSET = 0.11765;
 
-    // Smoothing: 0 = no change, 1 = instant jump.  Tune between 0.08-0.25.
-    private static final double SMOOTHING_ALPHA = 0.15;
+    // ── LUT: angle (degrees) → servo position ─────────────────────────────
+    // Centre is 0.5 = 0°. Calibrate by pointing turret at known angles and
+    // recording the servo position that gets it there.
+    // The table MUST be sorted by ascending angle.
+    private static final double[][] ANGLE_TO_POS_LUT = {
+        // { angleDeg, servoPosition }
+        { -160,  0.915 },
+        {  -90,  0.735 },
+        {  -45,  0.617 },
+        {    0,  0.500 },
+        {   45,  0.383 },
+        {   90,  0.265 },
+        {  160,  0.085 },
+    };
 
-    // Dead-zone in degrees — ignore errors smaller than this to prevent jitter.
-    private static final double DEADZONE_DEG = 1.0;
+    // ── Internal state ─────────────────────────────────────────────────────
+    private double currentPosition = 0.5;   // actual servo position (smoothed)
+    private double cachedPosition  = 0.5;   // last value written to hardware
+    private double lastError       = 0;
+    private long   lastTimeNanos   = System.nanoTime();
 
-    private double smoothedPosition = 0.5;
+    // ════════════════════════════════════════════════════════════════════════
+    //  CONSTRUCTOR
+    // ════════════════════════════════════════════════════════════════════════
 
-    public Turret(HardwareMap hardwareMap){
+    public Turret(HardwareMap hardwareMap) {
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
 
-        turretServo1.setPosition(0.5);
-        turretServo2.setPosition(0.5);
-        turretServo3.setPosition(0.5);
-        smoothedPosition = 0.5;
+        applyPosition(0.5);
+        currentPosition = 0.5;
+        cachedPosition  = 0.5;
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  SETTERS (called by Testing / TeleOp each loop before update())
+    // ════════════════════════════════════════════════════════════════════════
 
     public void setHeading(double heading) {
         this.heading = heading;
     }
 
     /**
-     * Wraps an angle into the [-180, 180] range.
-     */
-    private static double wrapAngle(double angle) {
-        while (angle > 180)  angle -= 360;
-        while (angle < -180) angle += 360;
-        return angle;
-    }
-
-    /**
-     * Sets the target angle (signed, already wrapped by Position.getTargetAngle()).
-     * Applies proper [-180,180] wrapping for safety.
+     * Accepts a signed turret angle (degrees, [-180, 180]) from
+     * {@code Position.getTargetAngle()}.
      */
     public void setTargetAngle(double angle) {
-        this.targetAngle = wrapAngle(angle);
-    }
-
-    /**
-     * Core update — call once per loop.
-     *
-     * Computes the desired servo position from the signed targetAngle,
-     * applies a dead-zone to avoid jitter, and smooths the movement with
-     * an exponential low-pass filter.
-     */
-    public void update(){
-        double totalAngle = wrapAngle(targetAngle + offsetAngle);
-
-        // Dead-zone: if the correction is tiny, don't move
-        if (Math.abs(totalAngle) < DEADZONE_DEG) {
-            // Hold current smoothed position — no update
-            applyPosition(smoothedPosition);
-            return;
-        }
-
-        // Map angle to servo position.
-        // Positive angle → position < 0.5 (turn one way)
-        // Negative angle → position > 0.5 (turn the other way)
-        double rawPosition = 0.5 - (totalAngle / ratio);
-
-        // Clamp to valid servo range [0, 1]
-        rawPosition = Math.max(0.0, Math.min(1.0, rawPosition));
-
-        // Exponential low-pass filter for smooth motion
-        smoothedPosition = SMOOTHING_ALPHA * rawPosition + (1.0 - SMOOTHING_ALPHA) * smoothedPosition;
-
-        applyPosition(smoothedPosition);
-    }
-
-    /**
-     * Sends the position to all three turret servos.
-     */
-    private void applyPosition(double position) {
-        turretServo1.setPosition(position);
-        turretServo2.setPosition(position);
-        turretServo3.setPosition(position);
-    }
-
-    public void goNeutral(){
-        smoothedPosition = 0.5;
-        applyPosition(0.5);
-    }
-
-    public double getTargetAngle() {
-        return targetAngle;
-    }
-
-    public double getAngleRatio() {
-        return targetAngle / ratio;
-    }
-
-    public double getPosition(){
-        return turretServo1.getPosition();
+        this.targetAngle = normalizeAngle(angle);
     }
 
     public void setOffsetAngle(double offsetAngle) {
         this.offsetAngle = offsetAngle;
     }
 
-    /** @deprecated Use {@link #setTargetAngle(double)} with a signed angle from
-     *  {@code Position.getTargetAngle()} instead. */
+    // ════════════════════════════════════════════════════════════════════════
+    //  MAIN UPDATE — call once per loop
+    // ════════════════════════════════════════════════════════════════════════
+
+    public void update() {
+        // 1. Combine target + motion offset, normalize, clamp
+        double combinedAngle = normalizeAngle(targetAngle + offsetAngle);
+        combinedAngle = clamp(combinedAngle, -MAX_TURRET_ANGLE, MAX_TURRET_ANGLE);
+
+        // 2. Dead-zone: if turret is basically on target, hold position
+        if (Math.abs(combinedAngle) < DEADZONE_DEG) {
+            writePosition(currentPosition);
+            return;
+        }
+
+        // 3. Look up the desired servo position from the calibration table
+        double targetPosition = lutLookup(combinedAngle);
+
+        // 4. PD control: compute a smooth step toward targetPosition
+        double error = targetPosition - currentPosition;
+        long   now   = System.nanoTime();
+        double dt    = (now - lastTimeNanos) / 1e9;
+        double derivative = (dt > 0) ? (error - lastError) / dt : 0;
+        lastError     = error;
+        lastTimeNanos = now;
+
+        double step = kP_SERVO * error + kD_SERVO * derivative;
+
+        // 5. Clamp step to MAX_STEP (slew-rate limit for smooth motion)
+        step = clamp(step, -MAX_STEP, MAX_STEP);
+
+        // 6. Apply
+        currentPosition = clamp(currentPosition + step, 0.0, 1.0);
+        writePosition(currentPosition);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  PRESET POSITIONS
+    // ════════════════════════════════════════════════════════════════════════
+
+    public void goNeutral() {
+        currentPosition = 0.5;
+        cachedPosition  = -1;   // force write
+        applyPosition(0.5);
+    }
+
+    public void setAuto() {
+        currentPosition = 0.5 + AUTO_OFFSET;
+        cachedPosition  = -1;
+        applyPosition(currentPosition);
+    }
+
+    public void setAutoBlue() {
+        currentPosition = 0.5 - AUTO_OFFSET;
+        cachedPosition  = -1;
+        applyPosition(currentPosition);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  GETTERS
+    // ════════════════════════════════════════════════════════════════════════
+
+    public double getTargetAngle() {
+        return targetAngle;
+    }
+
+    /**
+     * @deprecated The LUT-based mapping replaced the linear ratio formula.
+     * This value (targetAngle / 192.857…) no longer reflects actual servo
+     * behaviour and is kept only for callers that depend on it.
+     */
+    @Deprecated
+    public double getAngleRatio() {
+        return targetAngle / 192.8571428571429;
+    }
+
+    public double getPosition() {
+        return turretServo1.getPosition();
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  DEPRECATED / COMPAT
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * @deprecated No longer used internally. Target angle is now the signed
+     * error from {@code Position.getTargetAngle()}.
+     */
     @Deprecated
     public void setAngle(double angle) {
-        // Kept for API compatibility (used by callers).
-        // No longer used internally — targetAngle is now the signed error.
-    }
-
-    public void setAuto(){
-        smoothedPosition = 0.5 + AUTO_OFFSET;
-        applyPosition(smoothedPosition);
-    }
-
-    public void setAutoBlue(){
-        smoothedPosition = 0.5 - AUTO_OFFSET;
-        applyPosition(smoothedPosition);
+        // no-op — kept for backward compatibility
     }
 
     public void setDifPos(double difPos) {
         this.difPos = difPos;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  INTERNAL HELPERS
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Linearly interpolates the LUT to map an angle (degrees) to a servo
+     * position (0–1).  Extrapolates flat beyond the table boundaries.
+     */
+    private static double lutLookup(double angleDeg) {
+        // Below first entry → clamp
+        if (angleDeg <= ANGLE_TO_POS_LUT[0][0]) {
+            return ANGLE_TO_POS_LUT[0][1];
+        }
+        // Above last entry → clamp
+        int last = ANGLE_TO_POS_LUT.length - 1;
+        if (angleDeg >= ANGLE_TO_POS_LUT[last][0]) {
+            return ANGLE_TO_POS_LUT[last][1];
+        }
+        // Interpolate between two surrounding entries
+        for (int i = 0; i < last; i++) {
+            double aLo = ANGLE_TO_POS_LUT[i][0];
+            double aHi = ANGLE_TO_POS_LUT[i + 1][0];
+            if (angleDeg >= aLo && angleDeg <= aHi) {
+                double t = (angleDeg - aLo) / (aHi - aLo);
+                return ANGLE_TO_POS_LUT[i][1] + t * (ANGLE_TO_POS_LUT[i + 1][1] - ANGLE_TO_POS_LUT[i][1]);
+            }
+        }
+        return 0.5; // fallback (should never reach here)
+    }
+
+    /** Normalize an angle to [-180, 180]. */
+    private static double normalizeAngle(double angle) {
+        while (angle >  180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
+    }
+
+    /** Clamp a value to [min, max]. */
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    /**
+     * Only writes to the three servos if the position has changed by more
+     * than POSITION_WRITE_THRESHOLD since the last write.
+     * Reduces USB-bus traffic and prevents unnecessary micro-commands.
+     */
+    private void writePosition(double position) {
+        if (Math.abs(position - cachedPosition) > POSITION_WRITE_THRESHOLD) {
+            applyPosition(position);
+            cachedPosition = position;
+        }
+    }
+
+    /** Low-level: sends the same position to all three turret servos. */
+    private void applyPosition(double position) {
+        turretServo1.setPosition(position);
+        turretServo2.setPosition(position);
+        turretServo3.setPosition(position);
     }
 }
