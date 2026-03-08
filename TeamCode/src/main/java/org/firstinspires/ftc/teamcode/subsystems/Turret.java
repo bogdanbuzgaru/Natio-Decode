@@ -4,19 +4,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * 3-servo turret with PD control and LUT-based angle→position mapping.
+ * 3-servo turret using a LUT (lookup table) for angle→position mapping
+ * with exponential smoothing for jitter-free motion.
  *
- * Adapted from the proven motor-based turret that uses PD + LUT.
- * Instead of driving a motor with power, we compute a target servo
- * position from a lookup table and approach it with a PD-controlled
- * step each loop cycle for smooth, responsive, jitter-free motion.
+ * Position servos have their own internal controller, so the correct
+ * approach is to compute the desired absolute position from the LUT and
+ * set it directly — no incremental PD stepping needed (that pattern is
+ * for DC motors, not servos, and causes severe tracking lag).
  *
- * Tuning guide (all constants are at the top):
- *   kP_SERVO  – proportional gain on position error (start 0.35, raise for snappier)
- *   kD_SERVO  – derivative gain (start 0.01, raise if overshooting)
- *   DEADZONE_DEG – ignore angles smaller than this (prevents micro-jitter)
- *   MAX_STEP  – largest servo-position jump per loop (limits speed, prevents slam)
- *   POSITION_WRITE_THRESHOLD – skip USB write if change is smaller than this
+ * Tuning guide:
+ *   SMOOTHING_ALPHA         – 0 = frozen, 1 = instant jump; 0.4 is a good start
+ *   DEADZONE_DEG            – ignore corrections smaller than this (prevents jitter)
+ *   POSITION_WRITE_THRESHOLD– skip USB write if change is smaller than this
+ *   ANGLE_TO_POS_LUT        – calibrate by recording servo positions at known angles
  */
 public class Turret {
 
@@ -28,17 +28,17 @@ public class Turret {
     private double offsetAngle;   // motion-compensation offset in degrees
     private double difPos;        // kept for API compatibility
 
-    // ── PD gains for servo position control ────────────────────────────────
-    /** Proportional gain on (targetPos − currentPos).  0.35 is a good start. */
-    private static final double kP_SERVO = 0.35;
-    /** Derivative gain — dampens oscillation.  Increase if turret overshoots. */
-    private static final double kD_SERVO = 0.01;
+    // ── Smoothing ──────────────────────────────────────────────────────────
+    /**
+     * Exponential smoothing factor for servo position.
+     * 0 = never moves, 1 = instant jump.
+     * 0.4 gives fast, jitter-free tracking; raise toward 1.0 for snappier response.
+     */
+    private static final double SMOOTHING_ALPHA = 0.4;
 
     // ── Limits ─────────────────────────────────────────────────────────────
     /** Ignore turret corrections smaller than this (degrees). */
     private static final double DEADZONE_DEG = 0.8;
-    /** Max servo-position change per loop cycle (limits slew rate). */
-    private static final double MAX_STEP = 0.025;
     /** Clamp combined turret angle to this range (degrees). */
     private static final double MAX_TURRET_ANGLE = 140.0;
     /** Only push a new position to the servos when the delta exceeds this. */
@@ -63,10 +63,8 @@ public class Turret {
     };
 
     // ── Internal state ─────────────────────────────────────────────────────
-    private double currentPosition = 0.5;   // actual servo position (smoothed)
+    private double currentPosition = 0.5;   // smoothed servo position
     private double cachedPosition  = 0.5;   // last value written to hardware
-    private double lastError       = 0;
-    private long   lastTimeNanos   = System.nanoTime();
 
     // ════════════════════════════════════════════════════════════════════════
     //  CONSTRUCTOR
@@ -117,24 +115,16 @@ public class Turret {
             return;
         }
 
-        // 3. Look up the desired servo position from the calibration table
+        // 3. Look up the desired absolute servo position from the calibration table
         double targetPosition = lutLookup(combinedAngle);
 
-        // 4. PD control: compute a smooth step toward targetPosition
-        double error = targetPosition - currentPosition;
-        long   now   = System.nanoTime();
-        double dt    = (now - lastTimeNanos) / 1e9;
-        double derivative = (dt > 0) ? (error - lastError) / dt : 0;
-        lastError     = error;
-        lastTimeNanos = now;
+        // 4. Exponential smoothing toward target — the servo's own controller handles
+        //    the physical motion; we only need to damp high-frequency jitter here.
+        //    Raise SMOOTHING_ALPHA for snappier tracking, lower it to reduce jitter.
+        currentPosition = SMOOTHING_ALPHA * targetPosition
+                        + (1.0 - SMOOTHING_ALPHA) * currentPosition;
 
-        double step = kP_SERVO * error + kD_SERVO * derivative;
-
-        // 5. Clamp step to MAX_STEP (slew-rate limit for smooth motion)
-        step = clamp(step, -MAX_STEP, MAX_STEP);
-
-        // 6. Apply
-        currentPosition = clamp(currentPosition + step, 0.0, 1.0);
+        // 5. Write (skipped if change is below threshold — saves USB bandwidth)
         writePosition(currentPosition);
     }
 
