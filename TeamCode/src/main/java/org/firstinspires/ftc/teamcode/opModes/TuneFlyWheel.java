@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 @TeleOp
 public class TuneFlyWheel extends OpMode {
     private DcMotorEx leftShooter, rightShooter;
-    private double lowVelocity = 1067;
+    private double lowVelocity = 767;
     private double midVelocity = 1256;
-    private double highVelocity = 1400;
+    private double highVelocity = 1700;
     private double veryhighVelocity = 2100;
     private double currentVelocity = 0;
 
@@ -25,8 +25,8 @@ public class TuneFlyWheel extends OpMode {
     private int counter = 0, velCounter = 0;
 
     public void init(){
-        leftShooter = hardwareMap.get(DcMotorEx.class, "leftShooter");
-        rightShooter = hardwareMap.get(DcMotorEx.class, "rightShooter");
+        leftShooter = hardwareMap.get(DcMotorEx.class, "flywheel1");
+        rightShooter = hardwareMap.get(DcMotorEx.class, "flywheel2");
         leftShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightShooter.setDirection(DcMotorEx.Direction.REVERSE);

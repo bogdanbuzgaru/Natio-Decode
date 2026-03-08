@@ -155,6 +155,12 @@ public class Testing extends OpMode {
             }
         }
         shooter.update();
+
+        telemetry.addData("X", pinpoint.getPosX(DistanceUnit.INCH));
+        telemetry.addData("Y", pinpoint.getPosY(DistanceUnit.INCH));
+        telemetry.addData("target angle", pos.getTargetAngle());
+        telemetry.addData("velocity", shooter.getTicks());
+        telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
     }
 
     private void setUp(){
@@ -166,7 +172,7 @@ public class Testing extends OpMode {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 boolean ballPresent = !Double.isNaN(distance) && distance < 5.2;
                 if(ballPresent){
-                    gamepad1.rumble(700);
+                    gamepad1.rumble(200);
                     return State.E_BILE;
                 }
                 timer.reset();
@@ -224,7 +230,7 @@ public class Testing extends OpMode {
             if (gamepad.dpadUpWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        actualPositionX(120.000), actualPositionY(96.000),        //Up
+                        113.6, 102,        //Up
                         AngleUnit.DEGREES,
                         0
                 ));
@@ -233,7 +239,7 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadLeftWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        actualPositionX(0) + 2.48818898, Math.abs(actualPositionY(0)),    //opposite human player
+                        20.67, 18.2,    //opposite human player
                         AngleUnit.DEGREES,
                         180
                 ));
@@ -242,7 +248,7 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadDownWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        actualPositionX(120.000), actualPositionY(81.000),    //Up barrier
+                        113.4, 91,    //Up barrier
                         AngleUnit.DEGREES,
                         0
                 ));
@@ -251,7 +257,7 @@ public class Testing extends OpMode {
             }else if(gamepad.dpadRightWasPressed()){
                 pinpoint.setPosition(new Pose2D(
                         DistanceUnit.INCH,              //TODO tune
-                        144.000 - 9.7322834608, Math.abs(actualPositionY(0)),    //our human player
+                        120.6, 24.9,    //our human player
                         AngleUnit.DEGREES,
                         0
                 ));

@@ -27,11 +27,14 @@ public class Shooter {
         barrier = hardwareMap.get(Servo.class, "barrier");
         hood = hardwareMap.get(Servo.class, "hood");
 
+        flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 
-        flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(220,0,0,11.7));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(220,0,0,11.7));
 
 
         lowerBarrier();
@@ -52,7 +55,7 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = Math.min(ticks/2600 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+        targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){
