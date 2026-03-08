@@ -1,83 +1,80 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * 3-servo turret using a LUT (lookup table) for angle→position mapping
- * with exponential smoothing for jitter-free motion.
+ * 3-servo turret driven by Continuous-Rotation Servos (CRServos).
  *
- * Position servos have their own internal controller, so the correct
- * approach is to compute the desired absolute position from the LUT and
- * set it directly — no incremental PD stepping needed (that pattern is
- * for DC motors, not servos, and causes severe tracking lag).
+ * CRServos are velocity-controlled: {@code setPower(p)} where p ∈ [−1, 1]
+ * sets spin speed and direction — they have NO built-in position control.
+ * The correct approach is proportional control:
+ *
+ *     power = kP × angle_error   (clamped to [−1, 1])
+ *
+ * The {@code targetAngle} supplied by {@code Position.getTargetAngle()} is
+ * already the signed angular error (how far off the turret is), so it feeds
+ * directly into the P-controller each loop.
  *
  * Tuning guide:
- *   SMOOTHING_ALPHA         – 0 = frozen, 1 = instant jump; 0.4 is a good start
- *   DEADZONE_DEG            – ignore corrections smaller than this (prevents jitter)
- *   POSITION_WRITE_THRESHOLD– skip USB write if change is smaller than this
- *   ANGLE_TO_POS_LUT        – calibrate by recording servo positions at known angles
+ *   kP              – proportional gain; raise for faster response, lower if oscillating
+ *   DEADZONE_DEG    – errors smaller than this stop the motors (prevents jitter)
+ *   MAX_TURRET_ANGLE– clamp combined angle to this range (degrees)
+ *   POWER_THRESHOLD – skip setPower() call if change is below this (saves USB bandwidth)
+ *
+ * Hardware configuration: in the Robot Controller config the three servo
+ * ports must be set to "Continuous Servo" mode and named turretServo1/2/3.
+ * If the turret spins the wrong way, negate kP.
  */
 public class Turret {
 
-    private Servo turretServo1, turretServo2, turretServo3;
+    private CRServo turretServo1, turretServo2, turretServo3;
 
     // ── Inputs (set by callers each loop) ──────────────────────────────────
     private double targetAngle;   // signed degrees from Position.getTargetAngle()
-    private double heading;       // robot heading in degrees
+    private double heading;       // robot heading in degrees (kept for API compat)
     private double offsetAngle;   // motion-compensation offset in degrees
     private double difPos;        // kept for API compatibility
 
-    // ── Smoothing ──────────────────────────────────────────────────────────
+    // ── Proportional gain ──────────────────────────────────────────────────
     /**
-     * Exponential smoothing factor for servo position.
-     * 0 = never moves, 1 = instant jump.
-     * 0.4 gives fast, jitter-free tracking; raise toward 1.0 for snappier response.
+     * P-gain converting angle error (degrees) to CRServo power.
+     * At kP = 0.01: a 100° error → power 1.0 (full speed).
+     * If the turret rotates in the wrong direction, flip the sign.
      */
-    private static final double SMOOTHING_ALPHA = 0.4;
+    private static final double kP = 0.01;
 
     // ── Limits ─────────────────────────────────────────────────────────────
-    /** Ignore turret corrections smaller than this (degrees). */
-    private static final double DEADZONE_DEG = 0.8;
+    /** Errors smaller than this (degrees) stop the turret — prevents jitter. */
+    private static final double DEADZONE_DEG = 1.5;
     /** Clamp combined turret angle to this range (degrees). */
     private static final double MAX_TURRET_ANGLE = 140.0;
-    /** Only push a new position to the servos when the delta exceeds this. */
-    private static final double POSITION_WRITE_THRESHOLD = 0.003;
+    /** Skip setPower() call when the new power is within this of the last written value. */
+    private static final double POWER_THRESHOLD = 0.01;
 
-    // ── Auto-position offset (for autonomous pre-aim) ──────────────────────
-    private static final double AUTO_OFFSET = 0.11765;
-
-    // ── LUT: angle (degrees) → servo position ─────────────────────────────
-    // Centre is 0.5 = 0°. Calibrate by pointing turret at known angles and
-    // recording the servo position that gets it there.
-    // The table MUST be sorted by ascending angle.
-    private static final double[][] ANGLE_TO_POS_LUT = {
-        // { angleDeg, servoPosition }
-        { -160,  0.915 },
-        {  -90,  0.735 },
-        {  -45,  0.617 },
-        {    0,  0.500 },
-        {   45,  0.383 },
-        {   90,  0.265 },
-        {  160,  0.085 },
-    };
+    // ── Auto pre-aim angles ────────────────────────────────────────────────
+    /**
+     * Pre-aim target angles (degrees) for autonomous red/blue modes.
+     * After calling setAuto()/setAutoBlue(), drive update() in a loop
+     * until the turret reaches the target.
+     */
+    private static final double AUTO_ANGLE_RED  =  45.0;
+    private static final double AUTO_ANGLE_BLUE = -45.0;
 
     // ── Internal state ─────────────────────────────────────────────────────
-    private double currentPosition = 0.5;   // smoothed servo position
-    private double cachedPosition  = 0.5;   // last value written to hardware
+    private double currentPower = 0.0;          // last power sent to the CRServos
+    private double cachedPower  = Double.NaN;   // sentinel — forces write on first call
 
     // ════════════════════════════════════════════════════════════════════════
     //  CONSTRUCTOR
     // ════════════════════════════════════════════════════════════════════════
 
     public Turret(HardwareMap hardwareMap) {
-        turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
-        turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
-        turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
+        turretServo1 = hardwareMap.get(CRServo.class, "turretServo1");
+        turretServo2 = hardwareMap.get(CRServo.class, "turretServo2");
+        turretServo3 = hardwareMap.get(CRServo.class, "turretServo3");
 
-        applyPosition(0.5);
-        currentPosition = 0.5;
-        cachedPosition  = 0.5;
+        applyPower(0.0);
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -89,7 +86,7 @@ public class Turret {
     }
 
     /**
-     * Accepts a signed turret angle (degrees, [-180, 180]) from
+     * Accepts a signed turret angle error (degrees, [-180, 180]) from
      * {@code Position.getTargetAngle()}.
      */
     public void setTargetAngle(double angle) {
@@ -109,45 +106,46 @@ public class Turret {
         double combinedAngle = normalizeAngle(targetAngle + offsetAngle);
         combinedAngle = clamp(combinedAngle, -MAX_TURRET_ANGLE, MAX_TURRET_ANGLE);
 
-        // 2. Dead-zone: if turret is basically on target, hold position
+        // 2. Dead-zone: close enough → stop
         if (Math.abs(combinedAngle) < DEADZONE_DEG) {
-            writePosition(currentPosition);
+            writePower(0.0);
             return;
         }
 
-        // 3. Look up the desired absolute servo position from the calibration table
-        double targetPosition = lutLookup(combinedAngle);
+        // 3. Proportional control: drive power proportional to angle error.
+        //    CRServos are velocity-controlled so this naturally slows down
+        //    as the turret approaches its target.
+        double power = clamp(kP * combinedAngle, -1.0, 1.0);
 
-        // 4. Exponential smoothing toward target — the servo's own controller handles
-        //    the physical motion; we only need to damp high-frequency jitter here.
-        //    Raise SMOOTHING_ALPHA for snappier tracking, lower it to reduce jitter.
-        currentPosition = SMOOTHING_ALPHA * targetPosition
-                        + (1.0 - SMOOTHING_ALPHA) * currentPosition;
-
-        // 5. Write (skipped if change is below threshold — saves USB bandwidth)
-        writePosition(currentPosition);
+        // 4. Write (skipped when change is below threshold — saves USB bandwidth)
+        writePower(power);
     }
 
     // ════════════════════════════════════════════════════════════════════════
     //  PRESET POSITIONS
     // ════════════════════════════════════════════════════════════════════════
 
+    /** Immediately stops the turret and resets the target angle to 0. */
     public void goNeutral() {
-        currentPosition = 0.5;
-        cachedPosition  = -1;   // force write
-        applyPosition(0.5);
+        targetAngle = 0;
+        cachedPower = Double.NaN;   // force write
+        applyPower(0.0);
     }
 
+    /**
+     * Pre-aims the turret for autonomous red alliance.
+     * Must be followed by calling {@code update()} in a loop until on target.
+     */
     public void setAuto() {
-        currentPosition = 0.5 + AUTO_OFFSET;
-        cachedPosition  = -1;
-        applyPosition(currentPosition);
+        targetAngle = AUTO_ANGLE_RED;
     }
 
+    /**
+     * Pre-aims the turret for autonomous blue alliance.
+     * Must be followed by calling {@code update()} in a loop until on target.
+     */
     public void setAutoBlue() {
-        currentPosition = 0.5 - AUTO_OFFSET;
-        cachedPosition  = -1;
-        applyPosition(currentPosition);
+        targetAngle = AUTO_ANGLE_BLUE;
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -159,17 +157,17 @@ public class Turret {
     }
 
     /**
-     * @deprecated The LUT-based mapping replaced the linear ratio formula.
-     * This value (targetAngle / 192.857…) no longer reflects actual servo
-     * behaviour and is kept only for callers that depend on it.
+     * @deprecated The proportional power model replaced the linear ratio formula.
+     * Kept only for callers that depend on it.
      */
     @Deprecated
     public double getAngleRatio() {
         return targetAngle / 192.8571428571429;
     }
 
+    /** Returns the last power value written to the turret CRServos. */
     public double getPosition() {
-        return turretServo1.getPosition();
+        return currentPower;
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -193,32 +191,6 @@ public class Turret {
     //  INTERNAL HELPERS
     // ════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Linearly interpolates the LUT to map an angle (degrees) to a servo
-     * position (0–1).  Extrapolates flat beyond the table boundaries.
-     */
-    private static double lutLookup(double angleDeg) {
-        // Below first entry → clamp
-        if (angleDeg <= ANGLE_TO_POS_LUT[0][0]) {
-            return ANGLE_TO_POS_LUT[0][1];
-        }
-        // Above last entry → clamp
-        int last = ANGLE_TO_POS_LUT.length - 1;
-        if (angleDeg >= ANGLE_TO_POS_LUT[last][0]) {
-            return ANGLE_TO_POS_LUT[last][1];
-        }
-        // Interpolate between two surrounding entries
-        for (int i = 0; i < last; i++) {
-            double aLo = ANGLE_TO_POS_LUT[i][0];
-            double aHi = ANGLE_TO_POS_LUT[i + 1][0];
-            if (angleDeg >= aLo && angleDeg <= aHi) {
-                double t = (angleDeg - aLo) / (aHi - aLo);
-                return ANGLE_TO_POS_LUT[i][1] + t * (ANGLE_TO_POS_LUT[i + 1][1] - ANGLE_TO_POS_LUT[i][1]);
-            }
-        }
-        return 0.5; // fallback (should never reach here)
-    }
-
     /** Normalize an angle to [-180, 180]. */
     private static double normalizeAngle(double angle) {
         while (angle >  180) angle -= 360;
@@ -232,21 +204,22 @@ public class Turret {
     }
 
     /**
-     * Only writes to the three servos if the position has changed by more
-     * than POSITION_WRITE_THRESHOLD since the last write.
-     * Reduces USB-bus traffic and prevents unnecessary micro-commands.
+     * Only writes to the three CRServos if the power has changed by more
+     * than POWER_THRESHOLD since the last write.
+     * Reduces USB-bus traffic and prevents unnecessary repeated commands.
      */
-    private void writePosition(double position) {
-        if (Math.abs(position - cachedPosition) > POSITION_WRITE_THRESHOLD) {
-            applyPosition(position);
-            cachedPosition = position;
+    private void writePower(double power) {
+        if (Double.isNaN(cachedPower) || Math.abs(power - cachedPower) > POWER_THRESHOLD) {
+            applyPower(power);
+            cachedPower = power;
         }
     }
 
-    /** Low-level: sends the same position to all three turret servos. */
-    private void applyPosition(double position) {
-        turretServo1.setPosition(position);
-        turretServo2.setPosition(position);
-        turretServo3.setPosition(position);
+    /** Low-level: sends the same power to all three turret CRServos. */
+    private void applyPower(double power) {
+        turretServo1.setPower(power);
+        turretServo2.setPower(power);
+        turretServo3.setPower(power);
+        currentPower = power;
     }
 }
