@@ -100,16 +100,16 @@ public class Position {
             return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH)) + 14);
     }
     public double getTargetAngle(){
-        double h = heading;
         double targetHead;
         if(red)
             targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
         else
             targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH))) + 14;
-        if(Math.abs(h - targetHead) > 180){
-            return 360 - Math.abs(h - targetHead);
-        }
-        return Math.abs(h - targetHead);
+        double error = targetHead - heading;
+        // Wrap to [-180, 180]
+        while (error > 180) error -= 360;
+        while (error < -180) error += 360;
+        return error;
     }
     //------------------LINEAR EQUATIONS------------------
     private void calculateLinearEquations() {
