@@ -246,13 +246,13 @@ public class Position {
         double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);
-        return Math.max((int)((int) slope * hypo + extra + 390), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 500), 2167);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);       //TODO tune 1600
-        return Math.max((int)((int) slope * hypo + extra + 390), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 500), 2167);
     }
     public void whereToShoot(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){
@@ -269,8 +269,8 @@ public class Position {
         return red;
     }
     public double offsetAngleRed(double robotVelocityX, double robotVelocityY, double vx) {
-        double dx = 130 - pose.getX(DistanceUnit.INCH);
-        double dy = 130 - pose.getY(DistanceUnit.INCH);
+        double dx = Math.abs(130 - pose.getX(DistanceUnit.INCH));
+        double dy = Math.abs(130 - pose.getY(DistanceUnit.INCH));
         double robotToGoalTheta = Math.atan2(dy, dx);
 
         double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);
@@ -286,8 +286,8 @@ public class Position {
     }
     public double offsetAngleBlue(double robotVelocityX, double robotVelocityY, double vx) {
 
-        double dx = pose.getX(DistanceUnit.INCH) - 14;
-        double dy = 130 - pose.getY(DistanceUnit.INCH);
+        double dx = Math.abs(pose.getX(DistanceUnit.INCH) - 14);
+        double dy = Math.abs(130 - pose.getY(DistanceUnit.INCH));
         double robotToGoalTheta = Math.atan2(dy, dx);
 
         double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);

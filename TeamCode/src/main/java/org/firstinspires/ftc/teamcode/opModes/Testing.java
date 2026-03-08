@@ -84,7 +84,7 @@ public class Testing extends OpMode {
         ));
         pinpoint.recalibrateIMU();
         setUp();
-    }
+    }                                       //TODO Make the big triangle good and far other tan angle
     public void loop() {
 
         pinpoint.update();
@@ -168,7 +168,7 @@ public class Testing extends OpMode {
             timer.reset();
             return null;});
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            if (timer.milliseconds() >= 300) {
+            if (timer.milliseconds() >= 450) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 boolean ballPresent = !Double.isNaN(distance) && distance < 5.2;
                 if(ballPresent){
