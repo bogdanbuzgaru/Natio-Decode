@@ -33,6 +33,7 @@ public class Position {
     private boolean blue = false;
     private boolean red = true;
     private boolean shootClose = true;
+    private boolean changeCord = false;
     public Position (Pose2D pose){
         this.pose = pose;
         heading = pose.getHeading(AngleUnit.DEGREES);
@@ -97,14 +98,26 @@ public class Position {
         if(red)
             return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
         else
-            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH)) + 14);
+            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH)) - 14));
     }
+
+    public void setChangeCord(boolean changeCord) {
+        this.changeCord = changeCord;
+    }
+
     public double getTargetAngle(){
-        double targetHead;
-        if(red)
-            targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
-        else
-            targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH))) + 14;
+        double targetHead = 0;
+        if(!changeCord) {
+            if (red)
+                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
+            else if (blue)
+                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 14);
+        }else{
+            if (red)
+                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
+            else if (blue)
+                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 9);
+        }
         double error = targetHead - heading;
         // Wrap to [-180, 180]
         while (error > 180) error -= 360;
@@ -243,16 +256,16 @@ public class Position {
         }
     }
     public int getTicks(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
+        double hypo = Math.hypot(Math.abs(135 - pose.getX(DistanceUnit.INCH)), Math.abs(135 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);
-        return Math.max((int)((int) slope * hypo + extra + 500), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 300), 2167);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
         if(shootClose)
             return Math.min((int)((int) slope * hypo + extra), 1600);       //TODO tune 1600
-        return Math.max((int)((int) slope * hypo + extra + 500), 2167);
+        return Math.max((int)((int) slope * hypo + extra + 300), 2167);
     }
     public void whereToShoot(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){
