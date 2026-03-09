@@ -324,7 +324,7 @@ public class RedClose extends OpMode {
             PREPARE_SECOND = (follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(84.000, 84.000),
-                                    new Pose(84.000, 62.000)
+                                    new Pose(84.000, 66.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -332,7 +332,7 @@ public class RedClose extends OpMode {
 
             SECOND_ROW = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(100.000,65.000),
+                                    new Pose(100.000,66.000),
                                     new Pose(127.000, 65.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

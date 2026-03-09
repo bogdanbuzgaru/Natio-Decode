@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.pid.SimpleMotorFeedforward;
 public class Shooter {
     private DcMotorEx flywheelMotor1, flywheelMotor2;
     private Servo barrier, hood;
-    private double ticks = 1530;
-    private double hoodPosition;
+    private double ticks = 1000;
+    private double hoodPosition = 0;
     private double targetHood;
     private PIDController p = new PIDController(kp, 0, 0);
     public static  double ks = 0.0747, kv = 0.00008118565, ka = 0.01, kp = 0.01, velocity, nominalVoltage = 10.7;
@@ -52,6 +52,9 @@ public class Shooter {
 
     public double getTicks() {
         return flywheelMotor1.getVelocity();
+    }
+    public double getHoodPosition(){
+        return hood.getPosition();
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
@@ -88,7 +91,26 @@ public class Shooter {
             flywheelMotor2.setVelocity(ticks);
         }
     }
-    public void setHoodPosition(double hoodPosition) {
-//        this.hoodPosition = hoodPosition;
+    public void setHoodPosition(Gamepad gamepad) {
+        if(gamepad.dpadUpWasPressed()) {
+            hoodPosition += 0.1;
+            hood.setPosition(hoodPosition);
+        }else if (gamepad.dpadDownWasPressed()){
+            hoodPosition -= 0.1;
+            hood.setPosition(hoodPosition);
+        }
+        if (gamepad.leftBumperWasPressed()){
+            ticks -=50;
+        }else if (gamepad.rightBumperWasPressed()){
+            ticks +=50;
+        }
+
+        if(gamepad.crossWasPressed()){
+            raiseBarrier();
+        }else if (gamepad.circleWasPressed()){
+            lowerBarrier();
+        }
+        flywheelMotor1.setVelocity(ticks);
+        flywheelMotor2.setVelocity(ticks);
     }
 }

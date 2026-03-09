@@ -71,7 +71,7 @@ public class Testing extends OpMode {
 //        shooterCalculations = new ShooterCalculations(35, 45, 0.14,
 //                1, 8.85, 332);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(3.64173228, 5.5511811, DistanceUnit.INCH);
+        pinpoint.setOffsets(4.133859, 4.133858, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
@@ -134,15 +134,15 @@ public class Testing extends OpMode {
             pos.setChangeCord(true);
         }
         if(pos.isRed()) {
-            shooter.setTicks(pos.getTicks(8.8057, 1098));
-            turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
+            shooter.setTicks(pos.getTicks(11.45522, 764.68357));
+//            turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
             turret.setTargetAngle(pos.getTargetAngle());
             turret.setOffsetAngle(pos.offsetAngleRed(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH), pos.getTicks(8.8057, 1098)));
         }else if(pos.isBlue()){
-            shooter.setTicks(pos.getTicksBlue(8.8057, 1098));
-            turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
+            shooter.setTicks(pos.getTicksBlue(11.45522,764.68357));
+//            turret.setHeading(pinpoint.getHeading(AngleUnit.DEGREES));
             turret.setTargetAngle(pos.getTargetAngle());
-            turret.setOffsetAngle(pos.offsetAngleBlue(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH), pos.getTicks(8.8057, 1098)));
+            turret.setOffsetAngle(pos.getOffetAngle(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH)));
         }
 
         shooter.update();
@@ -152,6 +152,11 @@ public class Testing extends OpMode {
         telemetry.addData("target angle", pos.getTargetAngle());
         telemetry.addData("velocity", shooter.getTicks());
         telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("First servo position", turret.getPosition1());
+        telemetry.addData("Second servo position", turret.getPosition2());
+        telemetry.addData("Third servo position", turret.getPosition3());
+        telemetry.addData("Target angle", turret.getTargetAngle());
+//        telemetry.addData("Angle ratio", turret.getAngleRatio());
     }
 
     private void setUp(){
@@ -204,7 +209,6 @@ public class Testing extends OpMode {
                 leftBumperHoldTimer.reset();
                 leftBumperWasPressed = true;
             }
-
             // Check if held long enough
             if (leftBumperHoldTimer.seconds() >= holdTimeSeconds) {
                 return true;

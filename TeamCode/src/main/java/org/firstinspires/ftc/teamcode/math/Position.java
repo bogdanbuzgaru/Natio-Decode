@@ -111,14 +111,20 @@ public class Position {
             if (red)
                 targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
             else if (blue)
-                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 14);
+                targetHead =  Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 14);
         }else{
             if (red)
                 targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
             else if (blue)
                 targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 9);
         }
+
         double error = targetHead - heading;
+        if(red){
+            error = targetHead - heading;
+        }else if (blue){
+            error = 180 - targetHead - heading;
+        }
         // Wrap to [-180, 180]
         while (error > 180) error -= 360;
         while (error < -180) error += 360;
@@ -212,9 +218,9 @@ public class Position {
             double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
 
             return turretOffsetAngle;
-        }else{
-            double dx = 6 + pose.getX(DistanceUnit.INCH);
-            double dy = 138 - pose.getY(DistanceUnit.INCH);
+        }else if (blue){
+            double dx = Math.abs(pose.getX(DistanceUnit.INCH) - 6);
+            double dy = Math.abs(138 - pose.getY(DistanceUnit.INCH));
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
@@ -240,6 +246,7 @@ public class Position {
 
             return turretOffsetAngle;
         }
+        return 0;
     }
     public boolean activateOrientation(){
         double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));
@@ -256,10 +263,8 @@ public class Position {
         }
     }
     public int getTicks(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(135 - pose.getX(DistanceUnit.INCH)), Math.abs(135 - pose.getY(DistanceUnit.INCH)));
-        if(shootClose)
-            return Math.min((int)((int) slope * hypo + extra), 1600);
-        return Math.max((int)((int) slope * hypo + extra + 300), 2167);
+        double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
+        return (int)((int) slope * hypo + extra);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
