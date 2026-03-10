@@ -121,7 +121,6 @@ public class Turret {
      * Preset positions for auto
      */
     public void setAuto(){
-        // 0.11765 * 192.86 = 22.69° offset
         double position = SERVO_CENTER + 0.11765;
         turretServo1.setPosition(position);
         turretServo2.setPosition(position);

@@ -45,7 +45,7 @@ public class Shooter {
         adaptiveHood();
     }
     public void setTicks(double ticks) {
-        if(Math.abs(this.ticks - ticks) >= 50){
+        if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
     }
@@ -58,12 +58,17 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = flywheelMotor1.getVelocity() - ticks;
-        targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
-        if(ticks < 1728){
-            targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
-        }else {
-            targetHood = Math.min(ticks / 2720 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+        if(ticks >= 1400){
+            targetHood = Math.min(0.3 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+        }else{
+            targetHood = 0;
         }
+//        targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+//        if(ticks < 1728){
+//            targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+//        }else {
+//            targetHood = Math.min(ticks / 2720 + Math.min(hoodPosition + error * 0.0005, 1), 1);
+//        }
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){

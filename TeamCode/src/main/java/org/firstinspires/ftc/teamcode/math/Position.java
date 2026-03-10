@@ -125,7 +125,6 @@ public class Position {
         }else if (blue){
             error = 180 - targetHead - heading;
         }
-        // Wrap to [-180, 180]
         while (error > 180) error -= 360;
         while (error < -180) error += 360;
         return error;
