@@ -82,7 +82,7 @@ public class RedClose extends OpMode {
 
         turret.setAuto();
 
-        shooter.setTicks(1600);
+        shooter.setTicks(1450);
         shooter.update();
     }
     public void stop(){
@@ -201,7 +201,7 @@ public class RedClose extends OpMode {
             intake.autoTake();
             if(!follower.isBusy() && !repeat) {
                 return handleShoot(AutoState.PREPARE_LAST_ROW, 700, false);
-            }else if (follower.isBusy() && repeat){
+            }else if (!follower.isBusy() && repeat){
                 return handleShoot(AutoState.GO_TO_GOAL, 700, false);
             }
             return null;
@@ -309,12 +309,12 @@ public class RedClose extends OpMode {
             return value - 9.7322834608;
         }
         private double actualPositionY(double value){
-            return value - 6.67322833945;
+            return value - 6.692913;
         }
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(actualPositionX(120.000), actualPositionY(149.000)),
+                                            new Pose(actualPositionX(120.000), actualPositionY(141.000)),
                                             new Pose(90.000, 90.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

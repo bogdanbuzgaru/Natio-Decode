@@ -111,20 +111,16 @@ public class Position {
             if (red)
                 targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
             else if (blue)
-                targetHead =  Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 14);
-        }else{
+                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), -130 - pose.getX(DistanceUnit.INCH)));
+        } else {
             if (red)
                 targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
             else if (blue)
-                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH))) - 9);
+                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), -135 - pose.getX(DistanceUnit.INCH)));
         }
 
         double error = targetHead - heading;
-        if(red){
-            error = targetHead - heading;
-        }else if (blue){
-            error = 180 - targetHead - heading;
-        }
+
         while (error > 180) error -= 360;
         while (error < -180) error += 360;
         return error;
@@ -262,14 +258,12 @@ public class Position {
         }
     }
     public int getTicks(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(130 - pose.getX(DistanceUnit.INCH)), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
+        double hypo = Math.hypot(Math.abs(138 - pose.getX(DistanceUnit.INCH)), Math.abs(138 - pose.getY(DistanceUnit.INCH)));
         return (int)((int) slope * hypo + extra);
     }
     public int getTicksBlue(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 14), Math.abs(130 - pose.getY(DistanceUnit.INCH)));
-        if(shootClose)
-            return Math.min((int)((int) slope * hypo + extra), 1600);       //TODO tune 1600
-        return Math.max((int)((int) slope * hypo + extra + 300), 2167);
+        double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 6), Math.abs(138 - pose.getY(DistanceUnit.INCH)));
+        return (int)((int) slope * hypo + extra);
     }
     public void whereToShoot(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){
