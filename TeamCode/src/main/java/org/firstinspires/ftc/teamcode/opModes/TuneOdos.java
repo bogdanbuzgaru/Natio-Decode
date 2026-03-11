@@ -15,7 +15,7 @@ public class TuneOdos extends OpMode {
 
     private GoBildaPinpointDriver pinpoint;
     private Movement movement;
-    private double x = 3.64173228, y = 5.5511811;
+    private double x = 3.5433070866, y = -4.2519685039;
 
     private double step = 1;
 
@@ -69,6 +69,8 @@ public class TuneOdos extends OpMode {
 
 
         pinpoint.update();
+        telemetry.addData("X offset", x);
+        telemetry.addData("Y offset", y);
         telemetry.addData("X", pinpoint.getPosX(DistanceUnit.INCH));
         telemetry.addData("Y", pinpoint.getPosY(DistanceUnit.INCH));
         telemetry.addData("Heading", pinpoint.getHeading(AngleUnit.DEGREES));

@@ -51,7 +51,7 @@ public class FlywheelCalibration extends OpMode {
         intake = new Intake(hardwareMap);
         index = new Index (hardwareMap);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(3.64173228, 5.5511811, DistanceUnit.INCH);
+        pinpoint.setOffsets(3.64173228, -5.5511811, DistanceUnit.INCH);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);

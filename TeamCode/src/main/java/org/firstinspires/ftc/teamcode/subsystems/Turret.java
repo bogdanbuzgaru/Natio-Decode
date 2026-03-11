@@ -10,7 +10,7 @@ public class Turret {
 
     // CALIBRATION: Full servo range (0.0 to 1.0) = 385.71 degrees
     // Half range (0.5 to 1.0 or 0.0 to 0.5) = 192.86 degrees
-    private final double HALF_RANGE_DEGREES = 192.8571428571429;
+    private final double HALF_RANGE_DEGREES = 190.1785714285714;
     private final double SERVO_CENTER = 0.5;
 
     public Turret(HardwareMap hardwareMap){

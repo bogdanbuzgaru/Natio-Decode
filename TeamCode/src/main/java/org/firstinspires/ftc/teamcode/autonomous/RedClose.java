@@ -314,7 +314,7 @@ public class RedClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(actualPositionX(120.000), actualPositionY(144.000)),
+                                            new Pose(actualPositionX(120.000), actualPositionY(149.000)),
                                             new Pose(90.000, 90.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
