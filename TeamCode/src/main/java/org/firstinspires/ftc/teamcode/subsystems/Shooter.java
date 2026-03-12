@@ -44,12 +44,17 @@ public class Shooter {
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
     }
+    public void updateMotor(){
+        flywheelMotor1.setVelocity(ticks);
+        flywheelMotor2.setVelocity(ticks);
+        setAutoFarHood();
+    }
     public void setTicks(double ticks) {
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
         if(ticks > 1750){
-            this.ticks += 120;
+            this.ticks += 190;
         }
     }
 
@@ -101,6 +106,9 @@ public class Shooter {
             flywheelMotor1.setVelocity(ticks);
             flywheelMotor2.setVelocity(ticks);
         }
+    }
+    public void setAutoFarHood(){
+        hood.setPosition(0.8);
     }
     public void setHoodPosition(Gamepad gamepad) {
         if(gamepad.dpadUpWasPressed()) {

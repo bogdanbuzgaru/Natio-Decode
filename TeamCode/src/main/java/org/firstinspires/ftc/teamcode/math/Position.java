@@ -98,7 +98,7 @@ public class Position {
         if(red)
             return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
         else
-            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH)) - 14));
+            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH)) + 14));
     }
 
     public void setChangeCord(boolean changeCord) {
@@ -107,17 +107,17 @@ public class Position {
 
     public double getTargetAngle(){
         double targetHead = 0;
-        if(!changeCord) {
+//        if(!changeCord) {
             if (red)
-                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
+                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 126 - pose.getX(DistanceUnit.INCH)));
             else if (blue)
-                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), -130 - pose.getX(DistanceUnit.INCH)));
-        } else {
-            if (red)
-                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
-            else if (blue)
-                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), -135 - pose.getX(DistanceUnit.INCH)));
-        }
+                targetHead = 180 -Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH) - 14));
+//        } else {
+//            if (red)
+//                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
+//            else if (blue)
+//                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), -135 - pose.getX(DistanceUnit.INCH)));
+//        }
 
         double error = targetHead - heading;
 

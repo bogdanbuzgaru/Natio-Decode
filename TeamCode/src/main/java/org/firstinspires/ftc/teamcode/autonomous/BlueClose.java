@@ -318,15 +318,15 @@ public class BlueClose extends OpMode {
             PREPARE_SECOND = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(60.000, 66.000)
+                            new Pose(60.000, 60.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             SECOND_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(44.000, 66.000),
-                            new Pose(10.000, 65.000)
+                            new Pose(44.000, 60.000),
+                            new Pose(10.000, 60.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -344,14 +344,14 @@ public class BlueClose extends OpMode {
             GO_TO_GOAL = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(10.000, 60.000)
+                            new Pose(10.000, 62.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(137))
                     .build();
 
             GO_BACK = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, 60.000),
+                            new Pose(10.000, 64.000),
                             new Pose(8.000, 56.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(137), Math.toRadians(137))

@@ -44,7 +44,6 @@ public class RedClose extends OpMode {
         PARK
 
     }
-    private Position position;
     private Turret turret;
     private Shooter shooter;
     private Intake intake;
@@ -63,8 +62,8 @@ public class RedClose extends OpMode {
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
-        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
-                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
+//        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
+//                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
     }
     public void start(){
         setUp();
@@ -74,11 +73,11 @@ public class RedClose extends OpMode {
     public void loop(){
         follower.update();
         fsm.update();
-        position.update(new Pose2D(DistanceUnit.INCH,
-                follower.getPose().getX(),
-                follower.getPose().getY(),
-                AngleUnit.DEGREES,
-                Math.toDegrees(follower.getHeading())));
+//        position.update(new Pose2D(DistanceUnit.INCH,
+//                follower.getPose().getX(),
+//                follower.getPose().getY(),
+//                AngleUnit.DEGREES,
+//                Math.toDegrees(follower.getHeading())));
 
         turret.setAuto();
 
@@ -314,7 +313,7 @@ public class RedClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(actualPositionX(120.000), actualPositionY(141.000)),
+                                            new Pose(actualPositionX(120.000), actualPositionY(133.000)),
                                             new Pose(90.000, 90.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -324,7 +323,7 @@ public class RedClose extends OpMode {
             PREPARE_SECOND = (follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(90.000, 90.000),
-                                    new Pose(84.000, 66.000)
+                                    new Pose(100.000, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -332,7 +331,7 @@ public class RedClose extends OpMode {
 
             SECOND_ROW = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(100.000,66.000),
+                                    new Pose(100.000,60.000),
                                     new Pose(134.000, 65.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -353,7 +352,7 @@ public class RedClose extends OpMode {
             GO_TO_GOAL = (follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(90.000, 90.000),
-                                            new Pose(134.000, 60.000)
+                                            new Pose(134.000, 57.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(43))
                             .build()
@@ -361,7 +360,7 @@ public class RedClose extends OpMode {
 
             GO_BACK = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(134.000, 60.000),
+                                            new Pose(134.000, 57.000),
                                             new Pose(136.000, 56.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(43))
@@ -372,9 +371,10 @@ public class RedClose extends OpMode {
             SHOOT_THIRD = (follower.pathBuilder().addPath(
                                     new BezierCurve(
                                             new Pose(136.000, 56.000),
-                                            new Pose(130.000, 65.000),
-                                            new Pose(115.000, 72.000),
-                                            new Pose(97.000, 78.000),
+                                            new Pose(130.000, 60.000),
+                                            new Pose(115.000, 61.000),
+                                            new Pose(97.000, 70.000),
+                                            new Pose(93.000, 79.000),
                                             new Pose(90.000, 90.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(0))
@@ -383,13 +383,13 @@ public class RedClose extends OpMode {
             PREPARE_LAST_ROW = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(90.000, 90.000),
-                                    new Pose(106.000, 38.000)
+                                    new Pose(106.000, 36.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
             LAST_ROW = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose (106.000, 38.000),
+                                            new Pose (106.000, 36.000),
                                             new Pose(134.000, 36.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -425,7 +425,7 @@ public class RedClose extends OpMode {
             PARK = (follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(90.000, 90.000),
-                                            new Pose(128.000, 88.000)
+                                            new Pose(128.000, 93.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()

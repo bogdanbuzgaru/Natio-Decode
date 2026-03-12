@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode.movement;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Movement {
 
@@ -23,7 +27,8 @@ public class Movement {
 //        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 //        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        List<DcMotor> movementMotors = Arrays.asList(leftFront, rightFront, leftRear, rightRear);
+        movementMotors.forEach(motor -> motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE));
     }
 
     public void movementLoop (Gamepad gamepad){
