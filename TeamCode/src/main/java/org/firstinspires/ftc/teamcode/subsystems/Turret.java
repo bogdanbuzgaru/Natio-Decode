@@ -94,4 +94,10 @@ public class Turret {
         turretServo2.setPosition(position);
         turretServo3.setPosition(position);
     }
+    public void setFarAutoBlue(){
+        double position = SERVO_CENTER - 0.2143157894736842;
+        turretServo1.setPosition(position);
+        turretServo2.setPosition(position);
+        turretServo3.setPosition(position);
+    }
 }

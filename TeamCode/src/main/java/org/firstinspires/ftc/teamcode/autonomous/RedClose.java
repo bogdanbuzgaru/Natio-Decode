@@ -119,7 +119,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
             intake.autoTake();
             if(!follower.isBusy()) {
-                return handleShoot(AutoState.PREPARE_SECOND, 700, true);
+                return handleShoot(AutoState.PREPARE_SECOND, 900, true);
             }
             return null;
         });
@@ -170,7 +170,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy() && pathTimer.milliseconds() >= 2400) {
+            if(!follower.isBusy()) {
                 return AutoState.GO_BACK;
             }
             return null;
@@ -185,7 +185,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.GO_BACK, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy() && pathTimer.milliseconds() >= 430) {
+            if(!follower.isBusy() && pathTimer.milliseconds() >= 3400) {
                 return AutoState.SHOOT_THIRD;
             }
             return null;
@@ -342,7 +342,10 @@ public class RedClose extends OpMode {
                                     new BezierCurve(
                                             new Pose(134.000, 65.000),
                                             new Pose(115.000, 70.000),
-                                            new Pose(99.000, 78.000),
+                                            new Pose(99.000, 72.000),
+                                            new Pose(94.000, 74.000),
+                                            new Pose(92.000, 79.000),
+                                            new Pose(91.000, 81.000),
                                             new Pose(90.000, 90.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -352,7 +355,7 @@ public class RedClose extends OpMode {
             GO_TO_GOAL = (follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(90.000, 90.000),
-                                            new Pose(134.000, 57.000)
+                                            new Pose(103.000, 57.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(43))
                             .build()
@@ -360,8 +363,8 @@ public class RedClose extends OpMode {
 
             GO_BACK = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(134.000, 57.000),
-                                            new Pose(136.000, 56.000)
+                                            new Pose(103.000, 57.000),
+                                            new Pose(134.000, 59.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(43))
                             .build()
@@ -370,9 +373,9 @@ public class RedClose extends OpMode {
 
             SHOOT_THIRD = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(136.000, 56.000),
+                                            new Pose(134.000, 59.000),
                                             new Pose(130.000, 60.000),
-                                            new Pose(115.000, 61.000),
+                                            new Pose(115.000, 62.000),
                                             new Pose(97.000, 70.000),
                                             new Pose(93.000, 79.000),
                                             new Pose(90.000, 90.000)

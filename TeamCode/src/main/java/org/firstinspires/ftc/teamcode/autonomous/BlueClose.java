@@ -14,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.statemachine.StateMachine;
 import org.firstinspires.ftc.teamcode.subsystems.Index;
@@ -24,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import java.io.File;
 
-@Autonomous(name = "BlueClose")
+@Autonomous
 public class BlueClose extends OpMode {
 
     public enum AutoState {
@@ -43,7 +42,6 @@ public class BlueClose extends OpMode {
         PARK
     }
 
-    private Position position;
     private Turret turret;
     private Shooter shooter;
     private Intake intake;
@@ -59,18 +57,16 @@ public class BlueClose extends OpMode {
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
-        // Mirroring X: 144 - (120 - 9.732) = 33.732
-        // Mirroring Y: 144 - (144 - 6.673) = 137.327
-        follower.setStartingPose(new Pose(33.7322834608, 137.326771661));
+        // Mirrored Start Pose
+        // X: 144 - (120 - 9.732) = 33.732
+        // Y: 144 - (144 - 6.673) = 137.327
+        follower.setStartingPose(new Pose(33.7322834608, 137.326771661, Math.toRadians(180)));
 
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
-
-        position = new Position(new Pose2D(DistanceUnit.INCH, 33.7322834608,
-                137.326771661, AngleUnit.DEGREES, 180));
     }
 
     @Override
@@ -84,13 +80,7 @@ public class BlueClose extends OpMode {
     public void loop() {
         follower.update();
         fsm.update();
-        position.update(new Pose2D(DistanceUnit.INCH,
-                follower.getPose().getX(),
-                follower.getPose().getY(),
-                AngleUnit.DEGREES,
-                Math.toDegrees(follower.getHeading())));
-
-        turret.setAuto();
+        turret.setAutoBlue();
         shooter.setTicks(1450);
         shooter.update();
     }
@@ -98,12 +88,9 @@ public class BlueClose extends OpMode {
     @Override
     public void stop() {
         Pose pose = follower.getPose();
-        String xPose = Double.toString(pose.getX());
-        String yPose = Double.toString(pose.getY());
-        String heading = Double.toString(Math.toDegrees(pose.getHeading()));
-
+        String data = pose.getX() + "\n" + pose.getY() + "\n" + Math.toDegrees(pose.getHeading());
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, xPose + "\n" + yPose + "\n" + heading);
+        ReadWriteFile.writeFile(file, data);
     }
 
     private AutoState handleShoot(AutoState nextState, long durationMs, boolean change) {
@@ -130,9 +117,7 @@ public class BlueClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return handleShoot(AutoState.PREPARE_SECOND, 700, true);
-            }
+            if (!follower.isBusy()) return handleShoot(AutoState.PREPARE_SECOND, 900, true);
             return null;
         });
 
@@ -144,9 +129,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.PREPARE_SECOND, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy()) {
-                return AutoState.SECOND_ROW;
-            }
+            if (!follower.isBusy()) return AutoState.SECOND_ROW;
             return null;
         });
 
@@ -158,9 +141,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy()) {
-                return AutoState.SHOOT_SECOND;
-            }
+            if (!follower.isBusy()) return AutoState.SHOOT_SECOND;
             return null;
         });
 
@@ -171,9 +152,7 @@ public class BlueClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return handleShoot(AutoState.GO_TO_GOAL, 700, true);
-            }
+            if (!follower.isBusy()) return handleShoot(AutoState.GO_TO_GOAL, 700, true);
             return null;
         });
 
@@ -186,9 +165,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy() && pathTimer.milliseconds() >= 2400) {
-                return AutoState.GO_BACK;
-            }
+            if (!follower.isBusy()) return AutoState.GO_BACK;
             return null;
         });
 
@@ -201,9 +178,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.GO_BACK, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy() && pathTimer.milliseconds() >= 430) {
-                return AutoState.SHOOT_THIRD;
-            }
+            if (!follower.isBusy() && pathTimer.milliseconds() >= 3400) return AutoState.SHOOT_THIRD;
             return null;
         });
 
@@ -230,9 +205,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.PREPARE_LAST_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy()) {
-                return AutoState.LAST_ROW;
-            }
+            if (!follower.isBusy()) return AutoState.LAST_ROW;
             return null;
         });
 
@@ -244,9 +217,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.LAST_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy()) {
-                return AutoState.SHOOT_LAST;
-            }
+            if (!follower.isBusy()) return AutoState.SHOOT_LAST;
             return null;
         });
 
@@ -257,9 +228,7 @@ public class BlueClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return handleShoot(AutoState.FIRST_ROW, 700, false);
-            }
+            if (!follower.isBusy()) return handleShoot(AutoState.FIRST_ROW, 700, false);
             return null;
         });
 
@@ -271,9 +240,7 @@ public class BlueClose extends OpMode {
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if (!follower.isBusy()) {
-                return AutoState.SHOOT;
-            }
+            if (!follower.isBusy()) return AutoState.SHOOT;
             return null;
         });
 
@@ -284,9 +251,7 @@ public class BlueClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return handleShoot(AutoState.PARK, 700, false);
-            }
+            if (!follower.isBusy()) return handleShoot(AutoState.PARK, 700, false);
             return null;
         });
 
@@ -309,7 +274,7 @@ public class BlueClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(33.7322834608, 137.307087),
+                            new Pose(33.7322834608, 126.307087),
                             new Pose(54.000, 90.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -318,7 +283,7 @@ public class BlueClose extends OpMode {
             PREPARE_SECOND = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(60.000, 60.000)
+                            new Pose(44.000, 60.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -326,7 +291,7 @@ public class BlueClose extends OpMode {
             SECOND_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(44.000, 60.000),
-                            new Pose(10.000, 60.000)
+                            new Pose(10.000, 65.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -335,7 +300,10 @@ public class BlueClose extends OpMode {
                     .addPath(new BezierCurve(
                             new Pose(10.000, 65.000),
                             new Pose(29.000, 70.000),
-                            new Pose(45.000, 78.000),
+                            new Pose(45.000, 72.000),
+                            new Pose(50.000, 74.000),
+                            new Pose(52.000, 79.000),
+                            new Pose(53.000, 81.000),
                             new Pose(54.000, 90.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -344,25 +312,26 @@ public class BlueClose extends OpMode {
             GO_TO_GOAL = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(10.000, 62.000)
+                            new Pose(41.000, 57.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(137))
                     .build();
 
             GO_BACK = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, 64.000),
-                            new Pose(8.000, 56.000)
+                            new Pose(41.000, 57.000),
+                            new Pose(10.000, 59.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(137), Math.toRadians(137))
                     .build();
 
             SHOOT_THIRD = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(8.000, 56.000),
-                            new Pose(14.000, 65.000),
-                            new Pose(29.000, 72.000),
-                            new Pose(47.000, 78.000),
+                            new Pose(10.000, 59.000),
+                            new Pose(14.000, 60.000),
+                            new Pose(29.000, 62.000),
+                            new Pose(47.000, 70.000),
+                            new Pose(51.000, 79.000),
                             new Pose(54.000, 90.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(137), Math.toRadians(180))
@@ -371,14 +340,14 @@ public class BlueClose extends OpMode {
             PREPARE_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(38.000, 38.000)
+                            new Pose(38.000, 36.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(38.000, 38.000),
+                            new Pose(38.000, 36.000),
                             new Pose(10.000, 36.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -411,7 +380,7 @@ public class BlueClose extends OpMode {
             PARK = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(54.000, 90.000),
-                            new Pose(16.000, 88.000)
+                            new Pose(16.000, 93.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
