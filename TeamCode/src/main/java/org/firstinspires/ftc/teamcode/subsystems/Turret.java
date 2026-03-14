@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -28,14 +29,14 @@ public class Turret {
         this.offsetAngle = offsetAngle;
     }
 
-
     private double getFinalAngle() {
         double finalAngle = targetAngle + offsetAngle;
-        if(Math.abs(targetAngle) >= 80 && Math.signum(targetAngle) == -1){
+        if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1){
             targetAngle += (targetAngle - 30) * 0.075;
-        }else if(Math.abs(targetAngle) >= 80 && Math.signum(targetAngle) == 1){
+        }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
             targetAngle -= (targetAngle - 30) * 0.075;
         }
+
         return normalizeAngle(finalAngle);
     }
 
@@ -94,8 +95,20 @@ public class Turret {
         turretServo2.setPosition(position);
         turretServo3.setPosition(position);
     }
+    public void secondAutoFar(){
+        double position = SERVO_CENTER + 0.2083157894736842;
+        turretServo1.setPosition(position);
+        turretServo2.setPosition(position);
+        turretServo3.setPosition(position);
+    }
     public void setFarAutoBlue(){
         double position = SERVO_CENTER - 0.2143157894736842;
+        turretServo1.setPosition(position);
+        turretServo2.setPosition(position);
+        turretServo3.setPosition(position);
+    }
+    public void secondAutoFarBlue(){
+        double position = SERVO_CENTER - 0.2083157894736842;
         turretServo1.setPosition(position);
         turretServo2.setPosition(position);
         turretServo3.setPosition(position);

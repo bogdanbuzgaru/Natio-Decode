@@ -20,7 +20,8 @@ public class Shooter {
     private double hoodPosition = 0;
     private double targetHood;
     private PIDController p = new PIDController(kp, 0, 0);
-    public static  double ks = 0.0747, kv = 0.00008118565, ka = 0.01, kp = 0.01, velocity, nominalVoltage = 10.7;
+    private double voltagee;
+    public static  double ks = 0.226, kv = 0.0021039446333333, ka = 0.005, kp = 0.05, velocity, nominalVoltage = 11.2;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
@@ -40,10 +41,26 @@ public class Shooter {
         lowerBarrier();
     }
     public void update(){
+//        SimpleMotorFeedforward ff = new SimpleMotorFeedforward(ks, kv, ka);
+//        p.setPID(kp, 0, 0);
+//
+//
+//        double vecocity = flywheelMotor1.getVelocity();
+//
+//        double p_output = p.calculate(vecocity, ticks);
+//        double ff_ouput = ff.calculate(ticks);
+//
+//        flywheelMotor2.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
+//        flywheelMotor1.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
     }
+
+    public void setVoltagee(double voltagee) {
+        this.voltagee = voltagee;
+    }
+
     public void updateMotor(){
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
@@ -53,9 +70,12 @@ public class Shooter {
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
-        if(ticks > 1750){
-            this.ticks += 190;
+        if(ticks <= 1700){
+            this.ticks -= 120;
         }
+//        if(ticks > 1750){
+//            this.ticks += 190;
+//        }
     }
 
     public double getTicks() {
@@ -64,14 +84,19 @@ public class Shooter {
     public double getHoodPosition(){
         return hood.getPosition();
     }
+    public double getTarget(){
+        return targetHood;
+    }
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(ticks <= 1250){
+        if(flywheelMotor1.getVelocity()  <= 1250){
             targetHood = 0.2;
-        }else if (ticks <= 1400){
+        }else if (flywheelMotor1.getVelocity()  <= 1400){
             targetHood = 0.2 * ((ticks - 1200) / 200) + 0.2;
-        }else if (ticks <= 1700){
+        }else if (flywheelMotor1.getVelocity()  <= 1800){
             targetHood = 0.4 + 0.5 * ((ticks - 1400) / 300);
+        }else{
+            targetHood = 0.9;
         }
 //        targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
 //        if(ticks < 1728){
@@ -108,7 +133,13 @@ public class Shooter {
         }
     }
     public void setAutoFarHood(){
-        hood.setPosition(0.8);
+        hood.setPosition(0.94);
+    }
+    public void lowerHood(Gamepad gamepad){
+        if(gamepad.dpadDownWasPressed()){
+            ticks = 0;
+            hood.setPosition(0.2);
+        }
     }
     public void setHoodPosition(Gamepad gamepad) {
         if(gamepad.dpadUpWasPressed()) {

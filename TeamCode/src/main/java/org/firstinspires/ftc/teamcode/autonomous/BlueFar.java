@@ -47,15 +47,16 @@ public class BlueFar extends OpMode {
     private Index index;
     private Position position;
     private int number = 0;
-    private boolean repeat;
+    private boolean repeat = true;
+    private Position pos;
 
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
         // Mirrored Start: 144 - 87.000 = 57.000
-        follower.setStartingPose(new Pose(57.000, 8.000, Math.toRadians(180)));
-
+        follower.setStartingPose(new Pose(53.690, 9.100, Math.toRadians(180)));
+        pos = new Position(follower.getPose());
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -75,10 +76,12 @@ public class BlueFar extends OpMode {
     @Override
     public void loop() {
         follower.update();
+        pos.update(follower.getPose());
         fsm.update();
-
-        turret.setFarAutoBlue(); // Ensure turret logic handles the 180-degree flip
-        shooter.setTicks(2140);
+        turret.setTargetAngle(pos.getTargetAngle());
+        turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent()));
+        turret.update();
+        shooter.setTicks(1790);
         shooter.updateMotor();
     }
 
@@ -86,11 +89,10 @@ public class BlueFar extends OpMode {
     public void stop() {
         Pose pose = follower.getPose();
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, pose.getX() + "\n" + pose.getY() + "\n" + pose.getHeading());
+        ReadWriteFile.writeFile(file, pose.getX() + "\n" + pose.getY() + "\n" + Math.toDegrees(pose.getHeading()));
     }
 
     private AutoStates handleShoot(AutoStates nextState, long durationMs, boolean change) {
-        repeat = change;
         if (!isShooting) {
             pathTimer.reset();
             isShooting = true;
@@ -146,7 +148,7 @@ public class BlueFar extends OpMode {
             } else if (!follower.isBusy() && number < 5) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             } else if (!follower.isBusy()) {
-                return AutoStates.PARK;
+                return handleShoot(AutoStates.PARK, 700, true);
             }
             return null;
         });
@@ -203,7 +205,7 @@ public class BlueFar extends OpMode {
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(57.000, 8.000),
+                            new Pose(53.690, 9.100),
                             new Pose(10.000, 9.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -220,22 +222,22 @@ public class BlueFar extends OpMode {
             CENTER_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(49.500, 8.500),
-                            new Pose(42.000, 36.000)
+                            new Pose(46.000, 31.500)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             TAKE_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(42.000, 36.000),
-                            new Pose(24.000, 36.000)
+                            new Pose(46.000, 31.500),
+                            new Pose(20.000, 31.500)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             GO_SHOOT_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(24.000, 36.000),
+                            new Pose(24.000, 31.500),
                             new Pose(50.000, 8.500)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))

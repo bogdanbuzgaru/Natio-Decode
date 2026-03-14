@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.panels.Panels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-
+@Configurable
 @TeleOp
 public class TuneFlyWheel extends OpMode {
     private DcMotorEx leftShooter, rightShooter;
@@ -17,12 +20,16 @@ public class TuneFlyWheel extends OpMode {
     private double veryhighVelocity = 2100;
     private double currentVelocity = 0;
 
-    private double P = 20.4;
-    private double F = 0.1;
+    public static double P = 20.4;
+    public static double F = 0.1;
 
     private double tuneSteps[] = {10.00, 1.00, 0.1, 0.01 };
     private double stepsize = 0, error = 0;
     private int counter = 0, velCounter = 0;
+    public static ElapsedTime time = new ElapsedTime();
+    public static double vel;
+
+//    public static val panelsTelemetry = Panels.;
 
     public void init(){
         leftShooter = hardwareMap.get(DcMotorEx.class, "flywheel1");
@@ -38,9 +45,12 @@ public class TuneFlyWheel extends OpMode {
         telemetry.addData("F", F);
         telemetry.addLine("Initialized");
     }
-
+    public void start(){
+        time.reset();
+    }
     public void loop(){
         tune(gamepad1);
+        vel = rightShooter.getVelocity();
     }
     private void tune(Gamepad gamepad) {
 
@@ -112,17 +122,14 @@ public class TuneFlyWheel extends OpMode {
             telemetry.addLine("ERROR is POSITIVE");
         }
 
-        telemetry.addData("Velocity", leftShooter.getVelocity());
-        telemetry.addData("Target Velocity", rightShooter.getVelocity());
-        telemetry.addData("Current Velocity", currentVelocity);
-        telemetry.addData("Error", error);
-        telemetry.addData("Current steps", stepsize);
+        telemetry.addData("time", time);
+        telemetry.addData("velocity", vel);
         telemetry.addLine();
         telemetry.addLine("---------------------------------------------");
         telemetry.addLine();
         telemetry.addData("P", P);
         telemetry.addData("F", F);
-
+        telemetry.update();
     }
 
 }

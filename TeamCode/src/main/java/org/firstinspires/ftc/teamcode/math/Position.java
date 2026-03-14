@@ -4,6 +4,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
 
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class Position {
-    private Pose2D pose;
+    private Pose pose;
     private double heading;
     private int signOrdinate = 1, signAbscissa = 1;
     private final double l = 12.8740157349;     //inch
@@ -30,20 +31,21 @@ public class Position {
             bottomLeft = new LinearEquation(0, 0, 0, 0),
             bottomRight = new LinearEquation(0, 0, 0, 0);
     private double offsetAbscissa, offsetOrdinate;
-    private boolean blue = false;
-    private boolean red = true;
+    private boolean blue = true;
+    private boolean red = false;
     private boolean shootClose = true;
     private boolean changeCord = false;
-    public Position (Pose2D pose){
+    private boolean coord = false;
+    public Position (Pose pose){
         this.pose = pose;
-        heading = pose.getHeading(AngleUnit.DEGREES);
+        heading = Math.toDegrees(pose.getHeading());
         calculateOffsets();
         calculateLinearEquations();
     }
 
-    public void update(Pose2D pose) {
+    public void update(Pose pose) {
         this.pose = pose;
-        heading = pose.getHeading(AngleUnit.DEGREES);
+        heading = Math.toDegrees(pose.getHeading());
         calculateOffsets();
         if(Math.abs(heading) > 90){
             signOrdinate = - 1;
@@ -72,33 +74,33 @@ public class Position {
         return L * cos(Math.toRadians(currentHeading)) + l * sin(Math.toRadians(currentHeading));
     }
     public double getMaxY(){
-        double y = pose.getY(DistanceUnit.INCH);
+        double y = pose.getY();
         return y + distanceY() / 2;
     }
     public double getMaxX(){
-        double x = pose.getX(DistanceUnit.INCH);
+        double x = pose.getX();
         return x + distanceX() / 2;
     }
     public double getMinX(){
-        double x = pose.getX(DistanceUnit.INCH);
+        double x = pose.getX();
         return x - distanceX() / 2;
     }
     public double getMinY(){
-        double y = pose.getY(DistanceUnit.INCH);
+        double y = pose.getY();
         return y - distanceY() / 2;
     }
     private void calculateOffsets() {
-        offsetAbscissa = Math.toDegrees(Math.acos((getMaxX() - pose.getX(DistanceUnit.INCH)) / semiDiagonal));
-        offsetOrdinate = Math.toDegrees(Math.acos((getMaxY() - pose.getY(DistanceUnit.INCH)) / semiDiagonal));
+        offsetAbscissa = Math.toDegrees(Math.acos((getMaxX() - pose.getX()) / semiDiagonal));
+        offsetOrdinate = Math.toDegrees(Math.acos((getMaxY() - pose.getY()) / semiDiagonal));
     }
     public double getHeading(){
         return heading;
     }
     public double getAngle(){
         if(red)
-            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 130 - pose.getX(DistanceUnit.INCH)));
+            return Math.toDegrees(Math.atan2(130 - pose.getY(), 130 - pose.getX()));
         else
-            return Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), Math.abs(pose.getX(DistanceUnit.INCH)) + 14));
+            return Math.toDegrees(Math.atan2(130 - pose.getY(), Math.abs(pose.getX()) - 14));   //TODO this - change +
     }
 
     public void setChangeCord(boolean changeCord) {
@@ -109,9 +111,12 @@ public class Position {
         double targetHead = 0;
 //        if(!changeCord) {
             if (red)
-                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), 126 - pose.getX(DistanceUnit.INCH)));
-            else if (blue)
-                targetHead = 180 -Math.toDegrees(Math.atan2(130 - pose.getY(DistanceUnit.INCH), pose.getX(DistanceUnit.INCH) - 14));
+                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(), 126 - pose.getX()));
+            else if (blue) {
+                targetHead = 180 - Math.toDegrees(Math.atan2(130 - pose.getY(), pose.getX() - 14));
+                if(coord)
+                    targetHead = targetHead + Math.signum(targetHead) * 10;
+            }
 //        } else {
 //            if (red)
 //                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
@@ -125,23 +130,28 @@ public class Position {
         while (error < -180) error += 360;
         return error;
     }
+
+    public void setCoord(boolean coord) {
+        this.coord = coord;
+    }
+
     //------------------LINEAR EQUATIONS------------------
     private void calculateLinearEquations() {
-        topLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
+        topLeft = new LinearEquation(pose.getX() + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                  getMaxY(), getMinX(),
-                 pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
+                 pose.getY() + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        topRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
+        topRight = new LinearEquation(pose.getX() + signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMaxY(), getMaxX(),
-                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
+                pose.getY() + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        bottomLeft = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
+        bottomLeft = new LinearEquation(pose.getX() + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMinY(), getMinX(),
-                pose.getY(DistanceUnit.INCH) + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
+                pose.getY() + (-1) * signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
 
-        bottomRight = new LinearEquation(pose.getX(DistanceUnit.INCH) + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
+        bottomRight = new LinearEquation(pose.getX() + (-1) * signOrdinate * (semiDiagonal * sin(Math.toRadians(offsetAbscissa))),
                 getMinY(), getMaxX(),
-                pose.getY(DistanceUnit.INCH) + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
+                pose.getY() + signAbscissa * (semiDiagonal * sin(Math.toRadians(offsetOrdinate))));
     }
     public boolean areIntersecting(LinearEquation first, LinearEquation second) {
         if(Math.abs(first.getSlope() - second.getSlope()) < 1e-9){
@@ -158,14 +168,14 @@ public class Position {
     }
 
     public boolean isCenterInBigTriangle(){
-        return pose.getY(DistanceUnit.INCH) >= 72 &&
-                pose.getX(DistanceUnit.INCH) >= 144 - pose.getY(DistanceUnit.INCH) &&
-                pose.getX(DistanceUnit.INCH) <= pose.getY(DistanceUnit.INCH);
+        return pose.getY() >= 72 &&
+                pose.getX() >= 144 - pose.getY() &&
+                pose.getX() <= pose.getY();
     }
     public boolean isCenterInSmallTriangle() {
-        return pose.getY(DistanceUnit.INCH) <= 24 &&
-                pose.getX(DistanceUnit.INCH) >= 48 + pose.getY(DistanceUnit.INCH) &&
-                pose.getX(DistanceUnit.INCH) <= 96 - pose.getY(DistanceUnit.INCH);
+        return pose.getY() <= 24 &&
+                pose.getX() >= 48 + pose.getY() &&
+                pose.getX() <= 96 - pose.getY();
     }
     private boolean isTangentToBigTriangle(){
         return areIntersecting(topLeft, leftBigTriangle) || areIntersecting(topLeft, rightBigTriangle) ||
@@ -187,8 +197,8 @@ public class Position {
     }
     public double getOffetAngle(double robotVelocityX, double robotVelocityY){
         if(red) {
-            double dx = 138 - pose.getX(DistanceUnit.INCH);
-            double dy = 138 - pose.getY(DistanceUnit.INCH);
+            double dx = 138 - pose.getX();
+            double dy = 138 - pose.getY();
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
@@ -214,8 +224,8 @@ public class Position {
 
             return turretOffsetAngle;
         }else if (blue){
-            double dx = Math.abs(pose.getX(DistanceUnit.INCH) - 6);
-            double dy = Math.abs(138 - pose.getY(DistanceUnit.INCH));
+            double dx = Math.abs(pose.getX() - 6);
+            double dy = Math.abs(138 - pose.getY());
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
@@ -244,8 +254,8 @@ public class Position {
         return 0;
     }
     public boolean activateOrientation(){
-        double hypoHigh = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), 144 - pose.getY(DistanceUnit.INCH));
-        double hypoLow = Math.hypot(Math.abs(72 - pose.getX(DistanceUnit.INCH)), pose.getY(DistanceUnit.INCH));
+        double hypoHigh = Math.hypot(Math.abs(72 - pose.getX()), 144 - pose.getY());
+        double hypoLow = Math.hypot(Math.abs(72 - pose.getX()), pose.getY());
         return hypoHigh <= 90 || hypoLow <= 50;
     }
     public void chooseAlliance(Gamepad gamepad){
@@ -258,11 +268,11 @@ public class Position {
         }
     }
     public int getTicks(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(138 - pose.getX(DistanceUnit.INCH)), Math.abs(138 - pose.getY(DistanceUnit.INCH)));
+        double hypo = Math.hypot(Math.abs(130 - pose.getX()), Math.abs(130 - pose.getY()));
         return (int)((int) slope * hypo + extra);
     }
     public int getTicksBlue(double slope, double extra){
-        double hypo = Math.hypot(Math.abs(pose.getX(DistanceUnit.INCH) - 6), Math.abs(138 - pose.getY(DistanceUnit.INCH)));
+        double hypo = Math.hypot(Math.abs(pose.getX() - 14), Math.abs(130 - pose.getY()));
         return (int)((int) slope * hypo + extra);
     }
     public void whereToShoot(Gamepad gamepad){
@@ -280,8 +290,8 @@ public class Position {
         return red;
     }
     public double offsetAngleRed(double robotVelocityX, double robotVelocityY, double vx) {
-        double dx = Math.abs(130 - pose.getX(DistanceUnit.INCH));
-        double dy = Math.abs(130 - pose.getY(DistanceUnit.INCH));
+        double dx = Math.abs(130 - pose.getX());
+        double dy = Math.abs(130 - pose.getY());
         double robotToGoalTheta = Math.atan2(dy, dx);
 
         double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);
@@ -297,8 +307,8 @@ public class Position {
     }
     public double offsetAngleBlue(double robotVelocityX, double robotVelocityY, double vx) {
 
-        double dx = Math.abs(pose.getX(DistanceUnit.INCH) - 14);
-        double dy = Math.abs(130 - pose.getY(DistanceUnit.INCH));
+        double dx = Math.abs(pose.getX() - 14);
+        double dy = Math.abs(130 - pose.getY());
         double robotToGoalTheta = Math.atan2(dy, dx);
 
         double robotSpeed = Math.hypot(robotVelocityX, robotVelocityY);
