@@ -67,6 +67,7 @@ public class Shooter {
         setAutoFarHood();
     }
     public void setTicks(double ticks) {
+        ticks += 150;
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
@@ -93,8 +94,8 @@ public class Shooter {
             targetHood = 0.2;
         }else if (flywheelMotor1.getVelocity()  <= 1400){
             targetHood = 0.2 * ((ticks - 1200) / 200) + 0.2;
-        }else if (flywheelMotor1.getVelocity()  <= 1800){
-            targetHood = 0.4 + 0.5 * ((ticks - 1400) / 300);
+        }else if (flywheelMotor1.getVelocity()  <= 2000){
+            targetHood = 0.4 + 0.5 * ((ticks - 1400) / 600);
         }else{
             targetHood = 0.9;
         }

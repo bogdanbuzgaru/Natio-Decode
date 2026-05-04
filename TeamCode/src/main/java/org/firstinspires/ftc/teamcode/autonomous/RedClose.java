@@ -81,7 +81,7 @@ public class RedClose extends OpMode {
 
         turret.setAuto();
 
-        shooter.setTicks(1450);
+        shooter.setTicks(1480);
         shooter.update();
     }
     public void stop(){
@@ -323,7 +323,7 @@ public class RedClose extends OpMode {
             PREPARE_SECOND = (follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(90.000, 90.000),
-                                    new Pose(100.000, 60.000)
+                                    new Pose(100.000, 67.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -331,7 +331,7 @@ public class RedClose extends OpMode {
 
             SECOND_ROW = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(100.000,60.000),
+                                    new Pose(100.000,67.000),
                                     new Pose(134.000, 65.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

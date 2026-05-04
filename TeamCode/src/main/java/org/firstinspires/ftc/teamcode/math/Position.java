@@ -31,8 +31,8 @@ public class Position {
             bottomLeft = new LinearEquation(0, 0, 0, 0),
             bottomRight = new LinearEquation(0, 0, 0, 0);
     private double offsetAbscissa, offsetOrdinate;
-    private boolean blue = true;
-    private boolean red = false;
+    private boolean blue = false;
+    private boolean red = true;
     private boolean shootClose = true;
     private boolean changeCord = false;
     private boolean coord = false;
@@ -197,8 +197,8 @@ public class Position {
     }
     public double getOffetAngle(double robotVelocityX, double robotVelocityY){
         if(red) {
-            double dx = 138 - pose.getX();
-            double dy = 138 - pose.getY();
+            double dx = 132 - pose.getX();
+            double dy = 132 - pose.getY();
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
