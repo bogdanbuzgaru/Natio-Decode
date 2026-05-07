@@ -117,7 +117,7 @@ public class TeleOp extends OpMode {
         if (gamepad1.triangleWasPressed()) manual = !manual;
 
         // Auto Shooting Logic
-        if ((isLeftBumperHeld(0.0006) && (pos.shootClose() || pos.shootHigh()) || isLeftBumperHeld(0.5))) {
+        if ((isLeftBumperHeld(0.0006) && (pos.shootClose() || pos.shootHigh()) || isLeftBumperHeld(0.01))) {
             shooter.raiseBarrier();
             intake.autoTake();
             index.autoFeed();

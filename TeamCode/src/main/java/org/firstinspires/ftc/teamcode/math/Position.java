@@ -224,8 +224,8 @@ public class Position {
 
             return turretOffsetAngle;
         }else if (blue){
-            double dx = Math.abs(pose.getX() - 6);
-            double dy = Math.abs(138 - pose.getY());
+            double dx = Math.abs(pose.getX() - 12);
+            double dy = Math.abs(132 - pose.getY());
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
