@@ -50,6 +50,7 @@ public class RedClose extends OpMode {
     private Index index;
     private StateMachine<AutoState> fsm = new StateMachine<AutoState>(AutoState.SHOOT_FIRST);
     private Follower follower;
+    private Position pos;
     private boolean isShooting = false;
     private ElapsedTime pathTimer = new ElapsedTime();
     private Paths paths;
@@ -62,6 +63,7 @@ public class RedClose extends OpMode {
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
+        pos = new Position(follower.getPose());
 //        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
 //                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
     }
@@ -79,8 +81,11 @@ public class RedClose extends OpMode {
 //                AngleUnit.DEGREES,
 //                Math.toDegrees(follower.getHeading())));
 
-        turret.setAuto();
-
+//        turret.setAuto();
+        pos.update(follower.getPose());
+        turret.setTargetAngle(pos.getTargetAngle());
+        turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent()));
+        turret.update();
         shooter.setTicks(1480);
         shooter.update();
     }
