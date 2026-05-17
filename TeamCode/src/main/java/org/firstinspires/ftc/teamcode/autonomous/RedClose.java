@@ -64,6 +64,7 @@ public class RedClose extends OpMode {
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
         pos = new Position(follower.getPose());
+        pos.setRed();
 //        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
 //                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
     }

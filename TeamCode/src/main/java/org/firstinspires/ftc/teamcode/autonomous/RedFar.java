@@ -56,6 +56,7 @@ public class RedFar extends OpMode {
         // Mirrored Start: 144 - 53.690 = 90.310
         follower.setStartingPose(new Pose(90.310, 9.100, Math.toRadians(0)));
         pos = new Position(follower.getPose());
+        pos.setRed();
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);

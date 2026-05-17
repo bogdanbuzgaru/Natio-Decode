@@ -57,6 +57,7 @@ public class BlueFar extends OpMode {
         // Mirrored Start: 144 - 87.000 = 57.000
         follower.setStartingPose(new Pose(53.690, 9.100, Math.toRadians(180)));
         pos = new Position(follower.getPose());
+        pos.setBlue();
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);

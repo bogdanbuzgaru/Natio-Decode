@@ -111,9 +111,9 @@ public class Position {
         double targetHead = 0;
 //        if(!changeCord) {
             if (red)
-                targetHead = Math.toDegrees(Math.atan2(130 - pose.getY(), 126 - pose.getX()));
+                targetHead = Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(126 - pose.getX())));
             else if (blue) {
-                targetHead = 180 - Math.toDegrees(Math.atan2(130 - pose.getY(), pose.getX() - 14));
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(pose.getX() - 18)));
                 if(coord)
                     targetHead = targetHead + Math.signum(targetHead) * 10;
             }
@@ -130,7 +130,14 @@ public class Position {
         while (error < -180) error += 360;
         return error;
     }
-
+    public void setBlue(){
+        this.blue = true;
+        this.red = false;
+    }
+    public void setRed(){
+        this.red = true;
+        this.blue = false;
+    }
     public void setCoord(boolean coord) {
         this.coord = coord;
     }

@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.statemachine.StateMachine;
 import org.firstinspires.ftc.teamcode.subsystems.Index;
@@ -51,6 +52,7 @@ public class BlueClose extends OpMode {
     private boolean isShooting = false;
     private ElapsedTime pathTimer = new ElapsedTime();
     private Paths paths;
+    private Position pos;
     private boolean repeat = true;
 
     @Override
@@ -61,12 +63,13 @@ public class BlueClose extends OpMode {
         // X: 144 - (120 - 9.732) = 33.732
         // Y: 144 - (144 - 6.673) = 137.327
         follower.setStartingPose(new Pose(33.7322834608, 137.326771661, Math.toRadians(180)));
-
         paths = new Paths(follower);
+        pos = new Position(follower.getPose());
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
+        pos.setBlue();
     }
 
     @Override
