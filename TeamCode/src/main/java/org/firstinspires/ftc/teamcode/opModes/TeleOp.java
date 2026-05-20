@@ -104,7 +104,7 @@ public class TeleOp extends OpMode {
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
         resetPosition(gamepad2);
-        pos.whereToShoot(gamepad1);
+        pos.whereToShoot(gamepad2);
         pos.setCoord(true);
 
         // Lift Toggle

@@ -114,8 +114,8 @@ public class Position {
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(126 - pose.getX())));
             else if (blue) {
                 targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(pose.getX() - 18)));
-                if(coord)
-                    targetHead = targetHead + Math.signum(targetHead) * 10;
+//                if(coord)
+//                    targetHead = targetHead + Math.signum(targetHead) * 10;
             }
 //        } else {
 //            if (red)
@@ -123,6 +123,19 @@ public class Position {
 //            else if (blue)
 //                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), -135 - pose.getX(DistanceUnit.INCH)));
 //        }
+
+
+
+
+        //TODO TEST THIS IDEA !!!!!!
+        //NEW IDEA
+        /*
+        error = targetHead - heading;
+        if(Math.abs(error) > 80){
+            error += Math.signum(error) * error / 10
+        }
+         */
+
 
         double error = targetHead - heading;
 
