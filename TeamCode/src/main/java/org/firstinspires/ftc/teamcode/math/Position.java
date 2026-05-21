@@ -129,12 +129,10 @@ public class Position {
 
         //TODO TEST THIS IDEA !!!!!!
         //NEW IDEA
-        /*
-        error = targetHead - heading;
-        if(Math.abs(error) > 80){
-            error += Math.signum(error) * error / 10
-        }
-         */
+//        error = targetHead - heading;
+//        if(Math.abs(error) > 80){
+//            error += Math.signum(error) * error / 10
+//        }
 
 
         double error = targetHead - heading;

@@ -1,0 +1,145 @@
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+public class Turret {
+    private Servo turretServo1, turretServo2, turretServo3;
+
+    // Target state
+    private double targetAngle;
+    private double offsetAngle;
+
+    // Motion Profile State
+    private double currentProfiledAngle = 0.0;
+    private double currentVelocity = 0.0;
+    private double lastWrittenPosition = -1.0;
+    private ElapsedTime timer = new ElapsedTime();
+
+    // Constants
+    private final double HALF_RANGE_DEGREES = 175.1785714285714;
+    private final double SERVO_CENTER = 0.500000;
+
+    // Tuning Parameters (Degrees per second)
+    // TODO: Tune these on the real robot! Start low.
+    private final double MAX_VELOCITY = 180.0; // Max speed (degrees per sec)
+    private final double ACCELERATION = 250.0; // How fast it reaches max speed (degrees per sec^2)
+
+    public Turret(HardwareMap hardwareMap) {
+        turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
+        turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
+        turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
+
+        // Initialize state
+        currentProfiledAngle = 0.0;
+        targetAngle = 0.0;
+        timer.reset();
+
+        // Force the servos to starting position
+        update();
+    }
+
+    public void setTargetAngle(double angleRobotRelative) {
+        this.targetAngle = normalizeAngle(angleRobotRelative);
+    }
+
+    public void setOffsetAngle(double offsetAngle) {
+        this.offsetAngle = offsetAngle;
+    }
+
+    // FIXED: Uses a local variable instead of mutating the class targetAngle
+    private double getDesiredFinalAngle() {
+        double compensatedAngle = targetAngle;
+        if (Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1) {
+            compensatedAngle += (targetAngle - 30) * 0.075;
+        } else if (Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1) {
+            compensatedAngle -= (targetAngle - 30) * 0.075;
+        }
+        return normalizeAngle(compensatedAngle + offsetAngle);
+    }
+
+    public void update() {
+        // 1. Calculate time delta
+        double dt = timer.seconds();
+        timer.reset();
+
+        double desiredAngle = getDesiredFinalAngle();
+
+        // 2. Motion Profile Logic
+        double distanceToTarget = desiredAngle - currentProfiledAngle;
+        double absDistance = Math.abs(distanceToTarget);
+
+        // Braking distance equation: d = v^2 / 2a
+        double brakingDistance = (currentVelocity * currentVelocity) / (2.0 * ACCELERATION);
+
+        if (absDistance > 0.5) { // 0.5 degree deadband prevents micro-jittering
+            if (absDistance <= brakingDistance) {
+                // Decelerate Phase
+                currentVelocity -= ACCELERATION * dt;
+                currentVelocity = Math.max(currentVelocity, 0.0);
+            } else {
+                // Accelerate / Cruise Phase
+                currentVelocity += ACCELERATION * dt;
+                currentVelocity = Math.min(currentVelocity, MAX_VELOCITY);
+            }
+
+            // Apply velocity to current angle based on direction
+            if (distanceToTarget > 0) {
+                currentProfiledAngle += currentVelocity * dt;
+                currentProfiledAngle = Math.min(currentProfiledAngle, desiredAngle);
+            } else {
+                currentProfiledAngle -= currentVelocity * dt;
+                currentProfiledAngle = Math.max(currentProfiledAngle, desiredAngle);
+            }
+        } else {
+            // Reached target
+            currentVelocity = 0.0;
+            currentProfiledAngle = desiredAngle; // Snap to exact target
+        }
+
+        // 3. Convert profiled angle to servo position
+        double servoOffset = (currentProfiledAngle / HALF_RANGE_DEGREES) * 0.5000;
+        double servoPosition = SERVO_CENTER + servoOffset;
+
+        // Safety Clamp
+        servoPosition = Math.max(0.00000, Math.min(1.00000, servoPosition));
+
+        // 4. Hardware Write Caching (Boosts loop times)
+        if (Math.abs(servoPosition - lastWrittenPosition) > 0.001) {
+            turretServo1.setPosition(servoPosition);
+            turretServo2.setPosition(servoPosition);
+            turretServo3.setPosition(servoPosition);
+            lastWrittenPosition = servoPosition;
+        }
+    }
+
+    public void goNeutral() {
+        setTargetAngle(0.0);
+    }
+
+    private double normalizeAngle(double degrees) {
+        while (degrees > 180) degrees -= 360;
+        while (degrees < -180) degrees += 360;
+        return degrees;
+    }
+
+    public double getTargetAngle() { return targetAngle; }
+    public double getFinalAngleDegrees() { return getDesiredFinalAngle(); }
+    public double getCurrentProfiledAngle() { return currentProfiledAngle; }
+
+    public double getPosition1() { return turretServo1.getPosition(); }
+    public double getPosition2() { return turretServo2.getPosition(); }
+    public double getPosition3() { return turretServo3.getPosition(); }
+
+    // FIXED: Reverse-engineered your magic float numbers back into actual degrees
+    // You must still call update() in your main loop for these to execute!
+    public void setAuto() { setTargetAngle(47.94); }
+    public void setAutoBlue() { setTargetAngle(-47.94); }
+
+    public void setFarAuto() { setTargetAngle(75.09); }
+    public void secondAutoFar() { setTargetAngle(72.99); }
+
+    public void setFarAutoBlue() { setTargetAngle(-75.09); }
+    public void secondAutoFarBlue() { setTargetAngle(-72.99); }
+}

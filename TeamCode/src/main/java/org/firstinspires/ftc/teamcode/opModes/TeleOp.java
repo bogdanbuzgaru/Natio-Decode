@@ -52,7 +52,6 @@ public class TeleOp extends OpMode {
     public static Follower follower;
 
     public void init() {
-        // --- START FILE READING LOGIC ---
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
             String[] vals = ReadWriteFile.readFile(file).split("\n");
@@ -60,7 +59,6 @@ public class TeleOp extends OpMode {
                 results.add(Double.parseDouble(val));
             }
         } catch (Exception e) {
-            // Fallback if file is missing
             results.add(0.0); results.add(0.0); results.add(0.0);
         }
 
@@ -68,7 +66,6 @@ public class TeleOp extends OpMode {
         double startY = results.get(results.size() - 2);
         double startHeadingDeg = Math.toRadians(results.get(results.size() - 1));
         Pose startPose = new Pose(startX, startY, startHeadingDeg);
-        // --- END FILE READING LOGIC ---
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
