@@ -110,13 +110,17 @@ public class Position {
     public double getTargetAngle(){
         double targetHead = 0;
 //        if(!changeCord) {
-            if (red)
+            if (red && pose.getY() < 65)
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(126 - pose.getX())));
-            else if (blue) {
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()),Math.abs(pose.getX() - 18)));
-//                if(coord)
-//                    targetHead = targetHead + Math.signum(targetHead) * 10;
+            else if (red && pose.getY() >= 65)
+                targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(132 - pose.getX())));
+            else if (blue && pose.getY() < 65) {
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(130 - pose.getY()), Math.abs(pose.getX() - 18)));
             }
+            else if (blue && pose.getY() >= 65){
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()), Math.abs(pose.getX() - 12)));
+            }
+
 //        } else {
 //            if (red)
 //                targetHead = Math.toDegrees(Math.atan2(142 - pose.getY(DistanceUnit.INCH), 135 - pose.getX(DistanceUnit.INCH)));
@@ -149,6 +153,7 @@ public class Position {
         this.red = true;
         this.blue = false;
     }
+
     public void setCoord(boolean coord) {
         this.coord = coord;
     }

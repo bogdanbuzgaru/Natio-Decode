@@ -92,7 +92,7 @@ public class TeleOp extends OpMode {
         follower.update();
         pos.update(follower.getPose()); // Update math object with Follower's Pose
         fsm.update();
-
+        turret.setRed(pos.isRed());
         increaseAngle();
         increaseDecrease();
 

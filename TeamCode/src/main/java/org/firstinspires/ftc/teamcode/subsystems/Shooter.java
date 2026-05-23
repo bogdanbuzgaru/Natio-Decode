@@ -67,7 +67,7 @@ public class Shooter {
         setAutoFarHood();
     }
     public void setTicks(double ticks) {
-        ticks += 150;
+        ticks += 50;
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
