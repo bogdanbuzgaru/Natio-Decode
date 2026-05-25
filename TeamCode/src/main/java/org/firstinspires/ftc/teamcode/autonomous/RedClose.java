@@ -314,8 +314,8 @@ public class RedClose extends OpMode {
             return value - 9.7322834608;
         }
         private double actualPositionY(double value){
-            return value - 6.692913;
-        }
+            return value - 6.692913 - 1.968504;
+        } //1.968504 (intake extension)
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
@@ -375,7 +375,6 @@ public class RedClose extends OpMode {
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(43))
                             .build()
             );
-
 
             SHOOT_THIRD = (follower.pathBuilder().addPath(
                                     new BezierCurve(

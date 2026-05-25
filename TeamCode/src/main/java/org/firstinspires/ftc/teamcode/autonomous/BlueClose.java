@@ -277,7 +277,7 @@ public class BlueClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(33.7322834608, 126.307087),
+                            new Pose(33.7322834608, 126.307087 - 1.968504), //1.968504 (intake extention, supercycle)
                             new Pose(54.000, 90.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))

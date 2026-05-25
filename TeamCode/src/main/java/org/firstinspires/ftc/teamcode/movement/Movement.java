@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.movement;
 
-
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,53 +17,98 @@ public class Movement {
     private DcMotor rightFront;
     private DcMotor leftRear;
     private DcMotor rightRear;
+    private IMU imu;
 
-    public Movement (HardwareMap hardwareMap){
+    public Movement(HardwareMap hardwareMap) {
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
         rightFront = hardwareMap.get(DcMotor.class, "frontRight");
         leftRear = hardwareMap.get(DcMotor.class, "backLeft");
         rightRear = hardwareMap.get(DcMotor.class, "backRight");
 
+        // Reverse left motors
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
         List<DcMotor> movementMotors = Arrays.asList(leftFront, rightFront, leftRear, rightRear);
         movementMotors.forEach(motor -> motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE));
+
+        // Initialize IMU
+        imu = hardwareMap.get(IMU.class, "imu");
+
+        // IMPORTANT: Adjust these parameters to match how your Control Hub is mounted!
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+        imu.initialize(parameters);
     }
 
-    public void movementLoop (Gamepad gamepad){
+    public void movementFieldCentric(Gamepad gamepad) {
+        double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad.left_stick_x;
+        double rx = gamepad.right_stick_x;  //heading
+
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+        rotX = rotX * 1.1;
+
+        double frontLeftPower = (rotY + rotX + rx);
+        double backLeftPower = (rotY - rotX + rx);
+        double frontRightPower = (rotY - rotX - rx);
+        double backRightPower = (rotY + rotX - rx);
+
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        leftFront.setPower(frontLeftPower / denominator);
+        leftRear.setPower(backLeftPower / denominator);
+        rightFront.setPower(frontRightPower / denominator);
+        rightRear.setPower(backRightPower / denominator);
+    }
+
+    public void resetHeading() {
+        imu.resetYaw();
+    }
+
+    public void movementLoop(Gamepad gamepad) {
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
-        double heading = gamepad.right_stick_x;
+        double rx = gamepad.right_stick_x;  //heading
 
-        x = x * 1.1; // Counteract imperfect strafing
-        double rx = heading;
-        double frontLeftPower = (y + x + rx) ;
-        double backLeftPower = (y - x + rx) ;
+        x = x * 1.1;
+
+        double frontLeftPower = (y + x + rx);
+        double backLeftPower = (y - x + rx);
         double frontRightPower = (y - x - rx);
         double backRightPower = (y + x - rx);
 
-        leftFront.setPower(frontLeftPower);
-        rightFront.setPower(frontRightPower);
-        leftRear.setPower(backLeftPower);
-        rightRear.setPower(backRightPower);
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        leftFront.setPower(frontLeftPower / denominator);
+        rightFront.setPower(frontRightPower / denominator);
+        leftRear.setPower(backLeftPower / denominator);
+        rightRear.setPower(backRightPower / denominator);
     }
-    public void movementLoopSlow (Gamepad gamepad){
+
+    public void movementLoopSlow(Gamepad gamepad) {
+        double speedMultiplier = 0.5;
+
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
-        double heading = gamepad.right_stick_x;
+        double rx = gamepad.right_stick_x;
 
-        x = x * 1.1; // Counteract imperfect strafing
-        double rx = heading;
-        double frontLeftPower = (y + x + rx) ;
-        double backLeftPower = (y - x + rx) ;
-        double frontRightPower = (y - x - rx);
-        double backRightPower = (y + x - rx);
+        x = x * 1.1;
 
-        leftFront.setPower(frontLeftPower);
-        rightFront.setPower(frontRightPower);
-        leftRear.setPower(backLeftPower);
-        rightRear.setPower(backRightPower);
+        double frontLeftPower = (y + x + rx) * speedMultiplier;
+        double backLeftPower = (y - x + rx) * speedMultiplier;
+        double frontRightPower = (y - x - rx) * speedMultiplier;
+        double backRightPower = (y + x - rx) * speedMultiplier;
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        leftFront.setPower(frontLeftPower / denominator);
+        rightFront.setPower(frontRightPower / denominator);
+        leftRear.setPower(backLeftPower / denominator);
+        rightRear.setPower(backRightPower / denominator);
     }
 }
