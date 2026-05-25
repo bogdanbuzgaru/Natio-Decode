@@ -114,7 +114,7 @@ public class TeleOp extends OpMode {
         if (gamepad1.triangleWasPressed()) manual = !manual;
 
         // Auto Shooting Logic
-        if ((isLeftBumperHeld(0.0006) && (pos.shootClose() || pos.shootHigh()) || isLeftBumperHeld(0.01))) {
+        if (gamepad1.left_bumper) {
             shooter.raiseBarrier();
             intake.autoTake();
             index.autoFeed();
@@ -122,8 +122,8 @@ public class TeleOp extends OpMode {
             shooter.lowerBarrier();
         }
 
-        if (pos.activateOrientation() && !manual) turret.update();
-
+        if (pos.activateOrientation() && !manual)
+            turret.update();
         if (manual) {
             turret.goNeutral();
             if (gamepad1.leftBumperWasPressed()) shooter.raiseBarrier();
