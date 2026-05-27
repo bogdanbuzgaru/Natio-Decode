@@ -4,8 +4,10 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -44,7 +46,7 @@ public class TeleOp extends OpMode {
     private Lift lift;
     private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
     private ServoImplEx rgbLed;
-
+    private boolean fieldCentric = false;
     private boolean manual = false;
     private boolean park = true;
     private ElapsedTime leftBumperHoldTimer = new ElapsedTime();
@@ -52,8 +54,8 @@ public class TeleOp extends OpMode {
     private int angle = 0;
     private double tick;
     private ElapsedTime timer = new ElapsedTime();
-
     public static Follower follower;
+    private int offset = 0;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -65,7 +67,6 @@ public class TeleOp extends OpMode {
         } catch (Exception e) {
             results.add(0.0); results.add(0.0); results.add(0.0);
         }
-
         double startX = results.get(results.size() - 3);
         double startY = results.get(results.size() - 2);
         double startHeadingDeg = Math.toRadians(results.get(results.size() - 1));
@@ -100,8 +101,13 @@ public class TeleOp extends OpMode {
         turret.setRed(pos.isRed());
         increaseAngle();
         increaseDecrease();
-
-        movement.movementLoop(gamepad1);
+        if(!fieldCentric)
+            movement.movementLoop(gamepad1);
+        else
+            movement.movementFieldCentric(gamepad1);
+        if(gamepad1.triangleWasPressed()){
+            fieldCentric = !fieldCentric;
+        }
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
@@ -222,18 +228,24 @@ public class TeleOp extends OpMode {
     private void resetPosition(Gamepad gamepad) {
         if(pos.isRed()) {
             if (gamepad.dpadUpWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
                 follower.setPose(new Pose(
                         124.49, 84.91,        //Up
                         Math.toRadians(0)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
                 follower.setPose(new Pose(
                         116.214, 125.133,    //basket
                         Math.toRadians(38.4)
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
                 {
                     follower.setPose(new Pose(
                             123.33, 68.3,    //Up barrier
@@ -243,6 +255,8 @@ public class TeleOp extends OpMode {
                 }
                 manual = false;
             } else if (gamepad.dpadRightWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
                 follower.setPose(new Pose(
                         8.26, 9.08,    //our human player
                         Math.toRadians(270)
@@ -251,12 +265,16 @@ public class TeleOp extends OpMode {
             }
         }else if(pos.isBlue()){
             if (gamepad.dpadUpWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(180);
                 follower.setPose(new Pose(
                         19.51, 84.91,        //Up
                         Math.toRadians(180)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(180);
                 follower.setPose(new Pose(
                         27.786, 125.133,    //basket
                         Math.toRadians(141.6)
@@ -264,6 +282,8 @@ public class TeleOp extends OpMode {
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
                 {
+                    movement.resetHeading();
+                    movement.setOff(180);
                     follower.setPose(new Pose(
                             20.67, 68.3,    //Up barrier
                             Math.toRadians(180)
@@ -272,6 +292,8 @@ public class TeleOp extends OpMode {
                 }
                 manual = false;
             } else if (gamepad.dpadRightWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(180);
                 follower.setPose(new Pose(
                         135.74, 9.08,    //our human player
                         Math.toRadians(270)

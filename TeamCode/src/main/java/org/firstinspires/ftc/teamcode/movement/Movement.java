@@ -18,7 +18,7 @@ public class Movement {
     private DcMotor leftRear;
     private DcMotor rightRear;
     private IMU imu;
-
+    private int off = 0;
     public Movement(HardwareMap hardwareMap) {
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
         rightFront = hardwareMap.get(DcMotor.class, "frontRight");
@@ -42,12 +42,16 @@ public class Movement {
         imu.initialize(parameters);
     }
 
+    public void setOff(int off) {
+        this.off = off;
+    }
+
     public void movementFieldCentric(Gamepad gamepad) {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;  //heading
 
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.toRadians(off);
 
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
         double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
