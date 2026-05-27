@@ -5,6 +5,8 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
@@ -40,6 +42,7 @@ public class TeleOp extends OpMode {
     private RevColorSensorV3 colorSensor, colorSensor2;
     private Lift lift;
     private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
+    private ServoImplEx rgbLed;
 
     private boolean manual = false;
     private boolean park = true;
@@ -70,6 +73,8 @@ public class TeleOp extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         follower.setPose(startPose);
+        rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
+        indicatorLight.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -179,6 +184,7 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
+            rgbLed.setPosition(0.275);
             if (timer.milliseconds() >= 450) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 if (!Double.isNaN(distance) && distance < 5.2) {
@@ -190,6 +196,7 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
+            rgbLed.setPosition(0.425);
             if (timer.milliseconds() >= 300) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 if (Double.isNaN(distance) || distance > 5.8) return State.NU_E_BILE;
