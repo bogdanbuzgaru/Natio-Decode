@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.math.Position;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.statemachine.StateMachine;
@@ -48,6 +50,8 @@ public class RedFar extends OpMode {
     private int number = 0;
     private boolean repeat = true;
     private Position pos;
+    private Limelight limelight;
+    private int choice;
 
     @Override
     public void init() {
@@ -57,6 +61,7 @@ public class RedFar extends OpMode {
         follower.setStartingPose(new Pose(90.310, 9.100, Math.toRadians(0)));
         pos = new Position(follower.getPose());
         pos.setRed();
+        limelight = new Limelight(hardwareMap, "limelight");
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -73,6 +78,7 @@ public class RedFar extends OpMode {
 
     @Override
     public void loop() {
+        limelight.update();
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
@@ -141,9 +147,12 @@ public class RedFar extends OpMode {
         });
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
+            int choice = limelight.choice(limelight.getSelectedPath());
             if (!follower.isBusy() && number < 2) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
-            } else if (!follower.isBusy() && number < 5) {
+            } else if (!follower.isBusy() && number < 5 && choice == 1 || choice == 0) {    //TODO choice to be removede
+                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+            } else if (!follower.isBusy() && number < 5 && choice == 2  || choice == 0) {   //TODO choice to be removede
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             } else if (!follower.isBusy()) {
                 return handleShoot(AutoStates.PARK, 700, true);
@@ -152,14 +161,14 @@ public class RedFar extends OpMode {
         });
 
         fsm.onStateEnter(AutoStates.CENTER_LAST_ROW, () -> {
-            follower.followPath(paths.CENTER_LAST_ROW);
+            follower.followPath(paths.C_TAKE_LAST_ROW); //CURVE
             shooter.lowerBarrier();
             return null;
         });
         fsm.onStateUpdate(AutoStates.CENTER_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return AutoStates.TAKE_LAST_ROW;
+                return AutoStates.GO_SHOOT_LAST_ROW;
             }
             return null;
         });
@@ -198,7 +207,7 @@ public class RedFar extends OpMode {
     }
 
     public static class Paths {
-        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW;
+        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, C_TAKE_LAST_ROW, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
@@ -217,20 +226,13 @@ public class RedFar extends OpMode {
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
-            CENTER_LAST_ROW = follower.pathBuilder()
-                    .addPath(new BezierLine(
+            C_TAKE_LAST_ROW = follower.pathBuilder()
+                    .addPath(new BezierCurve(
                             new Pose(94.500, 8.500),
-                            new Pose(98.000, 31.500)
-                    ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                    .build();
-
-            TAKE_LAST_ROW = follower.pathBuilder()
-                    .addPath(new BezierLine(
                             new Pose(98.000, 31.500),
                             new Pose(124.000, 31.500)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
             GO_SHOOT_LAST_ROW = follower.pathBuilder()

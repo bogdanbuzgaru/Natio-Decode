@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opModes;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -84,7 +85,6 @@ public class TeleOp extends OpMode {
         lift = new Lift(hardwareMap);
         sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(startPose);
-
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         colorSensor.enableLed(true);
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
@@ -184,7 +184,7 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            rgbLed.setPosition(0.275);
+            rgbLed.setPosition(0.28);
             if (timer.milliseconds() >= 450) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 if (!Double.isNaN(distance) && distance < 5.2) {

@@ -1,43 +1,135 @@
 package org.firstinspires.ftc.teamcode.limelight;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import java.util.List;
 
 public class Limelight {
 
     private Limelight3A limelight;
 
+    // Standard Limelight Tracking
     private boolean targetDetected;
     private double xOffset;
     private double yOffset;
     private double targetArea;
 
-    public Limelight(HardwareMap hardwareMap, String deviceName, int pipeline) {
-        limelight = hardwareMap.get(Limelight3A.class, deviceName);
+    // --- Path Selection Variables ---
+    public enum Choice { LEFT, RIGHT, EQUAL, NONE }
+    private Choice selectedChoice = Choice.NONE;
 
-        limelight.pipelineSwitch(pipeline);
+    // Tuning Weights for Cost Function (w1, w2, w3)
+    public double w1 = 10.0; // Density Weight (Rewards having more artifacts)
+    public double w2 = 5.0;  // Velocity Weight (Placeholder for future velocity tracking)
+    public double w3 = -2.0; // Proximity Weight (Negative to penalize targets far from midline)
+
+    public Limelight(HardwareMap hardwareMap, String deviceName) {
+        limelight = hardwareMap.get(Limelight3A.class, deviceName);
         limelight.start();
+        limelight.pipelineSwitch(9); //TODO CARE O FI FOST
     }
 
     public void update() {
         LLResult result = limelight.getLatestResult();
-
         if (result != null && result.isValid()) {
             targetDetected = true;
+            // Primary targeted object (Usually the largest or most central)
             xOffset = result.getTx();
             yOffset = result.getTy();
             targetArea = result.getTa();
+
+            // Run the Cost Function evaluation for Left vs Right
+            evaluatePaths(result);
+
         } else {
+            // Reset if no target is seen
             targetDetected = false;
             xOffset = 0.0;
             yOffset = 0.0;
             targetArea = 0.0;
+            selectedChoice = Choice.NONE;
         }
     }
+
+    /**
+     * Splits detected objects into Left/Right regions, calculates their costs,
+     * and sets the selectedPath using the argmax function.
+     */
+    private void evaluatePaths(LLResult result) {
+        // Get all objects detected by the Neural Network pipeline
+        List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();
+
+        if (detections == null || detections.isEmpty()) {
+            selectedChoice = Choice.NONE;
+            return;
+        }
+
+        int nLeft = 0, nRight = 0;
+        double xSumLeft = 0, xSumRight = 0;
+
+        // Sort detections into Left and Right regions based on their X offset
+        for (LLResultTypes.DetectorResult detection : detections) {
+            double tx = detection.getTargetXDegrees();
+            if (tx < 0) {
+                nLeft++;
+                xSumLeft += tx; // Keep running sum to calculate average later
+            } else {
+                nRight++;
+                xSumRight += tx;
+            }
+        }
+
+        // Calculate average absolute offset from midline (|x_mid - x_artifact|)
+        double xOffsetLeft = (nLeft > 0) ? Math.abs(xSumLeft / nLeft) : 0;
+        double xOffsetRight = (nRight > 0) ? Math.abs(xSumRight / nRight) : 0;
+
+        // Velocity (v) is difficult to track accurately without frame-to-frame
+        // ID memory. Defaulting to 0.0 for static game pieces.
+        double vLeft = 0.0;
+        double vRight = 0.0;
+
+        // Calculate Cost for both paths
+        double cLeft = calculateCost(nLeft, vLeft, xOffsetLeft);
+        double cRight = calculateCost(nRight, vRight, xOffsetRight);
+
+        // argmax logic: Select the path with the highest score
+        if (nLeft == 0 && nRight == 0) {
+            selectedChoice = Choice.NONE;
+        } else if (cLeft > cRight) {
+            selectedChoice = Choice.LEFT;
+        } else if (cRight > cLeft) {
+            selectedChoice = Choice.RIGHT;
+        } else {
+            selectedChoice = Choice.EQUAL;
+        }
+    }
+
+    /**
+     * The Cost Function formula from the image:
+     */
+    private double calculateCost(int n, double v, double xOffset) {
+        return (w1 * n) + (w2 * v) + (w3 * Math.abs(xOffset));
+    }
+
+    public int choice(Choice choice){
+        if(choice == Choice.LEFT || choice == Choice.EQUAL){
+            return 1;
+        }else if (choice == Choice.RIGHT){
+            return 2;
+        }else{
+            return 0;
+        }
+    }
+
+    // --- Getters ---
+
     public boolean hasTarget() {
         return targetDetected;
     }
+
     public double getXOffset() {
         return xOffset;
     }
@@ -48,5 +140,8 @@ public class Limelight {
 
     public double getTargetArea() {
         return targetArea;
+    }
+    public Choice getSelectedPath() {
+        return selectedChoice;
     }
 }
