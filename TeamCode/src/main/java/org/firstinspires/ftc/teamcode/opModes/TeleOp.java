@@ -74,7 +74,7 @@ public class TeleOp extends OpMode {
         follower.setStartingPose(startPose);
         follower.setPose(startPose);
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
-        indicatorLight.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
