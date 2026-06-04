@@ -21,15 +21,13 @@ public class Path_Check extends OpMode {
 
     @Override
     public void init() {
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(110.2677165392, 131, Math.toRadians(0)));
 
         paths = new Paths(follower); // Build paths
 
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+
     }
 
     @Override
@@ -112,9 +110,7 @@ public class Path_Check extends OpMode {
     }
 
     public int autonomousPathUpdate() {
-        // Add your state machine Here
-        // Access paths with paths.pathName
-        // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
+
         return 0;
     }
 }

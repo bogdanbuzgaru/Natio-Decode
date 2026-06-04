@@ -33,7 +33,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends OpMode {
     private List<Double> results = new ArrayList<>();
-    private enum State { E_BILE, NU_E_BILE }
+    private enum State { E_BILE, NU_E_BILE, BOMB }
 
     private Turret turret;
     private Shooter shooter;
@@ -56,6 +56,8 @@ public class TeleOp extends OpMode {
     private ElapsedTime timer = new ElapsedTime();
     public static Follower follower;
     private int offset = 0;
+    private ElapsedTime bombTimer = new ElapsedTime();
+    private double lastSecond = 0;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -92,6 +94,9 @@ public class TeleOp extends OpMode {
         colorSensor2.enableLed(true);
 
         setUp();
+    }
+    public void start(){
+        bombTimer.reset();
     }
 
     public void loop() {
@@ -190,7 +195,11 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            rgbLed.setPosition(0.28);
+            if(bombTimer.seconds() < 110)
+                rgbLed.setPosition(0.28);
+            else{
+                return State.BOMB;
+            }
             if (timer.milliseconds() >= 450) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 if (!Double.isNaN(distance) && distance < 5.2) {
@@ -202,7 +211,11 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
-            rgbLed.setPosition(0.425);
+            if(bombTimer.seconds() < 110)
+                rgbLed.setPosition(0.425);
+            else{
+                return State.BOMB;
+            }
             if (timer.milliseconds() >= 300) {
                 double distance = colorSensor.getDistance(DistanceUnit.CM);
                 if (Double.isNaN(distance) || distance > 5.8) return State.NU_E_BILE;
@@ -210,7 +223,18 @@ public class TeleOp extends OpMode {
             }
             return null;
         });
+        fsm.onStateUpdate(State.BOMB, () ->{
+            if(bombTimer.seconds() < 115){
+                rgbLed.setPosition(0.3);
+            }else if (blink(bombTimer.milliseconds())){
+                rgbLed.setPosition(0.3);
+            }
+            return null;
+        });
         fsm.init();
+    }
+    private boolean blink(double currTime){
+        return (currTime % 400) < 200;
     }
 
     private boolean isLeftBumperHeld(double holdTimeSeconds) {
