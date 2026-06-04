@@ -46,12 +46,12 @@ public class Movement {
         this.off = off;
     }
 
-    public void movementFieldCentric(Gamepad gamepad) {
+    public void movementFieldCentric(Gamepad gamepad, double yaw) {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;  //heading
 
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.toRadians(off);
+        double botHeading = yaw;
 
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
         double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);

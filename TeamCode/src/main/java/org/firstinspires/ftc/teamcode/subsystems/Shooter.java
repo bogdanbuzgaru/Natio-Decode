@@ -99,12 +99,6 @@ public class Shooter {
         }else{
             targetHood = 0.9;
         }
-//        targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
-//        if(ticks < 1728){
-//            targetHood = Math.min(ticks/2200 + Math.min(hoodPosition + error * 0.0005, 1), 1);
-//        }else {
-//            targetHood = Math.min(ticks / 2720 + Math.min(hoodPosition + error * 0.0005, 1), 1);
-//        }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
     }

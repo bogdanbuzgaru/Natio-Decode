@@ -34,8 +34,7 @@ public class Position {
     private boolean blue = false;
     private boolean red = true;
     private boolean shootClose = true;
-    private boolean changeCord = false;
-    private boolean coord = false;
+
     public Position (Pose pose){
         this.pose = pose;
         heading = Math.toDegrees(pose.getHeading());
@@ -103,9 +102,6 @@ public class Position {
             return Math.toDegrees(Math.atan2(130 - pose.getY(), Math.abs(pose.getX()) - 14));   //TODO this - change +
     }
 
-    public void setChangeCord(boolean changeCord) {
-        this.changeCord = changeCord;
-    }
 
     public double getTargetAngle(){
         double targetHead = 0;
@@ -154,9 +150,6 @@ public class Position {
         this.blue = false;
     }
 
-    public void setCoord(boolean coord) {
-        this.coord = coord;
-    }
 
     //------------------LINEAR EQUATIONS------------------
     private void calculateLinearEquations() {

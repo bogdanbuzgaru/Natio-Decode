@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode.opModes;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,7 +31,7 @@ import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends OpMode {
-    private List<Double> results = new ArrayList<>();
+    private final List<Double> results = new ArrayList<>();
     private enum State { E_BILE, NU_E_BILE, BOMB }
 
     private Turret turret;
@@ -43,21 +42,19 @@ public class TeleOp extends OpMode {
     private Movement movement;
     private Sensor sensor;
     private RevColorSensorV3 colorSensor, colorSensor2;
+    private Rev2mDistanceSensor distanceSensor, distanceSensor2;
     private Lift lift;
-    private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
+    private final StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
     private ServoImplEx rgbLed;
     private boolean fieldCentric = false;
     private boolean manual = false;
     private boolean park = true;
-    private ElapsedTime leftBumperHoldTimer = new ElapsedTime();
-    private boolean leftBumperWasPressed = false;
     private int angle = 0;
     private double tick;
     private ElapsedTime timer = new ElapsedTime();
     public static Follower follower;
     private int offset = 0;
     private ElapsedTime bombTimer = new ElapsedTime();
-    private double lastSecond = 0;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -88,10 +85,12 @@ public class TeleOp extends OpMode {
         lift = new Lift(hardwareMap);
         sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(startPose);
+        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
+        distanceSensor2 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor2");
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         colorSensor.enableLed(true);
-        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
-        colorSensor2.enableLed(true);
+//        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
+//        colorSensor2.enableLed(true);
 
         setUp();
     }
@@ -101,15 +100,15 @@ public class TeleOp extends OpMode {
 
     public void loop() {
         follower.update();
-        pos.update(follower.getPose()); // Update math object with Follower's Pose
+        pos.update(follower.getPose());
         fsm.update();
-        turret.setRed(pos.isRed());
-        increaseAngle();
+//        turret.setRed(pos.isRed());
+
         increaseDecrease();
         if(!fieldCentric)
             movement.movementLoop(gamepad1);
         else
-            movement.movementFieldCentric(gamepad1);
+            movement.movementFieldCentric(gamepad1, follower.getPose().getHeading());
         if(gamepad1.triangleWasPressed()){
             fieldCentric = !fieldCentric;
         }
@@ -117,8 +116,7 @@ public class TeleOp extends OpMode {
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
         resetPosition(gamepad2);
-        pos.whereToShoot(gamepad2);
-        pos.setCoord(true);
+//        pos.whereToShoot(gamepad2);
 
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
@@ -126,10 +124,9 @@ public class TeleOp extends OpMode {
             park = !park;
         }
 
-        // Manual Mode Toggle
-        if (gamepad1.triangleWasPressed()) manual = !manual;
+        if (gamepad2.triangleWasPressed())
+            manual = !manual;
 
-        // Auto Shooting Logic
         if (gamepad1.left_bumper) {
             shooter.raiseBarrier();
             intake.autoTake();
@@ -145,9 +142,6 @@ public class TeleOp extends OpMode {
             if (gamepad1.leftBumperWasPressed()) shooter.raiseBarrier();
             else if (gamepad1.rightBumperWasPressed()) shooter.lowerBarrier();
         }
-
-        // Cord logic using Follower Pose
-        pos.setChangeCord(follower.getPose().getY() < 40);
 
         // Shooter & Turret Updates using Follower Velocity
         double velX = follower.getVelocity().getXComponent();
@@ -174,15 +168,7 @@ public class TeleOp extends OpMode {
         telemetry.addData("increased angle", angle);
         telemetry.update();
     }
-    private void increaseAngle(){
-        if(gamepad2.circleWasPressed()){
-            angle += 1;
-        }else if(gamepad2.squareWasPressed()) {
-            angle -= 1;
-        }else if (gamepad2.triangleWasPressed()){
-            angle = 0;
-        }
-    }
+
     private void increaseDecrease(){
         if(gamepad2.right_trigger > 0.01){
             tick = 100;
@@ -237,17 +223,7 @@ public class TeleOp extends OpMode {
         return (currTime % 400) < 200;
     }
 
-    private boolean isLeftBumperHeld(double holdTimeSeconds) {
-        if (gamepad1.left_bumper) {
-            if (!leftBumperWasPressed) {
-                leftBumperHoldTimer.reset();
-                leftBumperWasPressed = true;
-            }
-            return leftBumperHoldTimer.seconds() >= holdTimeSeconds;
-        }
-        leftBumperWasPressed = false;
-        return false;
-    }
+
 
     private void resetPosition(Gamepad gamepad) {
         if(pos.isRed()) {
