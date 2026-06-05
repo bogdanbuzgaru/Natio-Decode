@@ -136,6 +136,7 @@ public class TeleOp extends OpMode {
             shooter.raiseBarrier();
             intake.autoTake();
             index.autoFeed();
+
         } else {
             shooter.lowerBarrier();
         }

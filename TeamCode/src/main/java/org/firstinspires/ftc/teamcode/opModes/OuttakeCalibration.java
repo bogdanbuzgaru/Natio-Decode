@@ -39,7 +39,7 @@ public class OuttakeCalibration extends LinearOpMode {
             SimpleMotorFeedforward ff = new SimpleMotorFeedforward(ks, kv, ka);
             p.setPID(kp, 0, 0);
 
-            vecocity = motorLeft.getVelocity();
+            vecocity = motorRight.getVelocity();
 
             double p_output = p.calculate(vecocity, target);
             double ff_ouput = ff.calculate(target);

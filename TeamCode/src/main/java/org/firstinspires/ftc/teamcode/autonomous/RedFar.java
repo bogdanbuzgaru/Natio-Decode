@@ -152,7 +152,8 @@ public class RedFar extends OpMode {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
             } else if (!follower.isBusy() && number < 5 && choice == 1 || choice == 0) {    //TODO choice to be removede
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
-            } else if (!follower.isBusy() && number < 5 && choice == 2  || choice == 0) {   //TODO choice to be removede
+            } else if (!follower.isBusy() && number < 5 && choice == 2  || choice == 0) {
+                //TODO choice to be removede
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             } else if (!follower.isBusy()) {
                 return handleShoot(AutoStates.PARK, 700, true);
