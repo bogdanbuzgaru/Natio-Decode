@@ -9,7 +9,7 @@ public class Turret {
     private double targetAngle;  // Target angle relative to robot
     private double offsetAngle;                // Velocity compensation offset
 
-    private final double HALF_RANGE_DEGREES = 175.1785714285714;       //TODO Check for lower value
+    private final double HALF_RANGE_DEGREES = 173.1785714285714;       //TODO Check for lower value
     private final double SERVO_CENTER = 0.500000;
     private boolean isRed;
     public Turret(HardwareMap hardwareMap){
@@ -48,7 +48,7 @@ public class Turret {
             finalAngle -= 5;
         }
         double servoOffset = (finalAngle / HALF_RANGE_DEGREES) * 0.5000;
-        double servoPosition = SERVO_CENTER + servoOffset;
+        double servoPosition = SERVO_CENTER - servoOffset;
 
         servoPosition = Math.max(0.00000, Math.min(1.00000, servoPosition));
 

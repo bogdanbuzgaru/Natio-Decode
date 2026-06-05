@@ -34,8 +34,8 @@ public class Shooter {
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 
-        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(220,0,0,11.7));
-        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(220,0,0,11.7));
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(3,0,0,9.41));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(3,0,0,9.41));
 
 
         lowerBarrier();
@@ -103,10 +103,10 @@ public class Shooter {
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.53);
+        barrier.setPosition(0.91);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.3);
+        barrier.setPosition(0.78);
     }
     public void setTicks(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){
@@ -130,11 +130,9 @@ public class Shooter {
     public void setAutoFarHood(){
         hood.setPosition(0.94);
     }
-    public void lowerHood(Gamepad gamepad){
-        if(gamepad.dpadDownWasPressed()){
+    public void lowerHood(){
             ticks = 0;
-            hood.setPosition(0.2);
-        }
+            hood.setPosition(0);
     }
     public void setHoodPosition(Gamepad gamepad) {
         if(gamepad.dpadUpWasPressed()) {

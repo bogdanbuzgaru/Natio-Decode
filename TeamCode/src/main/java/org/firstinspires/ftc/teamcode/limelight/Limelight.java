@@ -28,8 +28,8 @@ public class Limelight {
 
     public Limelight(HardwareMap hardwareMap, String deviceName) {
         limelight = hardwareMap.get(Limelight3A.class, deviceName);
+        limelight.pipelineSwitch(0);
         limelight.start();
-        limelight.pipelineSwitch(9); //TODO CARE O FI FOST
     }
 
     public void update() {
@@ -54,10 +54,7 @@ public class Limelight {
         }
     }
 
-    /**
-     * Splits detected objects into Left/Right regions, calculates their costs,
-     * and sets the selectedPath using the argmax function.
-     */
+
     private void evaluatePaths(LLResult result) {
         // Get all objects detected by the Neural Network pipeline
         List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();

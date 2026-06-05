@@ -8,6 +8,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
@@ -55,6 +56,7 @@ public class TeleOp extends OpMode {
     public static Follower follower;
     private int offset = 0;
     private ElapsedTime bombTimer = new ElapsedTime();
+    private Servo indexMove;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -77,6 +79,8 @@ public class TeleOp extends OpMode {
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
+        indexMove = hardwareMap.get(Servo.class, "indexMove");
+        indexMove.setPosition(1);
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -89,6 +93,7 @@ public class TeleOp extends OpMode {
         distanceSensor2 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor2");
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         colorSensor.enableLed(true);
+        shooter.lowerHood();
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
 //        colorSensor2.enableLed(true);
 
@@ -103,7 +108,7 @@ public class TeleOp extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
 //        turret.setRed(pos.isRed());
-
+        indexMove.setPosition(1);
         increaseDecrease();
         if(!fieldCentric)
             movement.movementLoop(gamepad1);
@@ -156,7 +161,6 @@ public class TeleOp extends OpMode {
             turret.setTargetAngle(pos.getTargetAngle());//+ angle if needed
             turret.setOffsetAngle(pos.getOffetAngle(velX, velY));
         }
-        shooter.lowerHood(gamepad1);
         shooter.update();
 
         // Telemetry
