@@ -111,13 +111,23 @@ public class Limelight {
         return (w1 * n) + (w2 * v) + (w3 * Math.abs(xOffset));
     }
 
-    public int choice(Choice choice){
-        if(choice == Choice.LEFT || choice == Choice.EQUAL){
-            return 1;
-        }else if (choice == Choice.RIGHT){
-            return 2;
+    public int choice(Choice choice, boolean red){
+        if(!red) {
+            if (choice == Choice.LEFT ) {
+                return 1;
+            } else if (choice == Choice.RIGHT || choice == Choice.EQUAL) {
+                return 2;
+            } else {
+                return 0;
+            }
         }else{
-            return 0;
+            if (choice == Choice.LEFT || choice == Choice.EQUAL) {
+                return 1;
+            } else if (choice == Choice.RIGHT) {
+                return 2;
+            } else {
+                return 0;
+            }
         }
     }
 

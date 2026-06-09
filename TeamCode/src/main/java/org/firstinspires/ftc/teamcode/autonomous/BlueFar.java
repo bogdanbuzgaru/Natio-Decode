@@ -149,13 +149,14 @@ public class BlueFar extends OpMode {
         });
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
-            int choice = limelight.choice(limelight.getSelectedPath());
+            int choice = limelight.choice(limelight.getSelectedPath(), false);
             if (!follower.isBusy() && number < 2) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
             } else if (!follower.isBusy() && number < 5 && choice == 1) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             } else if (!follower.isBusy() && number < 5 && choice == 2) {
-                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+                number++;
+                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
             } else if (!follower.isBusy()) {
                 return handleShoot(AutoStates.PARK, 700, true);
             }
