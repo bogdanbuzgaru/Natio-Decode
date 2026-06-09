@@ -34,7 +34,7 @@ public class PositionCalibration  extends OpMode {
         follower.update();
         limelight.update();
         movement.movementLoop(gamepad1);
-        movement.movementFieldCentric(gamepad2, follower.getPose().getHeading());
+        movement.movementFieldCentric(gamepad2, follower.getPose().getHeading(), true);
         telemetry.addData("X: ", follower.getPose().getX());
         telemetry.addData("Y: ", follower.getPose().getY());
         telemetry.addData("Yaw: ", Math.toDegrees(follower.getPose().getHeading()));

@@ -46,12 +46,17 @@ public class Movement {
         this.off = off;
     }
 
-    public void movementFieldCentric(Gamepad gamepad, double yaw) {
+    public void movementFieldCentric(Gamepad gamepad, double yaw, boolean red) {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;  //heading
 
         double botHeading = yaw;
+        if(red){
+            botHeading -= Math.PI/2;
+        }else{
+            botHeading += Math.PI/2;
+        }
 
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
         double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
@@ -77,7 +82,7 @@ public class Movement {
     public void movementLoop(Gamepad gamepad) {
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
-        double rx = gamepad.right_stick_x;  //heading
+        double rx = gamepad.right_stick_x;
 
         x = x * 1.1;
 
