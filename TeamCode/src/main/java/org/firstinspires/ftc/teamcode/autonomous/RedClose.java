@@ -34,9 +34,9 @@ public class RedClose extends OpMode {
         SECOND_ROW,
         SHOOT_SECOND,
         GO_TO_GOAL,
-        GO_BACK,
-        SHOOT_THIRD,
-        PREPARE_LAST_ROW,
+//        GO_BACK,
+        SHOOT_GOAL,
+//        PREPARE_LAST_ROW,
         LAST_ROW,
         SHOOT_LAST,
         FIRST_ROW,
@@ -102,7 +102,6 @@ public class RedClose extends OpMode {
 
     }
     private AutoState handleShoot(AutoState nextState, long durationMs, boolean change) {
-        repeat = change;
         if (!isShooting) {
             pathTimer.reset();
             isShooting = true;
@@ -111,6 +110,7 @@ public class RedClose extends OpMode {
             index.autoFeed();
             if (pathTimer.milliseconds() > durationMs) {
                 isShooting = false;
+                repeat = change;
                 return nextState;
             }
         }
@@ -125,7 +125,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
             intake.autoTake();
             if(!follower.isBusy()) {
-                return handleShoot(AutoState.PREPARE_SECOND, 900, true);
+                return handleShoot(AutoState.SECOND_ROW, 900, true);
             }
             return null;
         });
@@ -177,53 +177,53 @@ public class RedClose extends OpMode {
             intake.autoTake();
             index.autoFeed();
             if(!follower.isBusy()) {
-                return AutoState.GO_BACK;
+                return AutoState.SHOOT_GOAL;
             }
             return null;
         });
-        fsm.onStateEnter(AutoState.GO_BACK, () -> {
-            follower.followPath(paths.GO_BACK);
+//        fsm.onStateEnter(AutoState.GO_BACK, () -> {
+//            follower.followPath(paths.GO_BACK);
+//            shooter.lowerBarrier();
+//            pathTimer.reset();
+//            return null;
+//
+//        });
+//        fsm.onStateUpdate(AutoState.GO_BACK, () -> {
+//            intake.autoTake();
+//            index.autoFeed();
+//            if(!follower.isBusy() && pathTimer.milliseconds() >= 3400) {
+//                return AutoState.SHOOT_GOAL;
+//            }
+//            return null;
+//        });
+        fsm.onStateEnter(AutoState.SHOOT_GOAL, () -> {
+            follower.followPath(paths.SHOOT_GOAL);
             shooter.lowerBarrier();
-            pathTimer.reset();
             return null;
 
         });
-        fsm.onStateUpdate(AutoState.GO_BACK, () -> {
-            intake.autoTake();
-            index.autoFeed();
-            if(!follower.isBusy() && pathTimer.milliseconds() >= 3400) {
-                return AutoState.SHOOT_THIRD;
-            }
-            return null;
-        });
-        fsm.onStateEnter(AutoState.SHOOT_THIRD, () -> {
-            follower.followPath(paths.SHOOT_THIRD);
-            shooter.lowerBarrier();
-            return null;
-
-        });
-        fsm.onStateUpdate(AutoState.SHOOT_THIRD, () -> {
+        fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
             intake.autoTake();
             if(!follower.isBusy() && !repeat) {
-                return handleShoot(AutoState.PREPARE_LAST_ROW, 700, false);
+                return handleShoot(AutoState.LAST_ROW, 700, false);
             }else if (!follower.isBusy() && repeat){
                 return handleShoot(AutoState.GO_TO_GOAL, 700, false);
             }
             return null;
         });
-        fsm.onStateEnter(AutoState.PREPARE_LAST_ROW, () -> {
-            follower.followPath(paths.PREPARE_LAST_ROW);
-            shooter.lowerBarrier();
-            return null;
-        });
-        fsm.onStateUpdate(AutoState.PREPARE_LAST_ROW, () -> {
-            intake.autoTake();
-            index.autoFeed();
-            if(!follower.isBusy()) {
-                return AutoState.LAST_ROW;
-            }
-            return null;
-        });
+//        fsm.onStateEnter(AutoState.PREPARE_LAST_ROW, () -> {
+//            follower.followPath(paths.PREPARE_LAST_ROW);
+//            shooter.lowerBarrier();
+//            return null;
+//        });
+//        fsm.onStateUpdate(AutoState.PREPARE_LAST_ROW, () -> {
+//            intake.autoTake();
+//            index.autoFeed();
+//            if(!follower.isBusy()) {
+//                return AutoState.LAST_ROW;
+//            }
+//            return null;
+//        });
         fsm.onStateEnter(AutoState.LAST_ROW, () -> {
             follower.followPath(paths.LAST_ROW);
             shooter.lowerBarrier();
@@ -302,7 +302,7 @@ public class RedClose extends OpMode {
         public PathChain SHOOT_SECOND;
         public PathChain GO_TO_GOAL;
         public PathChain GO_BACK;
-        public PathChain SHOOT_THIRD;
+        public PathChain SHOOT_GOAL;
         public PathChain PREPARE_LAST_ROW;
         public PathChain LAST_ROW;
         public PathChain SHOOT_LAST;
@@ -320,25 +320,30 @@ public class RedClose extends OpMode {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(actualPositionX(120.000), actualPositionY(133.000)),
-                                            new Pose(90.000, 90.000)
+                                            new Pose(84.000, 84.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()
             );
 
-            PREPARE_SECOND = (follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(90.000, 90.000),
-                                    new Pose(100.000, 67.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                    .build()
-            );
+//            PREPARE_SECOND = (follower.pathBuilder().addPath(
+//                            new BezierLine(
+//                                    new Pose(90.000, 90.000),
+//                                    new Pose(100.000, 67.000)
+//                            )
+//                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+//                    .build()
+//            );
 
             SECOND_ROW = (follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(100.000,67.000),
-                                    new Pose(134.000, 65.000)
+//                            new BezierLine(
+//                                    new Pose(100.000,67.000),
+//                                    new Pose(134.000, 65.000)
+//                            )
+                            new BezierCurve(
+                                    new Pose(84.000, 84.000),
+                                    new Pose(84.322, 51.681),
+                                    new Pose(127.434, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -352,18 +357,22 @@ public class RedClose extends OpMode {
                                             new Pose(94.000, 74.000),
                                             new Pose(92.000, 79.000),
                                             new Pose(91.000, 81.000),
-                                            new Pose(90.000, 90.000)
+                                            new Pose(84.000, 84.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()
             );
 
             GO_TO_GOAL = (follower.pathBuilder().addPath(
-                                    new BezierLine(
-                                            new Pose(90.000, 90.000),
-                                            new Pose(103.000, 59.000)
-                                    )
-                            ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+//                                    new BezierLine(
+//                                            new Pose(90.000, 90.000),
+//                                            new Pose(103.000, 59.000)
+//                                    )
+                                new BezierLine(
+                                        new Pose(84.000, 84.000),
+                                        new Pose(129.000, 57.000)
+                                )
+                            ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(40))
                             .build()
             );
 
@@ -376,38 +385,46 @@ public class RedClose extends OpMode {
                             .build()
             );
 
-            SHOOT_THIRD = (follower.pathBuilder().addPath(
+            SHOOT_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(134.000, 59.000),
-                                            new Pose(130.000, 60.000),
-                                            new Pose(115.000, 62.000),
-                                            new Pose(97.000, 70.000),
-                                            new Pose(93.000, 79.000),
-                                            new Pose(90.000, 90.000)
+//                                            new Pose(134.000, 59.000),
+//                                            new Pose(130.000, 60.000),
+//                                            new Pose(115.000, 62.000),
+//                                            new Pose(97.000, 70.000),
+//                                            new Pose(93.000, 79.000),
+//                                            new Pose(90.000, 90.000)
+                                            new Pose(129.000, 57.000),
+                                            new Pose(100.255, 67.783),
+                                            new Pose(84.000, 84.000)
                                     )
-                            ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(0))
+                            ).setLinearHeadingInterpolation(Math.toRadians(40), Math.toRadians(0))
                             .build()
             );
-            PREPARE_LAST_ROW = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(90.000, 90.000),
-                                    new Pose(106.000, 40.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                    .build();
+//            PREPARE_LAST_ROW = follower.pathBuilder().addPath(
+//                            new BezierLine(
+//                                    new Pose(90.000, 90.000),
+//                                    new Pose(106.000, 40.000)
+//                            )
+//                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+//                    .build();
             LAST_ROW = (follower.pathBuilder().addPath(
-                                    new BezierLine(
-                                            new Pose (106.000, 40.000),
-                                            new Pose(134.000, 40.000)
-                                    )
+//                                    new BezierLine(
+//                                            new Pose (106.000, 40.000),
+//                                            new Pose(134.000, 40.000)
+//                                    )
+                                new BezierCurve(
+                                        new Pose(84.000, 84.000),
+                                        new Pose(88.633, 23.549),
+                                        new Pose(129.000, 36.000)
+                                )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()
             );
 
             SHOOT_LAST = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(134.000,40.000),
-                                    new Pose(90.000, 90.000)
+                                    new Pose(129.000,36.000),
+                                    new Pose(84.000, 84.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -415,7 +432,7 @@ public class RedClose extends OpMode {
 
             FIRST_ROW = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(90.000, 90.000),
+                                            new Pose(84.000, 84.000),
                                             new Pose(128.000, 84.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -425,14 +442,14 @@ public class RedClose extends OpMode {
             SHOOT = (follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(128.000, 84.000),
-                                            new Pose(90.000, 90.000)
+                                            new Pose(84.000, 84.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                             .build()
             );
             PARK = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(90.000, 90.000),
+                                            new Pose(84.000, 84.000),
                                             new Pose(128.000, 93.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

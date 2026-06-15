@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.panels.Panels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,13 +9,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 @Configurable
 @TeleOp
 public class TuneFlyWheel extends OpMode {
     private DcMotorEx leftShooter, rightShooter;
-    private double lowVelocity = 767;
-    private double midVelocity = 1256;
+    private double lowVelocity = 500;
+    private double midVelocity = 1100;
     private double highVelocity = 1700;
     private double veryhighVelocity = 2100;
     private double currentVelocity = 0;
@@ -131,6 +129,7 @@ public class TuneFlyWheel extends OpMode {
         telemetry.addLine();
         telemetry.addData("P", P);
         telemetry.addData("F", F);
+        telemetry.addData("Step", stepsize);
         telemetry.update();
     }
 

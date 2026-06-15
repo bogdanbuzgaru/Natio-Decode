@@ -39,6 +39,6 @@ public class PositionCalibration  extends OpMode {
         telemetry.addData("Y: ", follower.getPose().getY());
         telemetry.addData("Yaw: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Is detecting", limelight.hasTarget());
-        telemetry.addData("where to go", limelight.choice(limelight.getSelectedPath()));
+        telemetry.addData("where to go", limelight.choice(limelight.getSelectedPath(), true));
     }
 }

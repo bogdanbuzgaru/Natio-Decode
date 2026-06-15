@@ -187,7 +187,7 @@ public class TeleOp extends OpMode {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
             if(bombTimer.seconds() < 110)
-                rgbLed.setPosition(0.28);
+                rgbLed.setPosition(0.3);
             else{
                 return State.BOMB;
             }
