@@ -55,6 +55,9 @@ public class RedClose extends OpMode {
     private ElapsedTime pathTimer = new ElapsedTime();
     private Paths paths;
     private boolean repeat = true;
+    private int goalCyclesDone = 0;
+    private int GOAL_CYCLES = 1;
+    private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 900;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(120.000 - 9.7322834608, 144.000 - 6.67322833945));
@@ -101,22 +104,20 @@ public class RedClose extends OpMode {
         ReadWriteFile.writeFile(file, xPose + "\n" + yPose + "\n" + heading);
 
     }
-    private AutoState handleShoot(AutoState nextState, long durationMs, boolean change) {
+    private AutoState handleShoot(AutoState nextState, long durationMs) {
         if (!isShooting) {
             pathTimer.reset();
             isShooting = true;
             shooter.raiseBarrier();
-        } else {
-            index.autoFeed();
-            if (pathTimer.milliseconds() > durationMs) {
-                isShooting = false;
-                repeat = change;
-                return nextState;
-            }
+        }
+        index.autoFeed();
+        if (pathTimer.milliseconds() > durationMs) {
+            isShooting = false;
+            return nextState;
         }
         return null;
     }
-    private void setUp(){
+    private void setUp() {
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
             follower.followPath(paths.SHOOT_FIRST);
             shooter.lowerBarrier();
@@ -124,21 +125,8 @@ public class RedClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
             intake.autoTake();
-            if(!follower.isBusy()) {
-                return handleShoot(AutoState.SECOND_ROW, 900, true);
-            }
-            return null;
-        });
-        fsm.onStateEnter(AutoState.PREPARE_SECOND, () -> {
-            follower.followPath(paths.PREPARE_SECOND);
-            shooter.lowerBarrier();
-            return null;
-        });
-        fsm.onStateUpdate(AutoState.PREPARE_SECOND, () -> {
-            intake.autoTake();
-            index.autoFeed();
-            if(!follower.isBusy()) {
-                return AutoState.SECOND_ROW;
+            if (!follower.isBusy()) {
+                return handleShoot(AutoState.SECOND_ROW, SHOOT_FIRST_MS);
             }
             return null;
         });
@@ -150,7 +138,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy()) {
+            if (!follower.isBusy()) {
                 return AutoState.SHOOT_SECOND;
             }
             return null;
@@ -162,78 +150,50 @@ public class RedClose extends OpMode {
         });
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
             intake.autoTake();
-            if(!follower.isBusy()) {
-                return handleShoot(AutoState.GO_TO_GOAL, 700, true);
+            if (!follower.isBusy()) {
+                return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
             }
             return null;
         });
         fsm.onStateEnter(AutoState.GO_TO_GOAL, () -> {
             follower.followPath(paths.GO_TO_GOAL);
             shooter.lowerBarrier();
-            pathTimer.reset();
             return null;
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy()) {
+            if (!follower.isBusy()) {
                 return AutoState.SHOOT_GOAL;
             }
             return null;
         });
-//        fsm.onStateEnter(AutoState.GO_BACK, () -> {
-//            follower.followPath(paths.GO_BACK);
-//            shooter.lowerBarrier();
-//            pathTimer.reset();
-//            return null;
-//
-//        });
-//        fsm.onStateUpdate(AutoState.GO_BACK, () -> {
-//            intake.autoTake();
-//            index.autoFeed();
-//            if(!follower.isBusy() && pathTimer.milliseconds() >= 3400) {
-//                return AutoState.SHOOT_GOAL;
-//            }
-//            return null;
-//        });
         fsm.onStateEnter(AutoState.SHOOT_GOAL, () -> {
             follower.followPath(paths.SHOOT_GOAL);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
             intake.autoTake();
-            if(!follower.isBusy() && !repeat) {
-                return handleShoot(AutoState.LAST_ROW, 700, false);
-            }else if (!follower.isBusy() && repeat){
-                return handleShoot(AutoState.GO_TO_GOAL, 700, false);
+            if (!follower.isBusy()) {
+                if (goalCyclesDone < GOAL_CYCLES) {
+                    goalCyclesDone++;
+                    return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
+                } else {
+                    return handleShoot(AutoState.LAST_ROW, SHOOT_MS);
+                }
             }
             return null;
         });
-//        fsm.onStateEnter(AutoState.PREPARE_LAST_ROW, () -> {
-//            follower.followPath(paths.PREPARE_LAST_ROW);
-//            shooter.lowerBarrier();
-//            return null;
-//        });
-//        fsm.onStateUpdate(AutoState.PREPARE_LAST_ROW, () -> {
-//            intake.autoTake();
-//            index.autoFeed();
-//            if(!follower.isBusy()) {
-//                return AutoState.LAST_ROW;
-//            }
-//            return null;
-//        });
         fsm.onStateEnter(AutoState.LAST_ROW, () -> {
             follower.followPath(paths.LAST_ROW);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.LAST_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy()) {
+            if (!follower.isBusy()) {
                 return AutoState.SHOOT_LAST;
             }
             return null;
@@ -242,13 +202,11 @@ public class RedClose extends OpMode {
             follower.followPath(paths.SHOOT_LAST);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
             intake.autoTake();
-            if(!follower.isBusy()) {
-                return handleShoot(AutoState.FIRST_ROW, 700, false);
-
+            if (!follower.isBusy()) {
+                return handleShoot(AutoState.FIRST_ROW, SHOOT_MS);
             }
             return null;
         });
@@ -256,12 +214,11 @@ public class RedClose extends OpMode {
             follower.followPath(paths.FIRST_ROW);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
             intake.autoTake();
             index.autoFeed();
-            if(!follower.isBusy()) {
+            if (!follower.isBusy()) {
                 return AutoState.SHOOT;
             }
             return null;
@@ -270,12 +227,11 @@ public class RedClose extends OpMode {
             follower.followPath(paths.SHOOT);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
             intake.autoTake();
-            if(!follower.isBusy()) {
-                return handleShoot(AutoState.PARK, 700, false);
+            if (!follower.isBusy()) {
+                return handleShoot(AutoState.PARK, SHOOT_MS);
             }
             return null;
         });
@@ -283,17 +239,13 @@ public class RedClose extends OpMode {
             follower.followPath(paths.PARK);
             shooter.lowerBarrier();
             return null;
-
         });
         fsm.onStateUpdate(AutoState.PARK, () -> {
-            intake.autoTake();
-//            if(!follower.isBusy()) {
-//                requestOpModeStop();
-//            }
+            if (!follower.isBusy()) {
+                requestOpModeStop();
+            }
             return null;
         });
-
-
     }
     public static class Paths {
         public PathChain SHOOT_FIRST;
@@ -351,7 +303,7 @@ public class RedClose extends OpMode {
 
             SHOOT_SECOND = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(134.000, 65.000),
+                                            new Pose(127.434, 60.000),
                                             new Pose(115.000, 70.000),
                                             new Pose(99.000, 72.000),
                                             new Pose(94.000, 74.000),

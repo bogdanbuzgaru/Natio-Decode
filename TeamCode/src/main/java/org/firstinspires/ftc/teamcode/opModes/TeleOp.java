@@ -114,6 +114,7 @@ public class TeleOp extends OpMode {
             movement.movementLoop(gamepad1);
         else
             movement.movementFieldCentric(gamepad1, follower.getPose().getHeading(), pos.isRed());
+
         if(gamepad1.triangleWasPressed()){
             fieldCentric = !fieldCentric;
         }
