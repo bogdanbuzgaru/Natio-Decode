@@ -60,7 +60,7 @@ public class RedClose extends OpMode {
     private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 900;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(120.000 - 9.7322834608, 144.000 - 6.67322833945));
+        follower.setStartingPose(new Pose(106.07, 132.1935));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -283,7 +283,7 @@ public class RedClose extends OpMode {
         public Paths(Follower follower) {
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                                     new BezierLine(
-                                            new Pose(actualPositionX(120.000), actualPositionY(133.000)),
+                                            new Pose(106.07, 132.1935),
                                             new Pose(84.000, 84.000)
                                     )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

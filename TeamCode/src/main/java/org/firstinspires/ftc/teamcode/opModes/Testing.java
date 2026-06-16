@@ -43,7 +43,6 @@ public class Testing extends OpMode {
 //    private GoBildaPinpointDriver pinpoint;
     private Sensor sensor;
     private double ticks = 100;
-    private RevColorSensorV3 colorSensor, colorSensor2;
     private boolean manual = false;
     private boolean detects = false;
     private StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
@@ -69,8 +68,7 @@ public class Testing extends OpMode {
                 7.2440944808, 7.08661417,
                 Math.toRadians(90)
         ));
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-        colorSensor.enableLed(true);
+
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
 //        colorSensor2.enableLed(true);
 
@@ -189,12 +187,8 @@ public class Testing extends OpMode {
             return null;});
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
             if (timer.milliseconds() >= 450) {
-                double distance = colorSensor.getDistance(DistanceUnit.CM);
-                boolean ballPresent = !Double.isNaN(distance) && distance < 5.2;
-                if(ballPresent){
-                    gamepad1.rumble(200);
-                    return State.E_BILE;
-                }
+
+
                 timer.reset();
                 return null;
             }
@@ -203,11 +197,7 @@ public class Testing extends OpMode {
         fsm.onStateEnter(State.E_BILE, () -> {return null;});
         fsm.onStateUpdate(State.E_BILE, () -> {
             if (timer.milliseconds() >= 300) {
-                double distance = colorSensor.getDistance(DistanceUnit.CM);
-                boolean ballAbsent = Double.isNaN(distance) || distance > 5.8;
-                if(ballAbsent){
-                    return State.NU_E_BILE;
-                }
+
                 timer.reset();
                 return null;
             }

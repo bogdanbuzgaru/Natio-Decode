@@ -24,7 +24,7 @@ public class PositionCalibration  extends OpMode {
     private Limelight limelight;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(7.2440944808, 7.08661417, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(7.2440944808 + 1.968504, 7.08661417, Math.toRadians(90)));
         limelight = new Limelight(hardwareMap, "limelight");
         movement = new Movement(hardwareMap);
         lift = new Lift(hardwareMap);

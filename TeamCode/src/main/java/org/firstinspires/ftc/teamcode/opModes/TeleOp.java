@@ -41,9 +41,7 @@ public class TeleOp extends OpMode {
     private Index index;
     private Intake intake;
     private Movement movement;
-    private Sensor sensor;
-    private RevColorSensorV3 colorSensor, colorSensor2;
-    private Rev2mDistanceSensor distanceSensor, distanceSensor2;
+    private Rev2mDistanceSensor distanceSensor, distanceSensor2, distanceSensor3;
     private Lift lift;
     private final StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
     private ServoImplEx rgbLed;
@@ -87,12 +85,10 @@ public class TeleOp extends OpMode {
         index = new Index(hardwareMap);
         movement = new Movement(hardwareMap);
         lift = new Lift(hardwareMap);
-        sensor = new Sensor(hardwareMap, "colorSensor");
         pos = new Position(startPose);
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
         distanceSensor2 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor2");
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-        colorSensor.enableLed(true);
+        distanceSensor3 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor3");
         shooter.lowerHood();
         shooter.middleBar();
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
@@ -155,11 +151,11 @@ public class TeleOp extends OpMode {
         double velY = follower.getVelocity().getYComponent();
 
         if (pos.isRed()) {
-            shooter.setTicks(pos.getTicks(6.89911, 1100.04194));
+            shooter.setTicks(pos.getTicks(6.89911, 790.04194));
             turret.setTargetAngle(pos.getTargetAngle()); //+ angle if needed
             turret.setOffsetAngle(pos.offsetAngleRed(velX, velY, pos.getTicks(8.8057, 1098)));
         } else if (pos.isBlue()) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 1100.04194));
+            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194));
             turret.setTargetAngle(pos.getTargetAngle());//+ angle if needed
             turret.setOffsetAngle(pos.getOffetAngle(velX, velY));
         }
@@ -192,14 +188,14 @@ public class TeleOp extends OpMode {
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
             indexMove.setPosition(0.5);
             if(bombTimer.seconds() < 110)
-                rgbLed.setPosition(0.3);
+                rgbLed.setPosition(0.7);
             else{
                 return State.BOMB;
             }
             if (timer.milliseconds() >= 450) {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-                double distance3 = colorSensor.getDistance(DistanceUnit.CM);
+                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
                         && (distance < 3.2 && distance2 < 3.2 && distance3 < 3.2))
                 {
@@ -211,16 +207,16 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
-            indexMove.setPosition(0.65);
+            indexMove.setPosition(0.37);
             if(bombTimer.seconds() < 110)
-                rgbLed.setPosition(0.425);
+                rgbLed.setPosition(0.5);
             else{
                 return State.BOMB;
             }
             if (timer.milliseconds() >= 300) {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-                double distance3 = colorSensor.getDistance(DistanceUnit.CM);
+                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if ((Double.isNaN(distance) || Double.isNaN(distance2) || Double.isNaN(distance3)) || (distance > 3.2 || distance2 > 3.2 || distance3 > 3.2))
                     return State.NU_E_BILE;
                 timer.reset();
@@ -229,9 +225,9 @@ public class TeleOp extends OpMode {
         });
         fsm.onStateUpdate(State.BOMB, () ->{
             if(bombTimer.seconds() < 115){
-                rgbLed.setPosition(0.3);
+                rgbLed.setPosition(0.7);
             }else if (blink(bombTimer.milliseconds())){
-                rgbLed.setPosition(0.3);
+                rgbLed.setPosition(0.7);
             }
             return null;
         });

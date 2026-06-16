@@ -33,8 +33,8 @@ public class Shooter {
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 //
-//        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.5,0,0,13.51));
-//        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.5,0,0,13.51));
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(120,0,0,13.3));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(120,0,0,13.3));
 
 
         lowerBarrier();
@@ -66,16 +66,14 @@ public class Shooter {
         setAutoFarHood();
     }
     public void setTicks(double ticks) {
-        ticks += 50;
+        if(ticks < 1500){
+            ticks+= 50;
+        }else{
+            ticks+=25;
+        }
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
         }
-        if(ticks <= 1700){
-            this.ticks -= 120;
-        }
-//        if(ticks > 1750){
-//            this.ticks += 190;
-//        }
     }
 
     public double getTicks() {
@@ -89,20 +87,18 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(flywheelMotor1.getVelocity()  <= 1250){
-            targetHood = 0.2;
-        }else if (flywheelMotor1.getVelocity()  <= 1400){
-            targetHood = 0.4 * ((ticks - 1200) / 200) + 0.2;
-        }else if (flywheelMotor1.getVelocity()  <= 1800){
-            targetHood = 0.6 + 0.5 * ((ticks - 1400) / 600);
+        if(flywheelMotor1.getVelocity()  <= 1150){
+            targetHood = 0;
+        }else if (flywheelMotor1.getVelocity()  <= 1700){
+            targetHood = 0.8 * ((ticks - 1150) / 550) + 0.2;
         }else{
-            targetHood = 0.9;
+            targetHood = 1;
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.5);
+        barrier.setPosition(0.53);
     }
     public void raiseBarrier(){
         barrier.setPosition(0.358);
