@@ -80,7 +80,7 @@ public class TeleOp extends OpMode {
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         indexMove = hardwareMap.get(Servo.class, "indexMove");
-        indexMove.setPosition(1);
+        indexMove.setPosition(0.5);
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -94,6 +94,7 @@ public class TeleOp extends OpMode {
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         colorSensor.enableLed(true);
         shooter.lowerHood();
+        shooter.middleBar();
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
 //        colorSensor2.enableLed(true);
 
@@ -108,7 +109,6 @@ public class TeleOp extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
 //        turret.setRed(pos.isRed());
-        indexMove.setPosition(1);
         increaseDecrease();
         if(!fieldCentric)
             movement.movementLoop(gamepad1);
@@ -172,6 +172,9 @@ public class TeleOp extends OpMode {
         telemetry.addData("Target Angle", pos.getTargetAngle());
         telemetry.addData("Shooter Velocity", shooter.getTicks());
         telemetry.addData("increased angle", angle);
+        telemetry.addData("First servo position", turret.getPosition1());
+        telemetry.addData("Second servo position", turret.getPosition2());
+        telemetry.addData("Third servo position", turret.getPosition3());
         telemetry.update();
     }
 
@@ -187,14 +190,19 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
+            indexMove.setPosition(0.5);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.3);
             else{
                 return State.BOMB;
             }
             if (timer.milliseconds() >= 450) {
-                double distance = colorSensor.getDistance(DistanceUnit.CM);
-                if (!Double.isNaN(distance) && distance < 5.2) {
+                double distance = distanceSensor.getDistance(DistanceUnit.CM);
+                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+                double distance3 = colorSensor.getDistance(DistanceUnit.CM);
+                if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+                        && (distance < 3.2 && distance2 < 3.2 && distance3 < 3.2))
+                {
                     gamepad1.rumble(200);
                     return State.E_BILE;
                 }
@@ -203,14 +211,18 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
+            indexMove.setPosition(0.65);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.425);
             else{
                 return State.BOMB;
             }
             if (timer.milliseconds() >= 300) {
-                double distance = colorSensor.getDistance(DistanceUnit.CM);
-                if (Double.isNaN(distance) || distance > 5.8) return State.NU_E_BILE;
+                double distance = distanceSensor.getDistance(DistanceUnit.CM);
+                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+                double distance3 = colorSensor.getDistance(DistanceUnit.CM);
+                if ((Double.isNaN(distance) || Double.isNaN(distance2) || Double.isNaN(distance3)) || (distance > 3.2 || distance2 > 3.2 || distance3 > 3.2))
+                    return State.NU_E_BILE;
                 timer.reset();
             }
             return null;

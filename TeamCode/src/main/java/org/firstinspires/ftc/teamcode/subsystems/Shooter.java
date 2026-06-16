@@ -27,7 +27,6 @@ public class Shooter {
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
         barrier = hardwareMap.get(Servo.class, "barrier");
         hood = hardwareMap.get(Servo.class, "hood");
-
         flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
@@ -93,9 +92,9 @@ public class Shooter {
         if(flywheelMotor1.getVelocity()  <= 1250){
             targetHood = 0.2;
         }else if (flywheelMotor1.getVelocity()  <= 1400){
-            targetHood = 0.2 * ((ticks - 1200) / 200) + 0.2;
-        }else if (flywheelMotor1.getVelocity()  <= 2000){
-            targetHood = 0.4 + 0.5 * ((ticks - 1400) / 600);
+            targetHood = 0.4 * ((ticks - 1200) / 200) + 0.2;
+        }else if (flywheelMotor1.getVelocity()  <= 1800){
+            targetHood = 0.6 + 0.5 * ((ticks - 1400) / 600);
         }else{
             targetHood = 0.9;
         }
@@ -103,10 +102,14 @@ public class Shooter {
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.91);
+        barrier.setPosition(0.5);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.78);
+        barrier.setPosition(0.358);
+    }
+    public void middleBar(){
+        barrier.setPosition(0.5);
+        hood.setPosition(0.5);
     }
     public void setTicks(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){

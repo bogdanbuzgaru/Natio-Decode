@@ -50,7 +50,7 @@ public class TuneFlyWheel extends OpMode {
     }
     public void loop(){
         tune(gamepad1);
-        vel = leftShooter.getVelocity();
+        vel = rightShooter.getVelocity();
     }
     private void tune(Gamepad gamepad) {
 

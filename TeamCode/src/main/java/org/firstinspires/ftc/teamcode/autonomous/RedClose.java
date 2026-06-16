@@ -117,6 +117,18 @@ public class RedClose extends OpMode {
         }
         return null;
     }
+    private AutoState gate(AutoState nextState, long durationMs){
+            if (!isShooting) {
+                pathTimer.reset();
+                isShooting = true;
+            }
+            index.autoFeed();
+            if (pathTimer.milliseconds() > durationMs) {
+                isShooting = false;
+                return nextState;
+            }
+            return null;
+    }
     private void setUp() {
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
             follower.followPath(paths.SHOOT_FIRST);
@@ -164,7 +176,7 @@ public class RedClose extends OpMode {
             intake.autoTake();
             index.autoFeed();
             if (!follower.isBusy()) {
-                return AutoState.SHOOT_GOAL;
+                return gate(AutoState.SHOOT_GOAL, SHOOT_MS);
             }
             return null;
         });

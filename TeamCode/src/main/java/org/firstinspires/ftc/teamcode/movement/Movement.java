@@ -53,9 +53,9 @@ public class Movement {
 
         double botHeading = yaw;
         if(red){
-            botHeading += Math.PI/2;
+            botHeading = botHeading;
         }else{
-            botHeading -= Math.PI/2;
+            botHeading += Math.PI;
         }
 
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
