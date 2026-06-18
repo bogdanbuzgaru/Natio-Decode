@@ -139,9 +139,11 @@ public class Position {
 
 
         double error = targetHead - heading;
+        if(error > 240) {error=240;}
+        else if (error <-270) {error=-270;}
 
-        while (error > 180) error -= 360;
-        while (error < -180) error += 360;
+        while (error > 120) error -= 240;
+        while (error < -135) error += 270;
         return error;
     }
     public void setBlue(){

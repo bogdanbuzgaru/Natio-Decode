@@ -78,7 +78,7 @@ public class TeleOp extends OpMode {
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         indexMove = hardwareMap.get(Servo.class, "indexMove");
-        indexMove.setPosition(0.5);
+        indexMove.setPosition(0.47);
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -186,7 +186,7 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            indexMove.setPosition(0.5);
+            indexMove.setPosition(0.47);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.7);
             else{
