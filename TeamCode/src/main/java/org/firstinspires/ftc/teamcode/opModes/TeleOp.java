@@ -207,7 +207,7 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
-            indexMove.setPosition(0.37);
+            indexMove.setPosition(0.2);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.5);
             else{
