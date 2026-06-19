@@ -98,10 +98,10 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(flywheelMotor1.getVelocity()  <= 1150){
+        if(flywheelMotor1.getVelocity()  <= (1150) * 1.45){
             targetHood = 0;
         }else {
-            targetHood = 0.8 * ((ticks - 1150) / 550) + 0.2;
+            targetHood = 0.8 * ((ticks - (1150 * 1.45)) / (550*1.45)) + 0.2;
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);

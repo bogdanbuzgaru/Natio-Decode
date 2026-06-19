@@ -104,33 +104,40 @@ public class Position {
 
 
     public double getTargetAngle(){
-            double targetHead = 0;
+        double targetHead = 0;
 //        if(!changeCord) {
-            if (red && pose.getY() >= 65)
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()),Math.abs(130 - pose.getX())));
+        if (red && pose.getY() >= 65)
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()),Math.abs(130 - pose.getX())));
 
-            else if (red && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) < 90)
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(133 - pose.getX())));
+        else if (red && pose.getY() < 65 && heading < 90 && heading > -90)
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(133 - pose.getX())));
+        else if (red && pose.getY() < 65 && heading >= 90 && heading <= -90)
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(160 - pose.getX())));
 
-            else if (red && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) >= 90)
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(160 - pose.getX())));
-
-            else if (blue && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) > 90)
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
-
-            else if (blue && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) <= 90)
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() - 16)));
-
-            else if (blue && pose.getY() >= 65){
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()), Math.abs(pose.getX() - 14)));
-            }
-            double error = targetHead - heading;
-            while (error > 120)
-                error -= 240;
-            while (error < -135)
-                error += 270;
-            return error;
+        else if (blue && pose.getY() >= 65){
+            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()), Math.abs(pose.getX() - 14)));
         }
+        else if (blue && pose.getY() < 65 && heading >= 90 && heading <= -90)
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
+
+        else if (blue && pose.getY() < 65 && heading < 90 && heading > -90)
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() - 16)));
+
+
+        double error = targetHead - heading;
+        if(error > 240) {
+            error=240;
+        }
+        else if (error <-270) {
+            error=-270;
+        }
+
+        while (error > 120)
+            error -= 240;
+        while (error < -135)
+            error += 270;
+        return error;
+    }
     public void setBlue(){
         this.blue = true;
         this.red = false;

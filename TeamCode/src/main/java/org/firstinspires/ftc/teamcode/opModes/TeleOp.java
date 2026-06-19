@@ -151,11 +151,11 @@ public class TeleOp extends OpMode {
         double velY = follower.getVelocity().getYComponent();
 
         if (pos.isRed()) {
-            shooter.setTicks(pos.getTicks(6.89911, 790.04194));
+            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813));
             turret.setTargetAngle(pos.getTargetAngle()); //+ angle if needed
             turret.setOffsetAngle(pos.offsetAngleRed(velX, velY, pos.getTicks(8.8057, 1098)));
         } else if (pos.isBlue()) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194));
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813));
             turret.setTargetAngle(pos.getTargetAngle());//+ angle if needed
             turret.setOffsetAngle(pos.getOffetAngle(velX, velY));
         }
@@ -171,6 +171,7 @@ public class TeleOp extends OpMode {
         telemetry.addData("First servo position", turret.getPosition1());
         telemetry.addData("Second servo position", turret.getPosition2());
         telemetry.addData("Third servo position", turret.getPosition3());
+
         telemetry.update();
     }
 

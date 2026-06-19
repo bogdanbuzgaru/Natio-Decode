@@ -19,8 +19,8 @@ public class TuneFlyWheel extends OpMode {
     private double veryhighVelocity = 2100;
     private double currentVelocity = 0;
 
-    public static double P = 20.4;
-    public static double F = 0.1;
+    public static double P = 29.6;//21.5
+    public static double F = 0.3;
 
     private double tuneSteps[] = {10.00, 1.00, 0.1, 0.01 };
     private double stepsize = 0, error = 0;
