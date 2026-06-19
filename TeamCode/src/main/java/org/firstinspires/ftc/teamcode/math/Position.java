@@ -112,13 +112,13 @@ public class Position {
             else if (red && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) < 90)
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(133 - pose.getX())));
 
-            else if (red && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) > 90)
+            else if (red && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) >= 90)
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(160 - pose.getX())));
 
             else if (blue && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) > 90)
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
 
-            else if (blue && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) < 90)
+            else if (blue && pose.getY() < 65 && Math.abs(Math.toDegrees(pose.getHeading())) <= 90)
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() - 16)));
 
             else if (blue && pose.getY() >= 65){
@@ -139,7 +139,12 @@ public class Position {
         this.red = true;
         this.blue = false;
     }
-
+    public boolean isFar(){
+        if(pose.getY() < 52){
+            return true;
+        }
+        return false;
+    }
 
     //------------------LINEAR EQUATIONS------------------
     private void calculateLinearEquations() {

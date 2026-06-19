@@ -119,7 +119,7 @@ public class TeleOp extends OpMode {
         pos.chooseAlliance(gamepad2);
         resetPosition(gamepad2);
 //        pos.whereToShoot(gamepad2);
-
+        shooter.changeCoef(pos.isFar());
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
             if (park) lift.lift(); else lift.lower();

@@ -21,6 +21,7 @@ public class Shooter {
     private double targetHood;
     private PIDController p = new PIDController(kp, 0, 0);
     private double voltagee;
+    private double pCoef = 120;
     public static  double ks = 0.226, kv = 0.0021039446333333, ka = 0.005, kp = 0.05, velocity, nominalVoltage = 11.2;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
@@ -33,8 +34,8 @@ public class Shooter {
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 //
-        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(120,0,0,13.3));
-        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(120,0,0,13.3));
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
 
 
         lowerBarrier();
@@ -51,9 +52,19 @@ public class Shooter {
 //
 //        flywheelMotor2.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
 //        flywheelMotor1.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
+
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
+    }
+    public void changeCoef(boolean far){
+        if(far){
+            pCoef = 170;
+        }else{
+            pCoef = 120;
+        }
     }
 
     public void setVoltagee(double voltagee) {
@@ -89,10 +100,8 @@ public class Shooter {
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
         if(flywheelMotor1.getVelocity()  <= 1150){
             targetHood = 0;
-        }else if (flywheelMotor1.getVelocity()  <= 1700){
+        }else {
             targetHood = 0.8 * ((ticks - 1150) / 550) + 0.2;
-        }else{
-            targetHood = 1;
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
