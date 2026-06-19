@@ -197,7 +197,7 @@ public class TeleOp extends OpMode {
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-                        && (distance < 3.2 && distance2 < 3.2 && distance3 < 3.2))
+                        && (distance < 6 && distance2 < 6 && distance3 < 8))
                 {
                     gamepad1.rumble(200);
                     return State.E_BILE;
@@ -217,7 +217,7 @@ public class TeleOp extends OpMode {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-                if ((Double.isNaN(distance) || Double.isNaN(distance2) || Double.isNaN(distance3)) || (distance > 3.2 || distance2 > 3.2 || distance3 > 3.2))
+                if (gamepad1.leftBumperWasPressed())
                     return State.NU_E_BILE;
                 timer.reset();
             }
