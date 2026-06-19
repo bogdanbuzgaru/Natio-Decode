@@ -9,7 +9,7 @@ public class Turret {
     private double targetAngle;  // Target angle relative to robot
     private double offsetAngle;                // Velocity compensation offset
 
-    private final double HALF_RANGE_DEGREES = 190.1785714285714;       //TODO  173.1785714285714
+    private final double HALF_RANGE_DEGREES = 173.1785714285714;       //TODO  173.1785714285714
     private final double SERVO_CENTER = 0.500000;
     private boolean isRed;
     public Turret(HardwareMap hardwareMap){

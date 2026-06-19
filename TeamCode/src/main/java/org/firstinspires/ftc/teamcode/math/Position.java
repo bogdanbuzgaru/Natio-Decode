@@ -125,10 +125,10 @@ public class Position {
                 targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()), Math.abs(pose.getX() - 14)));
             }
             double error = targetHead - heading;
-            while (error > 180)
-                error -= 360;
-            while (error < -180)
-                error += 360;
+            while (error > 120)
+                error -= 240;
+            while (error < -135)
+                error += 270;
             return error;
         }
     public void setBlue(){
