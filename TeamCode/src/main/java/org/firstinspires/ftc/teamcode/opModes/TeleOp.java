@@ -153,9 +153,11 @@ public class TeleOp extends OpMode {
         if (pos.isRed()) {
             shooter.setTicks(pos.getTicks(10.0037095, 1145.560813));
             turret.setTargetAngle(pos.target()); //+ angle if needed
+            turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue()) {
             shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813));
             turret.setTargetAngle(pos.target());//+ angle if needed
+            turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
         shooter.update();
 
@@ -196,7 +198,7 @@ public class TeleOp extends OpMode {
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-                        && (distance < 6 && distance2 < 6 && distance3 < 8))
+                        && (distance < 6 && distance2 < 6 && distance3 < 15))
                 {
                     gamepad1.rumble(200);
                     return State.E_BILE;
@@ -244,8 +246,8 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        124.49, 84.91,        //Up
-                        Math.toRadians(0)
+                        53.3397, 12.2725,        //Far shooting
+                        Math.toRadians(-90)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
@@ -261,7 +263,7 @@ public class TeleOp extends OpMode {
                 movement.setOff(0);
                 {
                     follower.setPose(new Pose(
-                            123.33, 68.3,    //Up barrier
+                            122.332, 79.3,    //Near gate
                             Math.toRadians(0)
                     ));
                     manual = false;
@@ -271,34 +273,34 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        8.26, 9.08,    //our human player
-                        Math.toRadians(270)
+                        10.8364, 10.7869,    //our human player w/ ext
+                        Math.toRadians(180)
                 ));
                 manual = false;
             }
         }else if(pos.isBlue()){
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
-                movement.setOff(180);
+                movement.setOff(0);
                 follower.setPose(new Pose(
-                        19.51, 84.91,        //Up
-                        Math.toRadians(180)
+                        90.6603, 12.2725,        //Far shooting
+                        Math.toRadians(-90)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
                 movement.resetHeading();
-                movement.setOff(180);
+                movement.setOff(0);
                 follower.setPose(new Pose(
                         27.786, 125.133,    //basket
                         Math.toRadians(141.6)
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
                 {
-                    movement.resetHeading();
-                    movement.setOff(180);
                     follower.setPose(new Pose(
-                            20.67, 68.3,    //Up barrier
+                            21.668, 79.3,    //Near gate
                             Math.toRadians(180)
                     ));
                     manual = false;
@@ -306,10 +308,10 @@ public class TeleOp extends OpMode {
                 manual = false;
             } else if (gamepad.dpadRightWasPressed()) {
                 movement.resetHeading();
-                movement.setOff(180);
+                movement.setOff(0);
                 follower.setPose(new Pose(
-                        135.74, 9.08,    //our human player
-                        Math.toRadians(270)
+                        133.1636, 10.7869,    //our human player w/ ext
+                        Math.toRadians(0)
                 ));
                 manual = false;
             }

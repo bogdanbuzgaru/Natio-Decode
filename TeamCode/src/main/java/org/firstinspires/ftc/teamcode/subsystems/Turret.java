@@ -12,6 +12,7 @@ public class Turret {
     private final double HALF_RANGE_DEGREES = 173.1785714285714;       //TODO  173.1785714285714
     private final double SERVO_CENTER = 0.500000;
     private boolean isRed;
+    private double heading;
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
@@ -24,6 +25,10 @@ public class Turret {
         this.targetAngle = normalizeAngle(angleRobotRelative);
     }
 
+    public void setHeading(double heading, boolean red) {
+        this.heading = heading;
+        isRed = red;
+    }
 
     public void setOffsetAngle(double offsetAngle) {
         this.offsetAngle = offsetAngle;
@@ -35,6 +40,11 @@ public class Turret {
             targetAngle += (targetAngle - 30) * 0.125;
         }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
             targetAngle -= (targetAngle - 30) * 0.125;
+        }
+        if(isRed && Math.abs(heading) < 90){
+            finalAngle -= 10;
+        }else if (!isRed && Math.abs(heading) > 90){
+            finalAngle -= 10;
         }
 
         return normalizeAngle(finalAngle);
@@ -77,9 +87,6 @@ public class Turret {
     public double getPosition2(){ return turretServo2.getPosition(); }
     public double getPosition3(){ return turretServo3.getPosition(); }
 
-    public void setRed(boolean red) {
-        isRed = red;
-    }
 
     public void setAuto(){
         double position = SERVO_CENTER + 0.1368421052631579;

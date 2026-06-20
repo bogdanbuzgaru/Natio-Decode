@@ -79,8 +79,6 @@ public class Shooter {
     public void setTicks(double ticks) {
         if(ticks < 1500){
             ticks+= 50;
-        }else{
-            ticks+=25;
         }
         if(Math.abs(this.ticks - ticks) >= 30){
             this.ticks = ticks;
@@ -101,7 +99,7 @@ public class Shooter {
         if(flywheelMotor1.getVelocity()  <= (1150) * 1.45){
             targetHood = 0;
         }else {
-            targetHood = 0.8 * ((ticks - (1150 * 1.45)) / (550*1.45)) + 0.2;
+            targetHood = 0.8 * ((ticks - (1150 * 1.45)) / (550*1.21)) + 0.2;
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
