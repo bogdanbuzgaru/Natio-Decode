@@ -18,17 +18,17 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(15.2)
             .forwardZeroPowerAcceleration(-36.60550623816884)
-            .lateralZeroPowerAcceleration(-60.7838173444961)
-            .translationalPIDFCoefficients(new PIDFCoefficients(1, 0.0005, 0.04, 0.1))
-            .useSecondaryTranslationalPIDF(true)
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4,0.0006,0.01,0.06))
-            .headingPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.004, 0.06))
-            .useSecondaryHeadingPIDF(true)
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.55, 0.006, 0.04, 0.06))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.8,0.00005,0.02,0,0.05))
-            .useSecondaryDrivePIDF(true)
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.0018, 0.006,0.0008, 0, 0.03))
-            .centripetalScaling(0.005);
+            .lateralZeroPowerAcceleration(-60.7838173444961);
+//            .translationalPIDFCoefficients(new PIDFCoefficients(1, 0.0005, 0.04, 0.1))
+//            .useSecondaryTranslationalPIDF(true)
+//            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4,0.0006,0.01,0.06))
+//            .headingPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.004, 0.06))
+//            .useSecondaryHeadingPIDF(true)
+//            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.55, 0.006, 0.04, 0.06))
+//            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.8,0.00005,0.02,0,0.05))
+//            .useSecondaryDrivePIDF(true)
+//            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.0018, 0.006,0.0008, 0, 0.03))
+//            .centripetalScaling(0.005);
 
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.9, 0.25);
