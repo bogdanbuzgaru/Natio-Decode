@@ -32,9 +32,9 @@ public class Turret {
     private double getFinalAngle() {
         double finalAngle = targetAngle + offsetAngle;
         if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1){
-            targetAngle += (targetAngle - 30) * 0.075;
+            targetAngle += (targetAngle - 30) * 0.125;
         }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
-            targetAngle -= (targetAngle - 30) * 0.075;
+            targetAngle -= (targetAngle - 30) * 0.125;
         }
         if (finalAngle > 240) {finalAngle = 240;}
         else if (finalAngle < -240) {finalAngle = -240;}
@@ -44,11 +44,7 @@ public class Turret {
 
     public void update(){
         double finalAngle = getFinalAngle();
-        if(Math.abs(finalAngle) > 65 && !isRed){
-            finalAngle += Math.signum(finalAngle) * finalAngle / 10;
-        }else if(isRed && Math.signum(finalAngle) == -1){
-            finalAngle -= 5;
-        }
+
         double servoOffset = (finalAngle / HALF_RANGE_DEGREES) * 0.5000;
         double servoPosition = SERVO_CENTER - servoOffset;
 

@@ -152,12 +152,10 @@ public class TeleOp extends OpMode {
 
         if (pos.isRed()) {
             shooter.setTicks(pos.getTicks(10.0037095, 1145.560813));
-            turret.setTargetAngle(pos.getTargetAngle()); //+ angle if needed
-            turret.setOffsetAngle(pos.offsetAngleRed(velX, velY, pos.getTicks(8.8057, 1098)));
+            turret.setTargetAngle(pos.target()); //+ angle if needed
         } else if (pos.isBlue()) {
             shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813));
-            turret.setTargetAngle(pos.getTargetAngle());//+ angle if needed
-            turret.setOffsetAngle(pos.getOffetAngle(velX, velY));
+            turret.setTargetAngle(pos.target());//+ angle if needed
         }
         shooter.update();
 
