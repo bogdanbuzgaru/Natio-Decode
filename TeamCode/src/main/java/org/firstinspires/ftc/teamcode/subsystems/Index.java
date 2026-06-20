@@ -7,18 +7,33 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Index {
     private DcMotorEx indexMotor;
+    private boolean lower = false;
     public Index (HardwareMap hardwareMap){
         indexMotor = hardwareMap.get(DcMotorEx.class, "index");
         indexMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         indexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
+
+    public void setLower(boolean lower) {
+        this.lower = lower;
+    }
+
     public void feed(Gamepad gamepad){
-        if(gamepad.right_trigger > 0.01)
-            indexMotor.setPower(0.8);
-        else if (gamepad.left_trigger > 0.01)
-            indexMotor.setPower(-gamepad.left_trigger);
-        else
-            stop();
+        if (!lower) {
+            if (gamepad.right_trigger > 0.01)
+                indexMotor.setPower(0.8);
+            else if (gamepad.left_trigger > 0.01)
+                indexMotor.setPower(-gamepad.left_trigger);
+            else
+                stop();
+        }else{
+            if (gamepad.right_trigger > 0.01)
+                indexMotor.setPower(0.3);
+            else if (gamepad.left_trigger > 0.01)
+                indexMotor.setPower(-gamepad.left_trigger);
+            else
+                stop();
+        }
     }
     public void autoFeed(){
         indexMotor.setPower(1);

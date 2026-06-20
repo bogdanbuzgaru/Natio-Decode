@@ -114,6 +114,7 @@ public class TeleOp extends OpMode {
         if(gamepad1.triangleWasPressed()){
             fieldCentric = !fieldCentric;
         }
+        hasBalls();
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
@@ -186,7 +187,13 @@ public class TeleOp extends OpMode {
 
         telemetry.update();
     }
-
+    private void hasBalls(){
+        if(distanceSensor.getDistance(DistanceUnit.CM) < 6 || distanceSensor2.getDistance(DistanceUnit.CM) < 7){
+            index.setLower(true);
+        }else{
+            index.setLower(false);
+        }
+    }
     private void increaseDecrease(){
         if(gamepad2.right_trigger > 0.01){
             tick = 100;
