@@ -158,7 +158,7 @@ public class TeleOp extends OpMode {
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813));
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + 120);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -167,7 +167,7 @@ public class TeleOp extends OpMode {
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn);
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn + 120);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
