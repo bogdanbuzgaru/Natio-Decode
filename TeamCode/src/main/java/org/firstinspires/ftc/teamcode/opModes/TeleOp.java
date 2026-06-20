@@ -269,27 +269,27 @@ public class TeleOp extends OpMode {
                         116.214, 125.133,    //basket
                         Math.toRadians(38.4)
                 ));
-                manual = false;
-            } else if (gamepad.dpadDownWasPressed()) {
-                movement.resetHeading();
-                movement.setOff(0);
-                {
-                    follower.setPose(new Pose(
-                            122.332, 79.3,    //Near gate
-                            Math.toRadians(0)
-                    ));
-                    manual = false;
-                }
-                manual = false;
-            } else if (gamepad.dpadRightWasPressed()) {
-                movement.resetHeading();
-                movement.setOff(0);
-                follower.setPose(new Pose(
-                        10.8364, 10.7869,    //our human player w/ ext
-                        Math.toRadians(180)
-                ));
-                manual = false;
-            }
+                manual = false;}
+//            } else if (gamepad.dpadDownWasPressed()) {
+//                movement.resetHeading();
+//                movement.setOff(0);
+//                {
+//                    follower.setPose(new Pose(
+//                            122.332, 79.3,    //Near gate
+//                            Math.toRadians(0)
+//                    ));
+//                    manual = false;
+//                }
+//                manual = false;
+//            }// else if (gamepad.dpadRightWasPressed()) {
+//                movement.resetHeading();
+//                movement.setOff(0);
+//                follower.setPose(new Pose(
+//                        10.8364, 10.7869,    //our human player w/ ext
+//                        Math.toRadians(180)
+//                ));
+//                manual = false;
+//            }
         }else if(pos.isBlue()){
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
@@ -306,27 +306,27 @@ public class TeleOp extends OpMode {
                         27.786, 125.133,    //basket
                         Math.toRadians(141.6)
                 ));
-                manual = false;
-            } else if (gamepad.dpadDownWasPressed()) {
-                movement.resetHeading();
-                movement.setOff(0);
-                {
-                    follower.setPose(new Pose(
-                            21.668, 79.3,    //Near gate
-                            Math.toRadians(180)
-                    ));
-                    manual = false;
-                }
-                manual = false;
-            } else if (gamepad.dpadRightWasPressed()) {
-                movement.resetHeading();
-                movement.setOff(0);
-                follower.setPose(new Pose(
-                        133.1636, 10.7869,    //our human player w/ ext
-                        Math.toRadians(0)
-                ));
-                manual = false;
-            }
+                manual = false;}
+//            } else if (gamepad.dpadDownWasPressed()) {
+//                movement.resetHeading();
+//                movement.setOff(0);
+//                {
+//                    follower.setPose(new Pose(
+//                            21.668, 79.3,    //Near gate
+//                            Math.toRadians(180)
+//                    ));
+//                    manual = false;
+//                }
+//                manual = false;}
+//            } else if (gamepad.dpadRightWasPressed()) {
+//                movement.resetHeading();
+//                movement.setOff(0);
+//                follower.setPose(new Pose(
+//                        133.1636, 10.7869,    //our human player w/ ext
+//                        Math.toRadians(0)
+//                ));
+//                manual = false;
+//            }
         }
     }
 }
