@@ -117,7 +117,7 @@ public class TeleOp extends OpMode {
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
-        resetPosition(gamepad2);
+        resetPosition(gamepad1);        //TODO Make it Gamepad2
 //        pos.whereToShoot(gamepad2);
         shooter.changeCoef(pos.isFar());
         // Lift Toggle
@@ -145,17 +145,29 @@ public class TeleOp extends OpMode {
             if (gamepad1.leftBumperWasPressed()) shooter.raiseBarrier();
             else if (gamepad1.rightBumperWasPressed()) shooter.lowerBarrier();
         }
-
+        double addOn = 130;
         // Shooter & Turret Updates using Follower Velocity
         double velX = follower.getVelocity().getXComponent();
         double velY = follower.getVelocity().getYComponent();
-
-        if (pos.isRed()) {
+        boolean add = false;
+        if(gamepad1.dpadRightWasPressed()){
+            add = !add;
+        }
+        if (pos.isRed() && !add) {
             shooter.setTicks(pos.getTicks(10.0037095, 1145.560813));
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
-        } else if (pos.isBlue()) {
+        } else if (pos.isBlue() && !add) {
             shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813));
+            turret.setTargetAngle(pos.target());//+ angle if needed
+            turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+        }
+        if (pos.isRed() && add) {
+            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813) + addOn);
+            turret.setTargetAngle(pos.target()); //+ angle if needed
+            turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+        } else if (pos.isBlue() && add) {
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -190,9 +202,9 @@ public class TeleOp extends OpMode {
             indexMove.setPosition(0.47);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.7);
-            else{
-                return State.BOMB;
-            }
+//            else{
+//                return State.BOMB;
+//            }
             if (timer.milliseconds() >= 450) {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
@@ -211,9 +223,9 @@ public class TeleOp extends OpMode {
             indexMove.setPosition(0.2);
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.5);
-            else{
-                return State.BOMB;
-            }
+//            else{
+//                return State.BOMB;
+//            }
             if (timer.milliseconds() >= 300) {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);

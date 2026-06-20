@@ -118,24 +118,13 @@ public class Position {
             targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()), Math.abs(pose.getX() - 14)));
         }
         else if (blue && pose.getY() < 65 && heading >= 90 && heading <= -90)
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
+            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
 
         else if (blue && pose.getY() < 65 && heading < 90 && heading > -90)
             targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() - 16)));
 
 
         double error = targetHead - heading;
-        if(error > 240) {
-            error=240;
-        }
-        else if (error <-270) {
-            error=-270;
-        }
-
-        while (error > 120)
-            error -= 240;
-        while (error < -135)
-            error += 270;
         return error;
     }
     public double target(){
