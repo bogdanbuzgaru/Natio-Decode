@@ -42,7 +42,7 @@ public class Turret {
             targetAngle -= (targetAngle - 30) * 0.125;
         }
         if(isRed && Math.abs(heading) < 90){
-            finalAngle -= 10;
+            finalAngle += 10;
         }else if (!isRed && Math.abs(heading) > 90){
             finalAngle -= 10;
         }
