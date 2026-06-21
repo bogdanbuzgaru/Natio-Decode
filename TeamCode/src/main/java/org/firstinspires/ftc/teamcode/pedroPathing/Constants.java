@@ -18,13 +18,49 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(15.2)
             .forwardZeroPowerAcceleration(-36.60550623816884)
-            .lateralZeroPowerAcceleration(-60.7838173444961);
+            .lateralZeroPowerAcceleration(-60.7838173444961)
+
+            // HEADING PID
+            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.09, 0.04))
+            .useSecondaryHeadingPIDF(false)
+
+            // TRANSLATIONAL PID
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
+            .useSecondaryTranslationalPIDF(false)
+
+            // DRIVE PID
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0, 0.0008, 0.6, 0.01))
+            .useSecondaryDrivePIDF(false)
+
+            //CENTRIPEDAL
+            .centripetalScaling(0);
+//    public static FollowerConstants followerConstants = new FollowerConstants()
+//            .mass(15.2)
+//            .forwardZeroPowerAcceleration(-36.60550623816884)
+//            .lateralZeroPowerAcceleration(-60.7838173444961)
+//
+//            // Heading PID
+//            .headingPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.004, 0.1))
+//            .useSecondaryHeadingPIDF(true)
+//            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.004, 0.06))
+//
+//            // Translational PID
+//            .translationalPIDFCoefficients(new PIDFCoefficients(1, 0.005, 0.04, 0.1))
+//            .useSecondaryTranslationalPIDF(true)
+//            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4, 0.0006, 0.01, 0.06))
+//
+//            // Drive PID
+//            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.8, 0.00005, 0.02, 0, 0.05))
+//            .useSecondaryDrivePIDF(true)
+//            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.0018, 0.006, 0.0008, 0, 0.03))
+//
+//            .centripetalScaling(0.005);
 //            .translationalPIDFCoefficients(new PIDFCoefficients(1, 0.0005, 0.04, 0.1))
 //            .useSecondaryTranslationalPIDF(true)
 //            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.4,0.0006,0.01,0.06))
 //            .headingPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.004, 0.06))
 //            .useSecondaryHeadingPIDF(true)
-//            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.55, 0.006, 0.04, 0.06))
+//            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.55, 0.006, 0.04, 0.06));
 //            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.8,0.00005,0.02,0,0.05))
 //            .useSecondaryDrivePIDF(true)
 //            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.0018, 0.006,0.0008, 0, 0.03))
@@ -34,12 +70,12 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.9, 0.25);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-//            .forwardPodY(92.5)
-//            .strafePodX(141)
-//            .distanceUnit(DistanceUnit.MM)
-            .strafePodX(-3.5433070866)
-            .forwardPodY(4.2519685039)
-            .distanceUnit(DistanceUnit.INCH)
+            .forwardPodY(92.5)
+            .strafePodX(-141)
+            .distanceUnit(DistanceUnit.MM)
+//            .strafePodX(-3.5433070866)
+//            .forwardPodY(4.2519685039)
+//            .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)

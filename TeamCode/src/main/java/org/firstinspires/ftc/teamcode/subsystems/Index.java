@@ -28,7 +28,7 @@ public class Index {
                 stop();
         }else{
             if (gamepad.right_trigger > 0.01)
-                indexMotor.setPower(0.3);
+                indexMotor.setPower(0.0);
             else if (gamepad.left_trigger > 0.01)
                 indexMotor.setPower(-gamepad.left_trigger);
             else

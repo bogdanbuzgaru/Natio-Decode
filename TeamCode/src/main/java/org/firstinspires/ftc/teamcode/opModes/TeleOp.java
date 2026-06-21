@@ -146,7 +146,7 @@ public class TeleOp extends OpMode {
             if (gamepad1.leftBumperWasPressed()) shooter.raiseBarrier();
             else if (gamepad1.rightBumperWasPressed()) shooter.lowerBarrier();
         }
-        double addOn = 130;
+        double addOn = 260;
         // Shooter & Turret Updates using Follower Velocity
         double velX = follower.getVelocity().getXComponent();
         double velY = follower.getVelocity().getYComponent();
@@ -188,7 +188,7 @@ public class TeleOp extends OpMode {
         telemetry.update();
     }
     private void hasBalls(){
-        if(distanceSensor.getDistance(DistanceUnit.CM) < 6 || distanceSensor2.getDistance(DistanceUnit.CM) < 7){
+        if(distanceSensor.getDistance(DistanceUnit.CM) < 6 && distanceSensor2.getDistance(DistanceUnit.CM) < 7){
             index.setLower(true);
         }else{
             index.setLower(false);

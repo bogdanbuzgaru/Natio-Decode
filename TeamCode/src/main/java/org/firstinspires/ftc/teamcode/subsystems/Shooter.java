@@ -108,7 +108,7 @@ public class Shooter {
         barrier.setPosition(0.53);
     }
     public void raiseBarrier(){
-        barrier.setPosition(0.358);
+        barrier.setPosition(0.1);
     }
     public void middleBar(){
         barrier.setPosition(0.5);
