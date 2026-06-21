@@ -286,7 +286,7 @@ public class Position {
     }
     public int getTicks(double slope, double extra){
         double hypo = Math.hypot(Math.abs(130 - pose.getX()), Math.abs(130 - pose.getY()));
-        double add = hypo / 150;
+        double add = hypo / 3 * (180 - Math.abs(Math.toDegrees(pose.getHeading())));
         return (int)((int) slope * hypo + extra);
     }
     public int getTicksBlue(double slope, double extra){

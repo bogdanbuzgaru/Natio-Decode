@@ -57,7 +57,7 @@ public class RedClose extends OpMode {
     private boolean repeat = true;
     private int goalCyclesDone = 0;
     private int GOAL_CYCLES = 1;
-    private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 900;
+    private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 1200;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(106.07, 132.1935));
@@ -90,7 +90,7 @@ public class RedClose extends OpMode {
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent()));
         turret.update();
-        shooter.setTicks(1480);
+        shooter.setTicks(1688);
         shooter.update();
     }
     public void stop(){
