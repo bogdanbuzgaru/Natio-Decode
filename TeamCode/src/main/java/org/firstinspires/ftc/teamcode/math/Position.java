@@ -286,10 +286,12 @@ public class Position {
     }
     public int getTicks(double slope, double extra){
         double hypo = Math.hypot(Math.abs(130 - pose.getX()), Math.abs(130 - pose.getY()));
+        double add = hypo / 150;
         return (int)((int) slope * hypo + extra);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX() - 14), Math.abs(130 - pose.getY()));
+
         return (int)((int) slope * hypo + extra);
     }
     public void whereToShoot(Gamepad gamepad){
