@@ -49,7 +49,12 @@ public class Turret {
 
         return normalizeAngle(finalAngle);
     }
-
+    public void angleToPos(double angle){
+        double pos = 0.5 * (angle / 190.1785714285714);
+        turretServo1.setPosition(0.5 - pos);
+        turretServo2.setPosition(0.5 - pos);
+        turretServo3.setPosition(0.5 - pos);
+    }
     public void update(){
         double finalAngle = getFinalAngle();
 

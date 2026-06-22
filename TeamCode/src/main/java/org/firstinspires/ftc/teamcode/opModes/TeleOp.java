@@ -54,7 +54,6 @@ public class TeleOp extends OpMode {
     public static Follower follower;
     private int offset = 0;
     private ElapsedTime bombTimer = new ElapsedTime();
-    private Servo indexMove;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -77,8 +76,8 @@ public class TeleOp extends OpMode {
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        indexMove = hardwareMap.get(Servo.class, "indexMove");
-        indexMove.setPosition(0.47);
+
+
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -206,7 +205,7 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            indexMove.setPosition(0.47);
+            index.normalIndex();
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.7);
 //            else{
@@ -227,7 +226,7 @@ public class TeleOp extends OpMode {
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
-            indexMove.setPosition(0.2);
+            index.lowerIndex();
             if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.5);
 //            else{
@@ -266,7 +265,7 @@ public class TeleOp extends OpMode {
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         53.3397, 12.2725,        //Far shooting
-                        Math.toRadians(-90)
+                        Math.toRadians(0)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {

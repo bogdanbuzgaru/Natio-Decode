@@ -13,7 +13,7 @@ public class Serpo extends OpMode {
     private double position = 0;
     private double step = 0.01, step2 = 0.1, actual = 0.1;
     public void init(){
-        servo = hardwareMap.get(Servo.class, "barrier");
+        servo = hardwareMap.get(Servo.class, "hood");
     }
     public void loop(){
          if(gamepad1.squareWasPressed()){

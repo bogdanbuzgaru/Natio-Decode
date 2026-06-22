@@ -77,12 +77,8 @@ public class Shooter {
         setAutoFarHood();
     }
     public void setTicks(double ticks) {
-        if(ticks < 1500){
-            ticks+= 50;
-        }
-        if(Math.abs(this.ticks - ticks) >= 30){
-            this.ticks = ticks;
-        }
+        ticks+= 50;
+        this.ticks = ticks;
     }
 
     public double getTicks() {
@@ -134,12 +130,13 @@ public class Shooter {
         }
     }
     public void setAutoFarHood(){
-        hood.setPosition(0.94);
+        hood.setPosition(1);
     }
     public void lowerHood(){
             ticks = 0;
             hood.setPosition(0);
     }
+
     public void setHoodPosition(Gamepad gamepad) {
         if(gamepad.dpadUpWasPressed()) {
             hoodPosition += 0.1;

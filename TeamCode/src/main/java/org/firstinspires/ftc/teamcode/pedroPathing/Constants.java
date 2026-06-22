@@ -18,22 +18,22 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(15.2)
             .forwardZeroPowerAcceleration(-36.60550623816884)
-            .lateralZeroPowerAcceleration(-60.7838173444961)
+            .lateralZeroPowerAcceleration(-60.7838173444961);
 
-            // HEADING PID
-            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.09, 0.04))
-            .useSecondaryHeadingPIDF(false)
-
-            // TRANSLATIONAL PID
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
-            .useSecondaryTranslationalPIDF(false)
-
-            // DRIVE PID
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0, 0.0008, 0.6, 0.01))
-            .useSecondaryDrivePIDF(false)
-
-            //CENTRIPEDAL
-            .centripetalScaling(0);
+//            // HEADING PID
+//            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.09, 0.04))
+//            .useSecondaryHeadingPIDF(false)
+//
+//            // TRANSLATIONAL PID
+//            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
+//            .useSecondaryTranslationalPIDF(false)
+//
+//            // DRIVE PID
+//            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0, 0.0008, 0.6, 0.01))
+//            .useSecondaryDrivePIDF(false)
+//
+//            //CENTRIPEDAL
+//            .centripetalScaling(0);
 //    public static FollowerConstants followerConstants = new FollowerConstants()
 //            .mass(15.2)
 //            .forwardZeroPowerAcceleration(-36.60550623816884)
