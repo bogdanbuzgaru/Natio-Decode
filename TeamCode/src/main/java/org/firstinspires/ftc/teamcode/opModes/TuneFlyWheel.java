@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp
 public class TuneFlyWheel extends OpMode {
     private DcMotorEx leftShooter, rightShooter;
-    private double lowVelocity = 500;
+    private double lowVelocity = 2500;
     private double midVelocity = 1100;
     private double highVelocity = 1700;
     private double veryhighVelocity = 2100;

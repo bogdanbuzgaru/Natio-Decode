@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import java.io.File;
 
-@Autonomous
+@Autonomous(name = "BlueFar")
 public class BlueFar extends OpMode {
 
     public enum AutoStates {
@@ -37,7 +37,7 @@ public class BlueFar extends OpMode {
         GO_SHOOT_LAST_ROW,
         PARK
     }
-    private Limelight limelight;
+
     private StateMachine<AutoStates> fsm = new StateMachine<>(AutoStates.PREPARE);
     private Follower follower;
     private Paths paths;
@@ -47,28 +47,28 @@ public class BlueFar extends OpMode {
     private Shooter shooter;
     private Intake intake;
     private Index index;
-    private Position position;
     private int number = 0;
     private boolean repeat = true;
     private Position pos;
+    private Limelight limelight;
     private int choice;
+    private ElapsedTime autoTimer;
 
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
-        // Mirrored Start: 144 - 87.000 = 57.000
+        // Mirrored Start: 144 - 53.690 = 90.310
         follower.setStartingPose(new Pose(53.690, 9.100, Math.toRadians(180)));
         pos = new Position(follower.getPose());
-        pos.setBlue();
+        pos.setRed();
         limelight = new Limelight(hardwareMap, "limelight");
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
-
-        // Turret offset/tuning for blue might be needed depending on your turret.update() logic
+        autoTimer = new ElapsedTime();
     }
 
     @Override
@@ -76,6 +76,7 @@ public class BlueFar extends OpMode {
         setUp();
         fsm.init();
         shooter.lowerBarrier();
+        autoTimer.reset();
     }
 
     @Override
@@ -84,11 +85,10 @@ public class BlueFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-        turret.setTargetAngle(pos.getTargetAngle());
-        turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent()));
-        turret.update();
-        shooter.setTicks(1790, false);
+        turret.angleToPos(-72.82);
+        shooter.setTicks(2460, false);
         shooter.updateMotor();
+        index.normalIndex();
     }
 
     @Override
@@ -100,8 +100,7 @@ public class BlueFar extends OpMode {
         heading = Double.toString(Math.toDegrees(pose.getHeading()));
 
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, 0 + "\n" + xPose + "\n" + yPose + "\n" + heading);
-
+        ReadWriteFile.writeFile(file, 1 + "\n" + xPose + "\n" + yPose + "\n" + heading);
     }
 
     private AutoStates handleShoot(AutoStates nextState, long durationMs, boolean change) {
@@ -155,29 +154,29 @@ public class BlueFar extends OpMode {
         });
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
-            int choice = limelight.choice(limelight.getSelectedPath(), false);
+            int choice = limelight.choice(limelight.getSelectedPath(), true);
             if (!follower.isBusy() && number < 2) {
+                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+            }else if (!follower.isBusy() && autoTimer.milliseconds() > 28000) {
+                return handleShoot(AutoStates.PARK, 700, true);
+            } else if (!follower.isBusy() && number < 5 && choice == 2) {
+                number ++;
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
             } else if (!follower.isBusy() && number < 5 && choice == 1) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
-            } else if (!follower.isBusy() && number < 5 && choice == 2) {
-                number++;
-                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
-            } else if (!follower.isBusy()) {
-                return handleShoot(AutoStates.PARK, 700, true);
             }
             return null;
         });
 
         fsm.onStateEnter(AutoStates.CENTER_LAST_ROW, () -> {
-            follower.followPath(paths.C_TAKE_LAST_ROW); //CURVE
+            follower.followPath(paths.CENTER_LAST_ROW); //CURVE
             shooter.lowerBarrier();
             return null;
         });
         fsm.onStateUpdate(AutoStates.CENTER_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return AutoStates.GO_SHOOT_LAST_ROW;
+                return AutoStates.TAKE_LAST_ROW;
             }
             return null;
         });
@@ -216,45 +215,58 @@ public class BlueFar extends OpMode {
     }
 
     public static class Paths {
-        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, C_TAKE_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW;
+        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, C_TAKE_LAST_ROW, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(53.690, 9.100),
-                            new Pose(10.000, 9.000)
+                            new Pose(10.000, 11.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             GO_SHOOT_HU = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, 9.000),
-                            new Pose(50.000, 8.500)
+                            new Pose(10.000, 11.000),
+                            new Pose(46.500, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
-
-            C_TAKE_LAST_ROW = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Pose(49.500, 8.500),
-                            new Pose(46.000, 31.500),
-                            new Pose(20.000, 31.500)
+            CENTER_LAST_ROW = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(46.500, 15.000),
+                            new Pose(39.200, 35.000)
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
+            TAKE_LAST_ROW = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(39.200, 35.000),
+                            new Pose(17.000, 36.000)
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .build();
+//            C_TAKE_LAST_ROW = follower.pathBuilder()
+//                    .addPath(new BezierCurve(
+//                            new Pose(97.500, 15.000),
+//                            new Pose(98.000, 33.000),
+//                            new Pose(127.000, 36.000)
+//                    ))
+//                    .setConstantHeadingInterpolation(Math.toRadians(0))
+//                    .build();
 
             GO_SHOOT_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(24.000, 31.500),
-                            new Pose(50.000, 8.500)
+                            new Pose(17.000, 36.000),
+                            new Pose(59.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             PARK = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(50.000, 8.500),
+                            new Pose(59.000, 15.000),
                             new Pose(33.000, 16.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))

@@ -51,7 +51,7 @@ public class Index {
         indexMotor.setPower(0);
     }
     public void slowFeed(){
-        indexMotor.setPower(0.5);
+        indexMotor.setPower(0.85);
     }
 }
 //Davidescu

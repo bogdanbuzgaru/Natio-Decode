@@ -86,7 +86,7 @@ public class RedFar extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
         turret.angleToPos(83.82);
-        shooter.setTicks(2430, false);
+        shooter.setTicks(1540, false);
         shooter.updateMotor();
         index.normalIndex();
     }

@@ -125,7 +125,6 @@ public class TeleOp extends OpMode {
         pos.chooseAlliance(gamepad2);
         resetPosition(gamepad1);        //TODO Make it Gamepad2
 //        pos.whereToShoot(gamepad2);
-        shooter.changeCoef(pos.isFar());
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
             if (park) lift.lift(); else lift.lower();
@@ -135,12 +134,15 @@ public class TeleOp extends OpMode {
         if (gamepad2.triangleWasPressed())
             manual = !manual;
 
-        if (gamepad1.left_bumper) {
+        if (gamepad1.left_bumper && follower.getPose().getY() < 43) {
+            shooter.raiseBarrier();
+            intake.autoTake();
+            index.slowFeed();
+        } else if (gamepad1.left_bumper && follower.getPose().getY() > 48 ){
             shooter.raiseBarrier();
             intake.autoTake();
             index.autoFeed();
-
-        } else {
+        }else {
             shooter.lowerBarrier();
         }
 
@@ -160,20 +162,20 @@ public class TeleOp extends OpMode {
             add = !add;
         }
         if (pos.isRed() && !add) {
-            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813), follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicks(6.89911, 790.04194), follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + 120, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194) + 120, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
         if (pos.isRed() && add) {
-            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813) + addOn, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicks(6.89911, 790.04194) + addOn, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn + 120, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194) + addOn + 120, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -189,15 +191,11 @@ public class TeleOp extends OpMode {
         telemetry.addData("First servo position", turret.getPosition1());
         telemetry.addData("Second servo position", turret.getPosition2());
         telemetry.addData("Third servo position", turret.getPosition3());
-
+        telemetry.addData("hood target", shooter.getTargetHood());
         telemetry.update();
     }
     private void hasBalls(){
-        if(distanceSensor.getDistance(DistanceUnit.CM) < 6 && distanceSensor2.getDistance(DistanceUnit.CM) < 7){
-            index.setLower(true);
-        }else{
-            index.setLower(false);
-        }
+        index.setLower(distanceSensor.getDistance(DistanceUnit.CM) < 6 && distanceSensor2.getDistance(DistanceUnit.CM) < 7);
     }
     private void increaseDecrease(){
         if(gamepad2.right_trigger > 0.01){

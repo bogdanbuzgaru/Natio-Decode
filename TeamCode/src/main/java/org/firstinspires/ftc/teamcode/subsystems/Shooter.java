@@ -22,6 +22,7 @@ public class Shooter {
     private PIDController p = new PIDController(kp, 0, 0);
     private double voltagee;
     private final double pCoef = 330;
+    private boolean far;
     public static  double ks = 0.226, kv = 0.0021039446333333, ka = 0.005, kp = 0.05, velocity, nominalVoltage = 11.2;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
@@ -70,10 +71,15 @@ public class Shooter {
     }
     public void setTicks(double ticks, boolean far) {
         ticks+= 50;
+        this.far = far;
         if(far){
-            ticks += 560;
+            ticks = 1720;
         }
         this.ticks = ticks;
+    }
+
+    public double getTargetHood() {
+        return targetHood;
     }
 
     public double getTicks() {
@@ -87,10 +93,12 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(flywheelMotor1.getVelocity()  <= (1150) * 1.45){
+        if(flywheelMotor1.getVelocity()  <= 1150){
             targetHood = 0;
-        }else {
-            targetHood = 0.8 * ((ticks - (1150 * 1.45)) / (550*1.21)) + 0.2;
+        }else if (flywheelMotor1.getVelocity() <= 1850 && !far) {
+            targetHood = 0.8 * ((ticks - 1150) / 665) + 0.2;
+        }else{
+            targetHood = 0.7 + 0.3 * ((ticks - 1850) / 380);
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
