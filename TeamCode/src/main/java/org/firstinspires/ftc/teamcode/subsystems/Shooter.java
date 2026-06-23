@@ -70,11 +70,10 @@ public class Shooter {
         setAutoFarHood();
     }
     public void setTicks(double ticks, boolean far) {
-        ticks+= 50;
         this.far = far;
-        if(far){
-            ticks = 1720;
-        }
+//        if(far){
+//            ticks = 1490;
+//        }
         this.ticks = ticks;
     }
 
@@ -93,12 +92,12 @@ public class Shooter {
     }
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(flywheelMotor1.getVelocity()  <= 1150){
+        if(flywheelMotor1.getVelocity()  <= 950){
             targetHood = 0;
-        }else if (flywheelMotor1.getVelocity() <= 1850 && !far) {
-            targetHood = 0.8 * ((ticks - 1150) / 665) + 0.2;
+        }else if (flywheelMotor1.getVelocity() <= 1500) {
+            targetHood = 0.8 * ((ticks - 950) / 550) + 0.2;
         }else{
-            targetHood = 0.7 + 0.3 * ((ticks - 1850) / 380);
+            targetHood = 1;
         }
         targetHood = Math.min(targetHood, 1);
         hood.setPosition(targetHood);
