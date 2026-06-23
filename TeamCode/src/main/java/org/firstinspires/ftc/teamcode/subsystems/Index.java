@@ -22,7 +22,7 @@ public class Index {
         this.lower = lower;
     }
     public void normalIndex(){
-        indexMove.setPosition(0.47);
+        indexMove.setPosition(0.52);
     }
     public void lowerIndex(){
         indexMove.setPosition(0.2);

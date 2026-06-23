@@ -43,8 +43,8 @@ public class Turret {
         }
         if(isRed && Math.abs(heading) < 90){
             finalAngle += 7.5;
-        }else if (!isRed && Math.abs(heading) > 90){
-            finalAngle -= 7.5;
+        }else if (!isRed){
+            finalAngle += 0.5;
         }
 
         return normalizeAngle(finalAngle);

@@ -86,16 +86,21 @@ public class RedFar extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
         turret.angleToPos(83.82);
-        shooter.setTicks(2370);
+        shooter.setTicks(2430, false);
         shooter.updateMotor();
         index.normalIndex();
     }
 
     @Override
     public void stop() {
+        String xPose, yPose, heading;
         Pose pose = follower.getPose();
+        xPose = Double.toString(pose.getX());
+        yPose = Double.toString(pose.getY());
+        heading = Double.toString(Math.toDegrees(pose.getHeading()));
+
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, pose.getX() + "\n" + pose.getY() + "\n" + Math.toDegrees(pose.getHeading()));
+        ReadWriteFile.writeFile(file, 1 + "\n" + xPose + "\n" + yPose + "\n" + heading);
     }
 
     private AutoStates handleShoot(AutoStates nextState, long durationMs, boolean change) {
@@ -254,7 +259,7 @@ public class RedFar extends OpMode {
             GO_SHOOT_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(127.000, 36.000),
-                            new Pose(94.000, 15.000)
+                            new Pose(85.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();

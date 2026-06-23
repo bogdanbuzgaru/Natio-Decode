@@ -54,6 +54,7 @@ public class TeleOp extends OpMode {
     public static Follower follower;
     private int offset = 0;
     private ElapsedTime bombTimer = new ElapsedTime();
+    private double isRed;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -63,8 +64,9 @@ public class TeleOp extends OpMode {
                 results.add(Double.parseDouble(val));
             }
         } catch (Exception e) {
-            results.add(0.0); results.add(0.0); results.add(0.0);
+            results.add(0.0); results.add(0.0); results.add(0.0); results.add(0.0);
         }
+        isRed = results.get(results.size() - 4);
         double startX = results.get(results.size() - 3);
         double startY = results.get(results.size() - 2);
         double startHeadingDeg = Math.toRadians(results.get(results.size() - 1));
@@ -75,8 +77,12 @@ public class TeleOp extends OpMode {
         follower.setPose(startPose);
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
-
-
+        pos = new Position(startPose);
+        if(isRed == 1){
+            pos.setRed();
+        }else if (isRed == 0){
+            pos.setBlue();
+        }
 
         turret = new Turret(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -84,7 +90,7 @@ public class TeleOp extends OpMode {
         index = new Index(hardwareMap);
         movement = new Movement(hardwareMap);
         lift = new Lift(hardwareMap);
-        pos = new Position(startPose);
+
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
         distanceSensor2 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor2");
         distanceSensor3 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor3");
@@ -154,20 +160,20 @@ public class TeleOp extends OpMode {
             add = !add;
         }
         if (pos.isRed() && !add) {
-            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813));
+            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813), follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + 120);
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + 120, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
         if (pos.isRed() && add) {
-            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813) + addOn);
+            shooter.setTicks(pos.getTicks(10.0037095, 1145.560813) + addOn, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn + 120);
+            shooter.setTicks(pos.getTicksBlue(10.0037095, 1145.560813) + addOn + 120, follower.getPose().getY() < 50);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }

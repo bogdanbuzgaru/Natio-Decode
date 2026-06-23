@@ -21,7 +21,7 @@ public class Shooter {
     private double targetHood;
     private PIDController p = new PIDController(kp, 0, 0);
     private double voltagee;
-    private double pCoef = 120;
+    private final double pCoef = 330;
     public static  double ks = 0.226, kv = 0.0021039446333333, ka = 0.005, kp = 0.05, velocity, nominalVoltage = 11.2;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
@@ -34,8 +34,8 @@ public class Shooter {
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 //
-        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
-        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
+        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,12.41));
+        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,12.41));
 
 
         lowerBarrier();
@@ -59,14 +59,6 @@ public class Shooter {
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
     }
-    public void changeCoef(boolean far){
-        if(far){
-            pCoef = 170;
-        }else{
-            pCoef = 120;
-        }
-    }
-
     public void setVoltagee(double voltagee) {
         this.voltagee = voltagee;
     }
@@ -76,8 +68,11 @@ public class Shooter {
         flywheelMotor2.setVelocity(ticks);
         setAutoFarHood();
     }
-    public void setTicks(double ticks) {
+    public void setTicks(double ticks, boolean far) {
         ticks+= 50;
+        if(far){
+            ticks += 560;
+        }
         this.ticks = ticks;
     }
 

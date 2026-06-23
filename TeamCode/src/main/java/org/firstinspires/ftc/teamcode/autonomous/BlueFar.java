@@ -87,15 +87,21 @@ public class BlueFar extends OpMode {
         turret.setTargetAngle(pos.getTargetAngle());
         turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent()));
         turret.update();
-        shooter.setTicks(1790);
+        shooter.setTicks(1790, false);
         shooter.updateMotor();
     }
 
     @Override
     public void stop() {
+        String xPose, yPose, heading;
         Pose pose = follower.getPose();
+        xPose = Double.toString(pose.getX());
+        yPose = Double.toString(pose.getY());
+        heading = Double.toString(Math.toDegrees(pose.getHeading()));
+
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, pose.getX() + "\n" + pose.getY() + "\n" + Math.toDegrees(pose.getHeading()));
+        ReadWriteFile.writeFile(file, 0 + "\n" + xPose + "\n" + yPose + "\n" + heading);
+
     }
 
     private AutoStates handleShoot(AutoStates nextState, long durationMs, boolean change) {
