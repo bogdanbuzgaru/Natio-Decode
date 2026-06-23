@@ -35,6 +35,10 @@ public class BlueFar extends OpMode {
         CENTER_LAST_ROW,
         TAKE_LAST_ROW,
         GO_SHOOT_LAST_ROW,
+        ROTATE,
+        TAKE_RANDOM,
+        SHOOT_RANDOM,
+        WAIT,
         PARK
     }
 
@@ -57,11 +61,9 @@ public class BlueFar extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-
-        // Mirrored Start: 144 - 53.690 = 90.310
         follower.setStartingPose(new Pose(53.690, 9.100, Math.toRadians(180)));
         pos = new Position(follower.getPose());
-        pos.setRed();
+        pos.setBlue();
         limelight = new Limelight(hardwareMap, "limelight");
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
@@ -85,7 +87,7 @@ public class BlueFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-        turret.angleToPos(-72.82);
+        turret.angleToPos(-75.82);
         shooter.setTicks(1500, false);
         shooter.updateMotor();
         index.normalIndex();
@@ -100,7 +102,7 @@ public class BlueFar extends OpMode {
         heading = Double.toString(Math.toDegrees(pose.getHeading()));
 
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, 1 + "\n" + xPose + "\n" + yPose + "\n" + heading);
+        ReadWriteFile.writeFile(file, 0 + "\n" + xPose + "\n" + yPose + "\n" + heading);
     }
 
     private AutoStates handleShoot(AutoStates nextState, long durationMs, boolean change) {
@@ -124,6 +126,7 @@ public class BlueFar extends OpMode {
             pathTimer.reset();
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.PREPARE, () -> {
             if (pathTimer.milliseconds() > 2800) {
                 index.autoFeed();
@@ -139,6 +142,7 @@ public class BlueFar extends OpMode {
             number++;
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.TAKE_HUMAN, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
@@ -152,27 +156,21 @@ public class BlueFar extends OpMode {
             shooter.lowerBarrier();
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
-            int choice = limelight.choice(limelight.getSelectedPath(), true);
-            if (!follower.isBusy() && number < 2) {
-                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
-            }else if (!follower.isBusy() && autoTimer.milliseconds() > 28000) {
-                return handleShoot(AutoStates.PARK, 700, true);
-            } else if (!follower.isBusy() && number < 5 && choice == 2) {
-                number ++;
-                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
-            } else if (!follower.isBusy() && number < 5 && choice == 1) {
-                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+            if (!follower.isBusy()) {
+                return AutoStates.WAIT;
             }
             return null;
         });
 
         fsm.onStateEnter(AutoStates.CENTER_LAST_ROW, () -> {
-            follower.followPath(paths.CENTER_LAST_ROW); //CURVE
+            follower.followPath(paths.CENTER_LAST_ROW);
             shooter.lowerBarrier();
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.CENTER_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
@@ -186,6 +184,7 @@ public class BlueFar extends OpMode {
             shooter.lowerBarrier();
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.TAKE_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
@@ -199,10 +198,83 @@ public class BlueFar extends OpMode {
             shooter.lowerBarrier();
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.GO_SHOOT_LAST_ROW, () -> {
             intake.autoTake();
-            if (!follower.isBusy() && number < 3) {
+            if (!follower.isBusy()) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+            }
+            return null;
+        });
+
+        fsm.onStateEnter(AutoStates.ROTATE, () -> {
+            follower.followPath(paths.ROTATE);
+            shooter.lowerBarrier();
+            return null;
+        });
+
+        fsm.onStateUpdate(AutoStates.ROTATE, () -> {
+            intake.autoTake();
+            if (!follower.isBusy()) {
+                return AutoStates.TAKE_RANDOM;
+            }
+            return null;
+        });
+
+        fsm.onStateEnter(AutoStates.TAKE_RANDOM, () -> {
+            follower.followPath(paths.TAKE_RANDOM);
+            shooter.lowerBarrier();
+            return null;
+        });
+
+        fsm.onStateUpdate(AutoStates.TAKE_RANDOM, () -> {
+            intake.autoTake();
+            if (!follower.isBusy()) {
+                return AutoStates.SHOOT_RANDOM;
+            }
+            return null;
+        });
+
+        fsm.onStateEnter(AutoStates.SHOOT_RANDOM, () -> {
+            follower.followPath(paths.SHOOT_RANDOM);
+            shooter.lowerBarrier();
+            return null;
+        });
+
+        fsm.onStateUpdate(AutoStates.SHOOT_RANDOM, () -> {
+            intake.autoTake();
+            if (!follower.isBusy()) {
+                return AutoStates.WAIT;
+            }
+            return null;
+        });
+
+        fsm.onStateEnter(AutoStates.WAIT, () -> {
+            shooter.lowerBarrier();
+            return null;
+        });
+
+        fsm.onStateUpdate(AutoStates.WAIT, () -> {
+            intake.autoTake();
+            int choice = limelight.choice(limelight.getSelectedPath(), true);
+            if (!follower.isBusy()) {
+                if (autoTimer.milliseconds() > 28000) {
+                    return handleShoot(AutoStates.PARK, 700, true);
+                } else if (number < 2) {
+                    return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+                } else if (number < 5 && choice == 1) {
+                    AutoStates next = handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+                    if (next != null) number++;
+                    return next;
+                } else if (number < 5 && choice == 2) {
+                    AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+                    if (next != null) number++;
+                    return next;
+                } else if (autoTimer.milliseconds() < 27000 && choice == 0) {
+                    AutoStates next = handleShoot(AutoStates.ROTATE, 700, true);
+                    if (next != null) number++;
+                    return next;
+                }
             }
             return null;
         });
@@ -211,11 +283,12 @@ public class BlueFar extends OpMode {
             follower.followPath(paths.PARK);
             return null;
         });
+
         fsm.onStateUpdate(AutoStates.PARK, () -> null);
     }
 
     public static class Paths {
-        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, C_TAKE_LAST_ROW, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW;
+        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW, ROTATE, TAKE_RANDOM, SHOOT_RANDOM;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
@@ -229,17 +302,19 @@ public class BlueFar extends OpMode {
             GO_SHOOT_HU = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(10.000, 11.000),
-                            new Pose(46.500, 15.000)
+                            new Pose(59.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
+
             CENTER_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(46.500, 15.000),
+                            new Pose(59.000, 15.000),
                             new Pose(39.200, 35.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
+
             TAKE_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(39.200, 35.000),
@@ -247,14 +322,6 @@ public class BlueFar extends OpMode {
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
-//            C_TAKE_LAST_ROW = follower.pathBuilder()
-//                    .addPath(new BezierCurve(
-//                            new Pose(97.500, 15.000),
-//                            new Pose(98.000, 33.000),
-//                            new Pose(127.000, 36.000)
-//                    ))
-//                    .setConstantHeadingInterpolation(Math.toRadians(0))
-//                    .build();
 
             GO_SHOOT_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
@@ -264,9 +331,33 @@ public class BlueFar extends OpMode {
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
-            PARK = follower.pathBuilder()
+            ROTATE = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(59.000, 15.000),
+                            new Pose(52.000, 16.000)
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
+                    .build();
+
+            TAKE_RANDOM = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(52.000, 16.000),
+                            new Pose(10.000, 36.000)
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180))
+                    .build();
+
+            SHOOT_RANDOM = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(10.000, 36.000),
+                            new Pose(59.000, 15.000)
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .build();
+
+            PARK = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(50.000, 15.000),
                             new Pose(33.000, 16.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
