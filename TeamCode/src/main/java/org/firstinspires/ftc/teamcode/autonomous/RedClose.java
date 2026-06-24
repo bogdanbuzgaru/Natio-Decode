@@ -56,7 +56,8 @@ public class RedClose extends OpMode {
     private Paths paths;
     private boolean repeat = true;
     private int goalCyclesDone = 0;
-    private int GOAL_CYCLES = 1;
+    private int GOAL_CYCLES = 2;
+    private ElapsedTime auto;
     private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 1000, WAIT_MS = 700;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
@@ -68,6 +69,7 @@ public class RedClose extends OpMode {
         index = new Index(hardwareMap);
         pos = new Position(follower.getPose());
         pos.setRed();
+        auto = new ElapsedTime();
 //        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
 //                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
     }
@@ -75,6 +77,7 @@ public class RedClose extends OpMode {
         setUp();
         fsm.init();
         shooter.lowerBarrier();
+        auto.reset();
     }
     public void loop(){
         follower.update();
@@ -91,6 +94,9 @@ public class RedClose extends OpMode {
         turret.angleToPos(55);
         shooter.setTicks(1180, false);
         shooter.update();
+        if(auto.seconds() > 31.9){
+            stop();
+        }
     }
     public void stop(){
         String xPose, yPose, heading;
@@ -169,6 +175,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.GO_TO_GOAL, () -> {
             follower.followPath(paths.GO_TO_GOAL);
             shooter.lowerBarrier();
+            index.normalIndex();
             return null;
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
@@ -183,6 +190,7 @@ public class RedClose extends OpMode {
             follower.followPath(paths.SHOOT_GOAL);
             goalCyclesDone++;
             shooter.lowerBarrier();
+            index.lowerIndex();
             return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
