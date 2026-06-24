@@ -76,7 +76,7 @@ public class Movement {
     }
 
     public void resetHeading() {
-        imu.resetYaw();
+//        imu.resetYaw();
     }
 
     public void movementLoop(Gamepad gamepad) {

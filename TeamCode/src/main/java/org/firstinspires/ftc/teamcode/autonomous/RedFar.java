@@ -212,10 +212,10 @@ public class RedFar extends OpMode {
             shooter.lowerBarrier();
             return null;
         });
-
         fsm.onStateUpdate(AutoStates.ROTATE, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
+            int choice = limelight.choice(limelight.getSelectedPath(), true);
+            if (!follower.isBusy() && (choice == 2 || choice == 1)) {
                 return AutoStates.TAKE_RANDOM;
             }
             return null;
@@ -288,7 +288,8 @@ public class RedFar extends OpMode {
     }
 
     public static class Paths {
-        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW, ROTATE, TAKE_RANDOM, SHOOT_RANDOM;
+        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW,
+                ROTATE, TAKE_RANDOM, SHOOT_RANDOM ;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
@@ -336,7 +337,7 @@ public class RedFar extends OpMode {
                             new Pose(85.000, 15.000),
                             new Pose(92.000, 16.000)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(40))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))
                     .build();
 
             TAKE_RANDOM = follower.pathBuilder()
@@ -344,7 +345,7 @@ public class RedFar extends OpMode {
                             new Pose(92.000, 16.000),
                             new Pose(134.000, 36.000)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(40), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(25), Math.toRadians(0))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()

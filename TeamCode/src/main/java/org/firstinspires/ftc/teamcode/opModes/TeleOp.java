@@ -45,7 +45,7 @@ public class TeleOp extends OpMode {
     private Lift lift;
     private final StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
     private ServoImplEx rgbLed;
-    private boolean fieldCentric = false;
+    private boolean fieldCentric = true;
     private boolean manual = false;
     private boolean park = true;
     private int angle = 0;
@@ -55,6 +55,7 @@ public class TeleOp extends OpMode {
     private int offset = 0;
     private ElapsedTime bombTimer = new ElapsedTime();
     private double isRed;
+    private boolean lowerSpeed = false;
 
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
@@ -123,35 +124,41 @@ public class TeleOp extends OpMode {
         intake.take(gamepad1);
         index.feed(gamepad1);
         pos.chooseAlliance(gamepad2);
-        resetPosition(gamepad1);        //TODO Make it Gamepad2
+        resetPosition(gamepad2, gamepad1);        //TODO Make it Gamepad2
 //        pos.whereToShoot(gamepad2);
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
-            if (park) lift.lift(); else lift.lower();
-            park = !park;
+            if (park) lift.lift();
+            else lift.lower();
+                park = !park;
         }
-
-        if (gamepad2.triangleWasPressed())
-            manual = !manual;
-
-        if (gamepad1.left_bumper && follower.getPose().getY() < 43) {
+        if (lowerSpeed){
+            index.setValue(0.59);
+        }else{
+            index.setValue(0.95);
+        }
+        if(gamepad2.circleWasPressed()){
+            lowerSpeed = !lowerSpeed;
+        }
+        if(gamepad1.left_bumper && follower.getPose().getY() < 43){
             shooter.raiseBarrier();
             intake.autoTake();
             index.slowFeed();
-        } else if (gamepad1.left_bumper && follower.getPose().getY() > 48 ){
+        }else if (gamepad1.left_bumper && follower.getPose().getY() > 48){
             shooter.raiseBarrier();
             intake.autoTake();
             index.autoFeed();
-        }else {
+        }else{
             shooter.lowerBarrier();
         }
-
         if (pos.activateOrientation() && !manual)
             turret.update();
         if (manual) {
             turret.goNeutral();
-            if (gamepad1.leftBumperWasPressed()) shooter.raiseBarrier();
-            else if (gamepad1.rightBumperWasPressed()) shooter.lowerBarrier();
+            if (gamepad1.left_bumper)
+                shooter.raiseBarrier();
+            else
+                shooter.lowerBarrier();
         }
         double addOn = 260;
         // Shooter & Turret Updates using Follower Velocity
@@ -215,15 +222,21 @@ public class TeleOp extends OpMode {
 //            else{
 //                return State.BOMB;
 //            }
+            double distance = distanceSensor.getDistance(DistanceUnit.CM);
+            double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+            double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
             if (timer.milliseconds() >= 450) {
-                double distance = distanceSensor.getDistance(DistanceUnit.CM);
-                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
                         && (distance < 6 && distance2 < 6 && distance3 < 15))
                 {
                     gamepad1.rumble(200);
                     return State.E_BILE;
+                }
+                if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+                        && (distance < 6 && distance2 < 6 && distance3 > 8)){
+                    rgbLed.setPosition(0.225);
+                }else{
+                    rgbLed.setPosition(0.7);
                 }
                 timer.reset();
             }
@@ -240,7 +253,8 @@ public class TeleOp extends OpMode {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-                if (gamepad1.leftBumperWasPressed())
+                if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed()
+                )
                     return State.NU_E_BILE;
                 timer.reset();
             }
@@ -262,13 +276,22 @@ public class TeleOp extends OpMode {
 
 
 
-    private void resetPosition(Gamepad gamepad) {
+    private void resetPosition(Gamepad gamepad, Gamepad driver) {
         if(pos.isRed()) {
+            if(driver.dpadLeftWasPressed()){
+                movement.resetHeading();
+                movement.setOff(0);
+                follower.setPose(new Pose(
+                        121.863, 3.48,        //other human
+                        Math.toRadians(0)
+                ));
+                manual = false;
+            }
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        53.3397, 12.2725,        //Far shooting
+                        120.86, 75.2791,        //Gate
                         Math.toRadians(0)
                 ));
                 manual = false;
@@ -279,34 +302,43 @@ public class TeleOp extends OpMode {
                         116.214, 125.133,    //basket
                         Math.toRadians(38.4)
                 ));
-                manual = false;}
-//            } else if (gamepad.dpadDownWasPressed()) {
-//                movement.resetHeading();
-//                movement.setOff(0);
-//                {
-//                    follower.setPose(new Pose(
-//                            122.332, 79.3,    //Near gate
-//                            Math.toRadians(0)
-//                    ));
-//                    manual = false;
-//                }
-//                manual = false;
-//            }// else if (gamepad.dpadRightWasPressed()) {
-//                movement.resetHeading();
-//                movement.setOff(0);
-//                follower.setPose(new Pose(
-//                        10.8364, 10.7869,    //our human player w/ ext
-//                        Math.toRadians(180)
-//                ));
-//                manual = false;
-//            }
+                manual = false;
+            } else if (gamepad.dpadDownWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
+                {
+                    follower.setPose(new Pose(
+                            47.4658, 12.92,    //Shooting zone far
+                            Math.toRadians(-90)
+                    ));
+                    manual = false;
+                }
+                manual = false;
+            }else if (gamepad.dpadRightWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
+                follower.setPose(new Pose(
+                        1.38, 20.934,    //our human player w/ ext
+                        Math.toRadians(180)
+                ));
+                manual = false;
+            }
         }else if(pos.isBlue()){
+            if(driver.dpadLeftWasPressed()){
+                movement.resetHeading();
+                movement.setOff(0);
+                follower.setPose(new Pose(
+                        144 - 121.863, 3.48,        //other human
+                        Math.toRadians(0)
+                ));
+                manual = false;
+            }
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        90.6603, 12.2725,        //Far shooting
-                        Math.toRadians(-90)
+                        23.14, 75.2791,        //Far shooting
+                        Math.toRadians(180)
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
@@ -316,27 +348,27 @@ public class TeleOp extends OpMode {
                         27.786, 125.133,    //basket
                         Math.toRadians(141.6)
                 ));
-                manual = false;}
-//            } else if (gamepad.dpadDownWasPressed()) {
-//                movement.resetHeading();
-//                movement.setOff(0);
-//                {
-//                    follower.setPose(new Pose(
-//                            21.668, 79.3,    //Near gate
-//                            Math.toRadians(180)
-//                    ));
-//                    manual = false;
-//                }
-//                manual = false;}
-//            } else if (gamepad.dpadRightWasPressed()) {
-//                movement.resetHeading();
-//                movement.setOff(0);
-//                follower.setPose(new Pose(
-//                        133.1636, 10.7869,    //our human player w/ ext
-//                        Math.toRadians(0)
-//                ));
-//                manual = false;
-//            }
+                manual = false;
+            } else if (gamepad.dpadDownWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
+                {
+                    follower.setPose(new Pose(
+                            144 - 47.4658, 12.92,    //Shooting zone far
+                            Math.toRadians(-90)
+                    ));
+                    manual = false;
+                }
+                manual = false;
+            }else if (gamepad.dpadRightWasPressed()) {
+                movement.resetHeading();
+                movement.setOff(0);
+                follower.setPose(new Pose(
+                        144 - 1.38, 20.934,    //our human player w/ ext
+                        Math.toRadians(180)
+                ));
+                manual = false;
+            }
         }
     }
 }

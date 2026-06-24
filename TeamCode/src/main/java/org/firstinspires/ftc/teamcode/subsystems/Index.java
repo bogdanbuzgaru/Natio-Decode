@@ -10,6 +10,7 @@ public class Index {
     private DcMotorEx indexMotor;
     private boolean lower = false;
     private Servo indexMove;
+    private double value;
     public Index (HardwareMap hardwareMap){
         indexMotor = hardwareMap.get(DcMotorEx.class, "index");
         indexMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -44,6 +45,11 @@ public class Index {
                 stop();
         }
     }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
     public void autoFeed(){
         indexMotor.setPower(1);
     }
@@ -51,7 +57,7 @@ public class Index {
         indexMotor.setPower(0);
     }
     public void slowFeed(){
-        indexMotor.setPower(0.85);
+        indexMotor.setPower(value);
     }
 }
 //Davidescu

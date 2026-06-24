@@ -336,7 +336,7 @@ public class BlueFar extends OpMode {
                             new Pose(59.000, 15.000),
                             new Pose(52.000, 16.000)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(155))
                     .build();
 
             TAKE_RANDOM = follower.pathBuilder()
@@ -344,7 +344,7 @@ public class BlueFar extends OpMode {
                             new Pose(52.000, 16.000),
                             new Pose(10.000, 36.000)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(155), Math.toRadians(180))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
