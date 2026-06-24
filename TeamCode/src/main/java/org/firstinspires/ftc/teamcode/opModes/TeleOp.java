@@ -128,7 +128,8 @@ public class TeleOp extends OpMode {
 //        pos.whereToShoot(gamepad2);
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
-            if (park) lift.lift();
+            if (park)
+                lift.lift();
             else lift.lower();
                 park = !park;
         }
@@ -273,9 +274,6 @@ public class TeleOp extends OpMode {
     private boolean blink(double currTime){
         return (currTime % 400) < 200;
     }
-
-
-
     private void resetPosition(Gamepad gamepad, Gamepad driver) {
         if(pos.isRed()) {
             if(driver.dpadLeftWasPressed()){

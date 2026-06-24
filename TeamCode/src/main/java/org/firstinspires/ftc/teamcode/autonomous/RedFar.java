@@ -91,6 +91,8 @@ public class RedFar extends OpMode {
         shooter.setTicks(1500, false);
         shooter.updateMotor();
         index.normalIndex();
+        telemetry.addData("has target", limelight.hasTarget());
+        telemetry.addData("Object", limelight.choice(limelight.getSelectedPath(), true));
     }
 
     @Override
