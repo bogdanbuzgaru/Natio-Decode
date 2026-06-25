@@ -91,6 +91,8 @@ public class BlueFar extends OpMode {
         shooter.setTicks(1500, false);
         shooter.updateMotor();
         index.normalIndex();
+        telemetry.addData("has target", limelight.hasTarget());
+        telemetry.addData("Object", limelight.choice(limelight.getSelectedPath(), true));
     }
 
     @Override
@@ -212,10 +214,10 @@ public class BlueFar extends OpMode {
             shooter.lowerBarrier();
             return null;
         });
-
         fsm.onStateUpdate(AutoStates.ROTATE, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
+            int choice = limelight.choice(limelight.getSelectedPath(), true);
+            if (!follower.isBusy() && (choice == 2 || choice == 1)) {
                 return AutoStates.TAKE_RANDOM;
             }
             return null;
@@ -288,7 +290,8 @@ public class BlueFar extends OpMode {
     }
 
     public static class Paths {
-        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW, ROTATE, TAKE_RANDOM, SHOOT_RANDOM;
+        public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW,
+                ROTATE, TAKE_RANDOM, SHOOT_RANDOM ;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
@@ -340,16 +343,17 @@ public class BlueFar extends OpMode {
                     .build();
 
             TAKE_RANDOM = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             new Pose(52.000, 16.000),
-                            new Pose(10.000, 36.000)
+                            new Pose (33.000, 35.000),
+                            new Pose(10.000, 44.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(155), Math.toRadians(180))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, 36.000),
+                            new Pose(10.000, 44.000),
                             new Pose(59.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))

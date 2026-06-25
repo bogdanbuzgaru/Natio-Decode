@@ -87,7 +87,7 @@ public class RedFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-        turret.angleToPos(83.82);
+        turret.angleToPos(85.82);
         shooter.setTicks(1500, false);
         shooter.updateMotor();
         index.normalIndex();
@@ -343,16 +343,17 @@ public class RedFar extends OpMode {
                     .build();
 
             TAKE_RANDOM = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             new Pose(92.000, 16.000),
-                            new Pose(134.000, 36.000)
+                            new Pose (120.900, 28.000),
+                            new Pose(134.000, 44.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(25), Math.toRadians(0))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(134.000, 36.000),
+                            new Pose(134.000, 44.000),
                             new Pose(85.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

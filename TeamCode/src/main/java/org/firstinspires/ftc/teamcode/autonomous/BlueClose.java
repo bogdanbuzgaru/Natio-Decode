@@ -91,7 +91,7 @@ public class BlueClose extends OpMode {
 //        turret.setAuto();
         pos.update(follower.getPose());
         index.normalIndex();
-        turret.angleToPos(-55);
+        turret.angleToPos(-51.5);
         shooter.setTicks(1180, false);
         shooter.update();
         if(auto.seconds() > 31.9){
