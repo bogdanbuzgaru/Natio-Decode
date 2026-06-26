@@ -79,13 +79,16 @@ public class TeleOp extends OpMode {
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
         pos = new Position(startPose);
+        turret = new Turret(hardwareMap);
         if(isRed == 1){
             pos.setRed();
+            turret.setBlue(false);
         }else if (isRed == 0){
             pos.setBlue();
+            turret.setBlue(true);
         }
 
-        turret = new Turret(hardwareMap);
+
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         index = new Index(hardwareMap);
@@ -170,20 +173,20 @@ public class TeleOp extends OpMode {
             add = !add;
         }
         if (pos.isRed() && !add) {
-            shooter.setTicks(pos.getTicks(6.89911, 790.04194), follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicks(6.89911, 790.04194), follower.getPose().getY() < 50, false);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194) + 120, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 720.04194) + 120, follower.getPose().getY() < 50, true);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
         if (pos.isRed() && add) {
-            shooter.setTicks(pos.getTicks(6.89911, 790.04194) + addOn, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicks(6.89911, 790.04194) + addOn, follower.getPose().getY() < 50, false);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 790.04194) + addOn + 120, follower.getPose().getY() < 50);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 720.04194) + addOn + 120, follower.getPose().getY() < 50, true);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -218,7 +221,7 @@ public class TeleOp extends OpMode {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
             index.normalIndex();
-            if(bombTimer.seconds() < 110)
+//            if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.7);
 //            else{
 //                return State.BOMB;
@@ -235,7 +238,7 @@ public class TeleOp extends OpMode {
                 }
                 if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
                         && (distance < 6 && distance2 < 6 && distance3 > 8)){
-                    rgbLed.setPosition(0.225);
+                    rgbLed.setPosition(0.9);
                 }else{
                     rgbLed.setPosition(0.7);
                 }
@@ -245,7 +248,7 @@ public class TeleOp extends OpMode {
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
             index.lowerIndex();
-            if(bombTimer.seconds() < 110)
+//            if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.5);
 //            else{
 //                return State.BOMB;

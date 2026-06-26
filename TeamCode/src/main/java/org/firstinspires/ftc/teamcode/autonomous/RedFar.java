@@ -88,7 +88,7 @@ public class RedFar extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
         turret.angleToPos(85.82);
-        shooter.setTicks(1500, false);
+        shooter.setTicks(1500, false, false);
         shooter.updateMotor();
         index.normalIndex();
         telemetry.addData("has target", limelight.hasTarget());
@@ -262,10 +262,8 @@ public class RedFar extends OpMode {
             if (!follower.isBusy()) {
                 if (autoTimer.milliseconds() > 28000) {
                     return handleShoot(AutoStates.PARK, 700, true);
-                } else if (number < 2) {
-                    return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
                 } else if (number < 5 && choice == 1) {
-                    AutoStates next = handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+                    AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
                     if (next != null) number++;
                     return next;
                 } else if (number < 5 && choice == 2) {

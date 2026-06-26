@@ -69,11 +69,14 @@ public class Shooter {
         flywheelMotor2.setVelocity(ticks);
         setAutoFarHood();
     }
-    public void setTicks(double ticks, boolean far) {
+    public void setTicks(double ticks, boolean far, boolean blue) {
         this.far = far;
 //        if(far){
 //            ticks = 1490;
 //        }
+        if (blue && far){
+            ticks -= 105;
+        }
         this.ticks = ticks;
     }
 

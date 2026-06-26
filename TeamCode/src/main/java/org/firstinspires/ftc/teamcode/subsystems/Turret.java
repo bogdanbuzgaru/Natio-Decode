@@ -13,6 +13,7 @@ public class Turret {
     private final double SERVO_CENTER = 0.500000;
     private boolean isRed;
     private double heading;
+    private boolean blue = false;
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
@@ -20,7 +21,9 @@ public class Turret {
 
         goNeutral();
     }
-
+    public void setBlue(boolean blue){
+        this.blue = blue;
+    }
     public void setTargetAngle(double angleRobotRelative) {
         this.targetAngle = normalizeAngle(angleRobotRelative);
     }
@@ -29,7 +32,9 @@ public class Turret {
         this.heading = heading;
         isRed = red;
     }
-
+    public boolean add(double heading, boolean blue){
+        return Math.abs(heading) < 90 && blue;
+    }
     public void setOffsetAngle(double offsetAngle) {
         this.offsetAngle = offsetAngle;
     }
@@ -46,7 +51,9 @@ public class Turret {
         }else if (!isRed){
             finalAngle += 0.5;
         }
-
+        if(add(heading, blue)){
+            finalAngle += 7;
+        }
         return normalizeAngle(finalAngle);
     }
     public void angleToPos(double angle){

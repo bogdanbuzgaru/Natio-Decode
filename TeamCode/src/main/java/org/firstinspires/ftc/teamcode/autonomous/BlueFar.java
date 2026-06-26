@@ -52,6 +52,7 @@ public class BlueFar extends OpMode {
     private Intake intake;
     private Index index;
     private int number = 0;
+    private boolean change = false;
     private boolean repeat = true;
     private Position pos;
     private Limelight limelight;
@@ -87,8 +88,12 @@ public class BlueFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-        turret.angleToPos(-75.82);
-        shooter.setTicks(1500, false);
+        if (!change)
+            turret.angleToPos(-78.82);
+        else {
+            turret.angleToPos(-75.68);
+        }
+        shooter.setTicks(1500, false, false);
         shooter.updateMotor();
         index.normalIndex();
         telemetry.addData("has target", limelight.hasTarget());
@@ -142,6 +147,7 @@ public class BlueFar extends OpMode {
             follower.followPath(paths.TAKE_HUMAN);
             shooter.lowerBarrier();
             number++;
+            change = true;
             return null;
         });
 
@@ -162,7 +168,7 @@ public class BlueFar extends OpMode {
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return AutoStates.WAIT;
+                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
             }
             return null;
         });
@@ -204,7 +210,7 @@ public class BlueFar extends OpMode {
         fsm.onStateUpdate(AutoStates.GO_SHOOT_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+                return handleShoot(AutoStates.WAIT, 700, true);
             }
             return null;
         });
@@ -262,10 +268,8 @@ public class BlueFar extends OpMode {
             if (!follower.isBusy()) {
                 if (autoTimer.milliseconds() > 28000) {
                     return handleShoot(AutoStates.PARK, 700, true);
-                } else if (number < 2) {
-                    return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
                 } else if (number < 5 && choice == 1) {
-                    AutoStates next = handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+                    AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
                     if (next != null) number++;
                     return next;
                 } else if (number < 5 && choice == 2) {

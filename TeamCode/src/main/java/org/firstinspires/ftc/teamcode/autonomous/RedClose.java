@@ -92,7 +92,7 @@ public class RedClose extends OpMode {
         pos.update(follower.getPose());
         index.normalIndex();
         turret.angleToPos(55);
-        shooter.setTicks(1180, false);
+        shooter.setTicks(1180, false, false);
         shooter.update();
         if(auto.seconds() > 31.9){
             stop();
