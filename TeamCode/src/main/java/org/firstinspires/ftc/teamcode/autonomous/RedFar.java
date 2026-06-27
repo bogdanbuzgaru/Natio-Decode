@@ -57,6 +57,9 @@ public class RedFar extends OpMode {
     private Limelight limelight;
     private int choice;
     private ElapsedTime autoTimer;
+    private boolean change = false;
+    private boolean skip = false;
+
 
     @Override
     public void init() {
@@ -131,7 +134,7 @@ public class RedFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.PREPARE, () -> {
             if (pathTimer.milliseconds() > 2800) {
-                index.autoFeed();
+                index.autoFeedFar();
                 intake.autoTake();
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             }
@@ -142,6 +145,7 @@ public class RedFar extends OpMode {
             follower.followPath(paths.TAKE_HUMAN);
             shooter.lowerBarrier();
             number++;
+            change = true;
             return null;
         });
 
@@ -161,8 +165,11 @@ public class RedFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return AutoStates.WAIT;
+            if (!follower.isBusy() && !skip) {
+                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+            }else if (!follower.isBusy() && skip){
+                return handleShoot(AutoStates.WAIT, 700, true);
+
             }
             return null;
         });
@@ -170,6 +177,7 @@ public class RedFar extends OpMode {
         fsm.onStateEnter(AutoStates.CENTER_LAST_ROW, () -> {
             follower.followPath(paths.CENTER_LAST_ROW);
             shooter.lowerBarrier();
+            skip = true;
             return null;
         });
 
@@ -204,7 +212,7 @@ public class RedFar extends OpMode {
         fsm.onStateUpdate(AutoStates.GO_SHOOT_LAST_ROW, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+                return handleShoot(AutoStates.WAIT, 700, true);
             }
             return null;
         });
@@ -260,7 +268,7 @@ public class RedFar extends OpMode {
             intake.autoTake();
             int choice = limelight.choice(limelight.getSelectedPath(), true);
             if (!follower.isBusy()) {
-                if (autoTimer.milliseconds() > 28000) {
+                if (autoTimer.milliseconds() > 26000) {
                     return handleShoot(AutoStates.PARK, 700, true);
                 } else if (number < 5 && choice == 1) {
                     AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);

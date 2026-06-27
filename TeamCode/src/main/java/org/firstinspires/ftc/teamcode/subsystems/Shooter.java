@@ -37,9 +37,6 @@ public class Shooter {
 //
         flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,12.41));
         flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,12.41));
-
-
-        lowerBarrier();
     }
     public void update(){
 //        SimpleMotorFeedforward ff = new SimpleMotorFeedforward(ks, kv, ka);
@@ -75,7 +72,7 @@ public class Shooter {
 //            ticks = 1490;
 //        }
         if (blue && far){
-            ticks -= 105;
+            ticks -= 75;
         }
         this.ticks = ticks;
     }

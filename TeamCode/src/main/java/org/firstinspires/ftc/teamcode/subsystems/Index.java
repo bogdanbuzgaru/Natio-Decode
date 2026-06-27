@@ -16,7 +16,6 @@ public class Index {
         indexMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         indexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         indexMove = hardwareMap.get(Servo.class, "indexMove");
-        indexMove.setPosition(0.47);
     }
 
     public void setLower(boolean lower) {
@@ -53,6 +52,11 @@ public class Index {
     public void autoFeed(){
         indexMotor.setPower(1);
     }
+
+
+    public void autoFeedFar(){
+        indexMotor.setPower(0.75);
+    }
     public void stop(){
         indexMotor.setPower(0);
     }
@@ -60,4 +64,4 @@ public class Index {
         indexMotor.setPower(value);
     }
 }
-//Davidescu
+//Davidescu e un tigan

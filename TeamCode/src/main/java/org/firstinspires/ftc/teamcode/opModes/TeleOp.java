@@ -77,7 +77,6 @@ public class TeleOp extends OpMode {
         follower.setStartingPose(startPose);
         follower.setPose(startPose);
         rgbLed = hardwareMap.get(ServoImplEx.class, "RGB");
-        rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
         pos = new Position(startPose);
         turret = new Turret(hardwareMap);
         if(isRed == 1){
@@ -98,8 +97,8 @@ public class TeleOp extends OpMode {
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
         distanceSensor2 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor2");
         distanceSensor3 = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor3");
-        shooter.lowerHood();
-        shooter.middleBar();
+//        shooter.lowerHood();
+//        shooter.middleBar();
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
 //        colorSensor2.enableLed(true);
 
@@ -107,6 +106,9 @@ public class TeleOp extends OpMode {
     }
     public void start(){
         bombTimer.reset();
+        rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        shooter.lowerHood();
+        shooter.middleBar();
     }
 
     public void loop() {
@@ -131,7 +133,7 @@ public class TeleOp extends OpMode {
 //        pos.whereToShoot(gamepad2);
         // Lift Toggle
         if (gamepad1.dpadDownWasPressed()) {
-            if (park)
+            if (park == true)
                 lift.lift();
             else lift.lower();
                 park = !park;
@@ -177,7 +179,7 @@ public class TeleOp extends OpMode {
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 720.04194) + 120, follower.getPose().getY() < 50, true);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + 120, follower.getPose().getY() < 50, true);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -186,7 +188,7 @@ public class TeleOp extends OpMode {
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 720.04194) + addOn + 120, follower.getPose().getY() < 50, true);
+            shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + addOn + 120, follower.getPose().getY() < 50, true);
             turret.setTargetAngle(pos.target());//+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
@@ -229,6 +231,9 @@ public class TeleOp extends OpMode {
             double distance = distanceSensor.getDistance(DistanceUnit.CM);
             double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
             double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+            if(gamepad2.squareWasPressed()){
+                return State.E_BILE;
+            }
             if (timer.milliseconds() >= 450) {
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
                         && (distance < 6 && distance2 < 6 && distance3 < 15))

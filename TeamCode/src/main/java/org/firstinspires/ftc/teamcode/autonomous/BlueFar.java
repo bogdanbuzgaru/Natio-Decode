@@ -57,6 +57,7 @@ public class BlueFar extends OpMode {
     private Position pos;
     private Limelight limelight;
     private int choice;
+    private boolean skip = false;
     private ElapsedTime autoTimer;
 
     @Override
@@ -89,11 +90,11 @@ public class BlueFar extends OpMode {
         pos.update(follower.getPose());
         fsm.update();
         if (!change)
-            turret.angleToPos(-78.82);
+            turret.angleToPos(-79.42);
         else {
-            turret.angleToPos(-75.68);
+            turret.angleToPos(-74.78);
         }
-        shooter.setTicks(1500, false, false);
+        shooter.setTicks(1490, false, false);
         shooter.updateMotor();
         index.normalIndex();
         telemetry.addData("has target", limelight.hasTarget());
@@ -136,7 +137,7 @@ public class BlueFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.PREPARE, () -> {
             if (pathTimer.milliseconds() > 2800) {
-                index.autoFeed();
+                index.autoFeedFar();
                 intake.autoTake();
                 return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
             }
@@ -167,8 +168,11 @@ public class BlueFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
+            if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+            }else if (!follower.isBusy() && skip){
+                return handleShoot(AutoStates.WAIT, 700, true);
+
             }
             return null;
         });
@@ -176,6 +180,7 @@ public class BlueFar extends OpMode {
         fsm.onStateEnter(AutoStates.CENTER_LAST_ROW, () -> {
             follower.followPath(paths.CENTER_LAST_ROW);
             shooter.lowerBarrier();
+            skip = true;
             return null;
         });
 
@@ -266,7 +271,7 @@ public class BlueFar extends OpMode {
             intake.autoTake();
             int choice = limelight.choice(limelight.getSelectedPath(), true);
             if (!follower.isBusy()) {
-                if (autoTimer.milliseconds() > 28000) {
+                if (autoTimer.milliseconds() > 26000) {
                     return handleShoot(AutoStates.PARK, 700, true);
                 } else if (number < 5 && choice == 1) {
                     AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);

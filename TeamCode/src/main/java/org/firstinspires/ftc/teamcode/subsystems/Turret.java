@@ -18,8 +18,6 @@ public class Turret {
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
-
-        goNeutral();
     }
     public void setBlue(boolean blue){
         this.blue = blue;

@@ -58,7 +58,7 @@ public class RedClose extends OpMode {
     private int goalCyclesDone = 0;
     private int GOAL_CYCLES = 2;
     private ElapsedTime auto;
-    private final int SHOOT_FIRST_MS = 700, SHOOT_MS = 1000, WAIT_MS = 700;
+    private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 700;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(106.07, 132.1935, Math.toRadians(0)));
@@ -179,7 +179,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
-            intake.autoTake();
+            intake.leaveGate();
             index.autoFeed();
             if (!follower.isBusy()) {
                 return gate(AutoState.SHOOT_GOAL, WAIT_MS);
@@ -194,7 +194,7 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
-            intake.autoTake();
+            intake.leaveGate();
             if (!follower.isBusy()) {
                 if (goalCyclesDone <= GOAL_CYCLES) {
                     return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
@@ -343,7 +343,7 @@ public class RedClose extends OpMode {
                                         new Pose(84.000, 84.000),
                                         new Pose(95.000, 65.000),
                                         new Pose (128.900, 62.000),
-                                        new Pose(132.100, 60.000)
+                                        new Pose(131.800, 60.000)
                                 )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(18.9))
                             .build()
@@ -351,7 +351,7 @@ public class RedClose extends OpMode {
 
             SHOOT_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(132.100, 60.000),
+                                            new Pose(131.800, 60.000),
                                             new Pose(100.255, 67.783),
                                             new Pose(84.000, 84.000)
                                     )

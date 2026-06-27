@@ -24,6 +24,9 @@ public class Intake {
     public void autoTake(){
         intakeMotor.setPower(1);
     }
+    public void leaveGate(){
+        intakeMotor.setPower(0.65);
+    }
     public void spit(){
         intakeMotor.setPower(-1);
     }
