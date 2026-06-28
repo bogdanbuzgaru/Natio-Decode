@@ -50,6 +50,7 @@ public class TeleOp extends OpMode {
     private boolean park = true;
     private int angle = 0;
     private double tick;
+    private double redBase = 790.04194;
     private ElapsedTime timer = new ElapsedTime();
     public static Follower follower;
     private int offset = 0;
@@ -86,7 +87,6 @@ public class TeleOp extends OpMode {
             pos.setBlue();
             turret.setBlue(true);
         }
-
 
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -138,6 +138,7 @@ public class TeleOp extends OpMode {
             else lift.lower();
                 park = !park;
         }
+        redBase = tick + 790.04194;
         if (lowerSpeed){
             index.setValue(0.59);
         }else{
@@ -175,7 +176,7 @@ public class TeleOp extends OpMode {
             add = !add;
         }
         if (pos.isRed() && !add) {
-            shooter.setTicks(pos.getTicks(6.89911, 790.04194), follower.getPose().getY() < 50, false);
+            shooter.setTicks(pos.getTicks(6.89911, redBase), follower.getPose().getY() < 50, false);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && !add) {
@@ -184,7 +185,7 @@ public class TeleOp extends OpMode {
             turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         }
         if (pos.isRed() && add) {
-            shooter.setTicks(pos.getTicks(6.89911, 790.04194) + addOn, follower.getPose().getY() < 50, false);
+            shooter.setTicks(pos.getTicks(6.89911, redBase) + addOn, follower.getPose().getY() < 50, false);
             turret.setTargetAngle(pos.target()); //+ angle if needed
             turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         } else if (pos.isBlue() && add) {
@@ -211,9 +212,9 @@ public class TeleOp extends OpMode {
         index.setLower(distanceSensor.getDistance(DistanceUnit.CM) < 6 && distanceSensor2.getDistance(DistanceUnit.CM) < 7);
     }
     private void increaseDecrease(){
-        if(gamepad2.right_trigger > 0.01){
+        if(gamepad2.right_trigger > 0.2){
             tick = 100;
-        }else if (gamepad2.left_trigger > 0.01){
+        }else if (gamepad2.left_trigger > 0.2){
             tick = -120;
         }else{
             tick = 0;
@@ -370,7 +371,7 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        144 - 1.38, 20.934,    //our human player w/ ext
+                        142.1786, 19.9337,    //our human player w/ ext
                         Math.toRadians(180)
                 ));
                 manual = false;

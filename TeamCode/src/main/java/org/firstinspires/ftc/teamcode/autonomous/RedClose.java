@@ -88,10 +88,13 @@ public class RedClose extends OpMode {
 //                AngleUnit.DEGREES,
 //                Math.toDegrees(follower.getHeading())));
 
+
 //        turret.setAuto();
         pos.update(follower.getPose());
         index.normalIndex();
-        turret.angleToPos(55);
+        turret.angleToPos(54.5);
+//        turret.setTargetAngle(pos.target()); //+ angle if needed
+//        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         shooter.setTicks(1180, false, false);
         shooter.update();
         if(auto.seconds() > 31.9){
@@ -314,7 +317,7 @@ public class RedClose extends OpMode {
                             new BezierCurve(
                                     new Pose(84.000, 84.000),
                                     new Pose(84.322, 51.681),
-                                    new Pose(118.434, 60.000)
+                                    new Pose(115.434, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
@@ -322,7 +325,7 @@ public class RedClose extends OpMode {
 
             SHOOT_SECOND = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(118.434, 60.000),
+                                            new Pose(115.434, 60.000),
                                             new Pose(115.000, 62.000),
                                             new Pose(99.000, 65.000),
                                             new Pose(94.000, 72.000),
@@ -342,8 +345,8 @@ public class RedClose extends OpMode {
                                 new BezierCurve(
                                         new Pose(84.000, 84.000),
                                         new Pose(95.000, 65.000),
-                                        new Pose (128.900, 62.000),
-                                        new Pose(131.800, 60.000)
+                                        new Pose (124.200, 62.000),
+                                        new Pose(127.000, 60.000)
                                 )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(18.9))
                             .build()
@@ -351,7 +354,7 @@ public class RedClose extends OpMode {
 
             SHOOT_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(131.800, 60.000),
+                                            new Pose(127.000, 60.000),
                                             new Pose(100.255, 67.783),
                                             new Pose(84.000, 84.000)
                                     )

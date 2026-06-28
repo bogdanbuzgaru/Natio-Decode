@@ -59,7 +59,7 @@ public class RedFar extends OpMode {
     private ElapsedTime autoTimer;
     private boolean change = false;
     private boolean skip = false;
-
+    private boolean add = false;
 
     @Override
     public void init() {
@@ -90,8 +90,11 @@ public class RedFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-        turret.angleToPos(85.82);
-        shooter.setTicks(1500, false, false);
+//        turret.angleToPos(85.82);
+        turret.setTargetAngle(pos.target()); //+ angle if needed
+        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+        turret.update();
+        shooter.setTicks(1590, false, false);
         shooter.updateMotor();
         index.normalIndex();
         telemetry.addData("has target", limelight.hasTarget());
@@ -133,10 +136,10 @@ public class RedFar extends OpMode {
         });
 
         fsm.onStateUpdate(AutoStates.PREPARE, () -> {
-            if (pathTimer.milliseconds() > 2800) {
+            if (pathTimer.milliseconds() > 1400) {
                 index.autoFeedFar();
                 intake.autoTake();
-                return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+                return handleShoot(AutoStates.TAKE_HUMAN, 600, true);
             }
             return null;
         });
@@ -144,8 +147,8 @@ public class RedFar extends OpMode {
         fsm.onStateEnter(AutoStates.TAKE_HUMAN, () -> {
             follower.followPath(paths.TAKE_HUMAN);
             shooter.lowerBarrier();
-            number++;
             change = true;
+            number++;
             return null;
         });
 
@@ -166,10 +169,16 @@ public class RedFar extends OpMode {
         fsm.onStateUpdate(AutoStates.GO_SHOOT_HU, () -> {
             intake.autoTake();
             if (!follower.isBusy() && !skip) {
-                return handleShoot(AutoStates.CENTER_LAST_ROW, 700, true);
+                return handleShoot(AutoStates.CENTER_LAST_ROW, 600, true);
             }else if (!follower.isBusy() && skip){
-                return handleShoot(AutoStates.WAIT, 700, true);
-
+                if (!follower.isBusy() && number < 6 && number % 4 == 0) {
+                    return handleShoot(AutoStates.TAKE_HUMAN, 600, true);
+                }else if (!follower.isBusy() && number < 6) {
+                    add = true;
+                    return handleShoot(AutoStates.CENTER_LAST_ROW, 600, true);
+                }else if (!follower.isBusy()){
+                    return handleShoot(AutoStates.PARK, 600, true);
+                }
             }
             return null;
         });
@@ -178,6 +187,9 @@ public class RedFar extends OpMode {
             follower.followPath(paths.CENTER_LAST_ROW);
             shooter.lowerBarrier();
             skip = true;
+            if (add == true){
+                number++;
+            }
             return null;
         });
 
@@ -211,8 +223,10 @@ public class RedFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.GO_SHOOT_LAST_ROW, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
-                return handleShoot(AutoStates.WAIT, 700, true);
+            if (!follower.isBusy() && number < 5) {
+                return handleShoot(AutoStates.TAKE_HUMAN, 500, true);
+            }else if (!follower.isBusy()){
+                return AutoStates.PARK;
             }
             return null;
         });
@@ -225,6 +239,9 @@ public class RedFar extends OpMode {
         fsm.onStateUpdate(AutoStates.ROTATE, () -> {
             intake.autoTake();
             int choice = limelight.choice(limelight.getSelectedPath(), true);
+//            if(autoTimer.seconds() > 24){
+//                return AutoStates.WAIT;
+//            }
             if (!follower.isBusy() && (choice == 2 || choice == 1)) {
                 return AutoStates.TAKE_RANDOM;
             }
@@ -261,6 +278,7 @@ public class RedFar extends OpMode {
 
         fsm.onStateEnter(AutoStates.WAIT, () -> {
             shooter.lowerBarrier();
+            number++;
             return null;
         });
 
@@ -268,20 +286,19 @@ public class RedFar extends OpMode {
             intake.autoTake();
             int choice = limelight.choice(limelight.getSelectedPath(), true);
             if (!follower.isBusy()) {
-                if (autoTimer.milliseconds() > 26000) {
-                    return handleShoot(AutoStates.PARK, 700, true);
-                } else if (number < 5 && choice == 1) {
+                if (autoTimer.milliseconds() > 28000 || number >= 5) {
+                    return AutoStates.PARK;
+//                } else if (number < 5 && choice == 1) {
+//                    AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+//                    if (next != null) number++;
+//                    return next;
+                } else if (number < 5) {
                     AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
-                    if (next != null) number++;
-                    return next;
-                } else if (number < 5 && choice == 2) {
-                    AutoStates next = handleShoot(AutoStates.TAKE_HUMAN, 700, true);
-                    if (next != null) number++;
-                    return next;
-                } else if (autoTimer.milliseconds() < 27000 && choice == 0) {
-                    AutoStates next = handleShoot(AutoStates.ROTATE, 700, true);
-                    if (next != null) number++;
-                    return next;
+                    return handleShoot(AutoStates.TAKE_HUMAN, 700, true);
+//                } else if (autoTimer.milliseconds() < 27000 && choice == 0) {
+//                    AutoStates next = handleShoot(AutoStates.ROTATE, 700, true);
+//                    if (next != null) number++;
+//                    return next;
                 }
             }
             return null;
@@ -311,14 +328,14 @@ public class RedFar extends OpMode {
             GO_SHOOT_HU = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(134.000, 11.000),
-                            new Pose(85.000, 15.000)
+                            new Pose(89.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             CENTER_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(85.000, 15.000),
+                            new Pose(89.000, 15.000),
                             new Pose(104.800, 35.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -335,14 +352,14 @@ public class RedFar extends OpMode {
             GO_SHOOT_LAST_ROW = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(127.000, 36.000),
-                            new Pose(85.000, 15.000)
+                            new Pose(89.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             ROTATE = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(85.000, 15.000),
+                            new Pose(89.000, 15.000),
                             new Pose(92.000, 16.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))

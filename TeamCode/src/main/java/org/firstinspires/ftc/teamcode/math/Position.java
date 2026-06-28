@@ -130,7 +130,7 @@ public class Position {
     public double target(){
         double targetHead = 0;
         if(red){
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(136 - pose.getX())));
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(142 - pose.getX())));
         }else{
             targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - 8)));
         }

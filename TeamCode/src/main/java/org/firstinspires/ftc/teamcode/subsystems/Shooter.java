@@ -23,6 +23,7 @@ public class Shooter {
     private double voltagee;
     private final double pCoef = 330;
     private boolean far;
+    private int ti;
     public static  double ks = 0.226, kv = 0.0021039446333333, ka = 0.005, kp = 0.05, velocity, nominalVoltage = 11.2;
     public Shooter (HardwareMap hardwareMap){
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
@@ -61,6 +62,10 @@ public class Shooter {
         this.voltagee = voltagee;
     }
 
+    public void setTi(int ti) {
+        this.ti = ti;
+    }
+
     public void updateMotor(){
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
@@ -71,9 +76,6 @@ public class Shooter {
 //        if(far){
 //            ticks = 1490;
 //        }
-        if (blue && far){
-            ticks -= 75;
-        }
         this.ticks = ticks;
     }
 
@@ -93,7 +95,7 @@ public class Shooter {
     private void adaptiveHood(){
         double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
         if(flywheelMotor1.getVelocity()  <= 950){
-            targetHood = 0;
+            targetHood = 0.3;
         }else if (flywheelMotor1.getVelocity() <= 1500) {
             targetHood = 0.8 * ((ticks - 950) / 550) + 0.2;
         }else{
@@ -103,8 +105,8 @@ public class Shooter {
         hood.setPosition(targetHood);
     }
     public void lowerBarrier(){
-        barrier.setPosition(0.53);
-    }
+        barrier.setPosition(0.48);
+    }//53
     public void raiseBarrier(){
         barrier.setPosition(0.1);
     }
