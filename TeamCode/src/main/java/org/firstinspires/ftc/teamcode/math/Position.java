@@ -5,6 +5,7 @@ import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
 
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -34,6 +35,8 @@ public class Position {
     private boolean blue = false;
     private boolean red = true;
     private boolean shootClose = true;
+    private boolean changeOrientation = false;
+    private PathChain fastPark;
 
     public Position (Pose pose){
         this.pose = pose;
@@ -99,31 +102,40 @@ public class Position {
         if(red)
             return Math.toDegrees(Math.atan2(130 - pose.getY(), 130 - pose.getX()));
         else
-            return Math.toDegrees(Math.atan2(130 - pose.getY(), Math.abs(pose.getX()) - 14));   //TODO this - change +
+            return Math.toDegrees(Math.atan2(130 - pose.getY(), Math.abs(pose.getX()) - 14));
     }
 
 
-    public double getTargetAngle(){
+    public double getTargetAngle(Gamepad gamepad){
         double targetHead = 0;
-//        if(!changeCord) {
-        if (red && pose.getY() >= 65)
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()),Math.abs(130 - pose.getX())));
-
-        else if (red && pose.getY() < 65 && heading < 90 && heading > -90)
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(133 - pose.getX())));
-        else if (red && pose.getY() < 65 && heading >= 90 && heading <= -90)
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(160 - pose.getX())));
-
-        else if (blue && pose.getY() >= 65){
-            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(135 - pose.getY()), Math.abs(pose.getX() - 14)));
+        if(gamepad.rightBumperWasPressed()){
+            changeOrientation = !changeOrientation;
         }
-        else if (blue && pose.getY() < 65 && heading >= 90 && heading <= -90)
-            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() + 3)));
-
-        else if (blue && pose.getY() < 65 && heading < 90 && heading > -90)
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(138 - pose.getY()),Math.abs(pose.getX() - 16)));
-
-
+        if(pose.getY() > 35){
+            changeOrientation = false;
+        }
+        if(pose.getY() < -48){
+            changeOrientation = true;
+        }
+        if(!changeOrientation) {
+            if (pose.getY() > - 48 && red) {
+                targetHead = Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(142 - pose.getX())));
+            } else if (pose.getY() > - 48 && !red){
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - 8)));
+            }else {
+                if(pose.getX() < 72){
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)));      //TODO is 144 + getY because of negative sign
+                }else{
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)));      //TODO is 144 + getY because of negative sign
+                }
+            }
+        }else{
+            if(pose.getX() < 72){
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)));      //TODO is 144 + getY because of negative sign
+            }else{
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)));      //TODO is 144 + getY because of negative sign
+            }
+        }
         double error = targetHead - heading;
         return error;
     }
@@ -273,7 +285,8 @@ public class Position {
     public boolean activateOrientation(){
         double hypoHigh = Math.hypot(Math.abs(72 - pose.getX()), 144 - pose.getY());
         double hypoLow = Math.hypot(Math.abs(72 - pose.getX()), pose.getY());
-        return hypoHigh <= 90 || hypoLow <= 50;
+        double hypoCom = Math.hypot(Math.abs(72 - pose.getX()), -72 + pose.getY());
+        return hypoHigh <= 90 || hypoLow <= 50 || (hypoCom <= 50 && pose.getY() <= - 48);
     }
     public void chooseAlliance(Gamepad gamepad){
         if(gamepad.leftBumperWasPressed()){
@@ -286,13 +299,20 @@ public class Position {
     }
     public int getTicks(double slope, double extra){
         double hypo = Math.hypot(Math.abs(130 - pose.getX()), Math.abs(130 - pose.getY()));
-        double add = hypo / 3 * (180 - Math.abs(Math.toDegrees(pose.getHeading())));
-        return (int)((int) slope * hypo + extra);
+        double neu = Math.hypot(Math.abs(72 - pose.getX()), Math.abs(-120 + pose.getY()));
+//        double add = hypo / 3 * (180 - Math.abs(Math.toDegrees(pose.getHeading())));
+        if(!changeOrientation)
+            return (int)((int) slope * hypo + extra);
+        else
+            return (int)((int) slope * neu  + extra);
     }
     public int getTicksBlue(double slope, double extra){
         double hypo = Math.hypot(Math.abs(pose.getX() - 14), Math.abs(130 - pose.getY()));
-
-        return (int)((int) slope * hypo + extra);
+        double neu = Math.hypot(Math.abs(72 - pose.getX()), Math.abs(-120 + pose.getY()));
+        if(!changeOrientation)
+            return (int)((int) slope * hypo + extra);
+        else
+            return (int)((int) slope * neu  + extra);
     }
     public void whereToShoot(Gamepad gamepad){
         if(gamepad.dpadLeftWasPressed()){

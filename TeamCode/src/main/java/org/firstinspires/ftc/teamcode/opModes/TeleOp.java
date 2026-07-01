@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -57,7 +60,9 @@ public class TeleOp extends OpMode {
     private ElapsedTime bombTimer = new ElapsedTime();
     private double isRed;
     private boolean lowerSpeed = false;
+    private boolean parking = false;
 
+    private PathChain autoPark;
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
@@ -158,7 +163,13 @@ public class TeleOp extends OpMode {
         }else{
             shooter.lowerBarrier();
         }
-        if (pos.activateOrientation() && !manual)
+        if(gamepad1.dpadRightWasPressed()){
+            parking = !parking;
+        }
+        if(parking){
+            turret.angleToPos(90);
+        }
+        if (pos.activateOrientation() && !manual && !parking)
             turret.update();
         if (manual) {
             turret.goNeutral();
@@ -175,31 +186,57 @@ public class TeleOp extends OpMode {
         if(gamepad1.dpadRightWasPressed()){
             add = !add;
         }
-        if (pos.isRed() && !add) {
-            shooter.setTicks(pos.getTicks(6.89911, redBase), follower.getPose().getY() < 50, false);
-            turret.setTargetAngle(pos.target()); //+ angle if needed
-            turret.setHeading(Math.toDegrees(follower.getHeading()), true);
-        } else if (pos.isBlue() && !add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + 120, follower.getPose().getY() < 50, true);
-            turret.setTargetAngle(pos.target());//+ angle if needed
-            turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+        if(!parking) {
+            if (pos.isRed() && !add) {
+                shooter.setTicks(pos.getTicks(6.89911, redBase), follower.getPose().getY() < 50, false);
+                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+            } else if (pos.isBlue() && !add) {
+                shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + 120, follower.getPose().getY() < 50, true);
+                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+            }
+            if (pos.isRed() && add) {
+                shooter.setTicks(pos.getTicks(6.89911, redBase) + addOn, follower.getPose().getY() < 50, false);
+                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+            } else if (pos.isBlue() && add) {
+                shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + addOn + 120, follower.getPose().getY() < 50, true);
+                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+            }
+            shooter.update();
+        }else if (parking && isRed == 1){
+            autoPark = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
+                            new Pose (33.000, 35.000)
+                    ))
+                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(135))
+                    .build();
+            follower.followPath(autoPark);
+            if(!follower.isBusy()){
+                lift.lift();
+            }
+        }else if (parking && isRed == 0){
+            autoPark = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
+                            new Pose (111.000, 35.000)
+                    ))
+                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(45))
+                    .build();
+            follower.followPath(autoPark);
+            if(!follower.isBusy()){
+                lift.lift();
+            }
         }
-        if (pos.isRed() && add) {
-            shooter.setTicks(pos.getTicks(6.89911, redBase) + addOn, follower.getPose().getY() < 50, false);
-            turret.setTargetAngle(pos.target()); //+ angle if needed
-            turret.setHeading(Math.toDegrees(follower.getHeading()), true);
-        } else if (pos.isBlue() && add) {
-            shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + addOn + 120, follower.getPose().getY() < 50, true);
-            turret.setTargetAngle(pos.target());//+ angle if needed
-            turret.setHeading(Math.toDegrees(follower.getHeading()), false);
-        }
-        shooter.update();
+
 
         // Telemetry
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading (Deg)", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("Target Angle", pos.getTargetAngle());
         telemetry.addData("Shooter Velocity", shooter.getTicks());
         telemetry.addData("increased angle", angle);
         telemetry.addData("First servo position", turret.getPosition1());
