@@ -348,7 +348,7 @@ public class RedClose extends OpMode {
                                         new Pose (124.200, 62.000),
                                         new Pose(127.000, 60.000)
                                 )
-                            ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(18.9))
+                            ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(15.9))
                             .build()
             );
 
@@ -358,7 +358,7 @@ public class RedClose extends OpMode {
                                             new Pose(100.255, 67.783),
                                             new Pose(84.000, 84.000)
                                     )
-                            ).setLinearHeadingInterpolation(Math.toRadians(18.9), Math.toRadians(0))
+                            ).setLinearHeadingInterpolation(Math.toRadians(15.9), Math.toRadians(0))
                             .build()
             );
 //            PREPARE_LAST_ROW = follower.pathBuilder().addPath(

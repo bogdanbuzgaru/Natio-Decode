@@ -343,7 +343,7 @@ public class BlueClose extends OpMode {
                                     new Pose(27.000, 65.000),
                                     new Pose (13.700, 60.300)
                                     )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(161.1))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(164.1))
                     .build()
             );
 
@@ -353,7 +353,7 @@ public class BlueClose extends OpMode {
                                     new Pose(43.745, 67.783),
                                     new Pose(60.000, 84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(161.1), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(164.1), Math.toRadians(180))
                     .build()
             );
 //            PREPARE_LAST_ROW = follower.pathBuilder().addPath(
