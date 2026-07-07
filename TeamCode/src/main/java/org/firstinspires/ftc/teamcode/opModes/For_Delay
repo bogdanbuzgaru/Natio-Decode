@@ -1,0 +1,60 @@
+Nice job catching those first two! Forcing the `PathChain` generation into a single-frame trigger and caching those blocking distance sensor reads are massive wins for your loop times.
+
+To fix the 3rd problem—**enabling Hub Bulk Reads**—you need to configure your REV Hubs to operate in `MANUAL` caching mode. This tells the hardware to take a single "snapshot" of all inputs (motor encoders, digital pins, analog sensors) at the very beginning of the loop, rather than making slow individual data round-trips every time your code calls a method like `motor.getCurrentPosition()`.
+
+Here is exactly how to integrate it into your current class structure:
+
+### Step 1: Declare the Hub List
+
+At the top of your `TeleOp` class, declare a variable to hold your REV Hub modules alongside your other subsystems:
+
+```java
+private List<LynxModule> allHubs;
+
+```
+
+### Step 2: Configure Manual Mode in `init()`
+
+Inside your `init()` method, retrieve all the hubs from the hardware map and set their caching mode to `MANUAL`. Place this at the very beginning of `init()`:
+
+```java
+@Override
+public void init() {
+    // 1. Enable Manual Bulk Caching on Hubs immediately
+    allHubs = hardwareMap.get(LynxModule.class);
+    for (LynxModule hub : allHubs) {
+        hub.setBulkCachingMode(LynxModule.CachingMode.MANUAL);
+    }
+
+    // 2. Your existing file reading and subsystem initialization continues below...
+    File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
+    // ... rest of init code
+}
+
+```
+
+### Step 3: Clear the Cache at the Start of `loop()`
+
+Because you are using `MANUAL` mode, the hubs will hold onto that sensor snapshot forever until you explicitly tell them to clear it. You must clear the cache at the **very first line** of your `loop()` method so that the robot takes a fresh snapshot for the current cycle:
+
+```java
+@Override
+public void loop() {
+    // Clear Bulk Cache at the absolute start of every loop iteration
+    for (LynxModule hub : allHubs) {
+        hub.clearBulkCache();
+    }
+
+    // Your existing loop code continues below...
+    follower.update();
+    pos.update(follower.getPose());
+    // ... rest of loop code
+}
+
+```
+
+### Why this finishes the job:
+
+Now, when Pedro Pathing reads motor encoders to calculate its position, and when your state machine checks your subsystems, they will instantly read from the fast local RAM cache instead of stalling the CPU to talk to the hardware chips.
+
+Combined with your sensor caching and path fixes, your loop times should plummet right into the single digits (under 10ms), entirely eliminating your joystick input delay!

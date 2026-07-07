@@ -61,8 +61,9 @@ public class TeleOp extends OpMode {
     private double isRed;
     private boolean lowerSpeed = false;
     private boolean parking = false;
-
+    private ElapsedTime checkArt = new ElapsedTime();
     private PathChain autoPark;
+    public double distance, distance2, distance3;
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
@@ -114,6 +115,7 @@ public class TeleOp extends OpMode {
         rgbLed.setPwmRange(new PwmControl.PwmRange(500, 2500));
         shooter.lowerHood();
         shooter.middleBar();
+        checkArt.reset();
     }
 
     public void loop() {
@@ -140,8 +142,9 @@ public class TeleOp extends OpMode {
         if (gamepad1.dpadDownWasPressed()) {
             if (park == true)
                 lift.lift();
-            else lift.lower();
-                park = !park;
+            else
+                lift.lower();
+            park = !park;
         }
         redBase = tick + 790.04194;
         if (lowerSpeed){
@@ -206,30 +209,30 @@ public class TeleOp extends OpMode {
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
             }
             shooter.update();
-        }else if (parking && isRed == 1){
-            autoPark = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
-                            new Pose (33.000, 35.000)
-                    ))
-                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(135))
-                    .build();
-            follower.followPath(autoPark);
-            if(!follower.isBusy()){
-                lift.lift();
-            }
-        }else if (parking && isRed == 0){
-            autoPark = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
-                            new Pose (111.000, 35.000)
-                    ))
-                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(45))
-                    .build();
-            follower.followPath(autoPark);
-            if(!follower.isBusy()){
-                lift.lift();
-            }
+//        }else if (parking && isRed == 1){
+//            autoPark = follower.pathBuilder()
+//                    .addPath(new BezierLine(
+//                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
+//                            new Pose (33.000, 35.000)
+//                    ))
+//                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(135))
+//                    .build();
+//            follower.followPath(autoPark);
+//            if(!follower.isBusy()){
+//                lift.lift();
+//            }
+//        }else if (parking && isRed == 0){
+//            autoPark = follower.pathBuilder()
+//                    .addPath(new BezierLine(
+//                            new Pose(follower.getPose().getX(), follower.getPose().getY()),
+//                            new Pose (111.000, 35.000)
+//                    ))
+//                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(45))
+//                    .build();
+//            follower.followPath(autoPark);
+//            if(!follower.isBusy()){
+//                lift.lift();
+//            }
         }
 
 
@@ -266,9 +269,12 @@ public class TeleOp extends OpMode {
 //            else{
 //                return State.BOMB;
 //            }
-            double distance = distanceSensor.getDistance(DistanceUnit.CM);
-            double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-            double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+            if(checkArt.milliseconds() >= 75) {
+                distance = distanceSensor.getDistance(DistanceUnit.CM);
+                distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+                distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+                checkArt.reset();
+            }
             if(gamepad2.squareWasPressed()){
                 return State.E_BILE;
             }
