@@ -53,7 +53,7 @@ public class BlueNeutral {
     public void init() {
         follower = Constants.createFollower(hardwareMap);
         // 84.000 -> 144 - 84 = 60.000
-        follower.setStartingPose(new Pose(60.000, -116.000, Math.toRadians(144.2)));
+        follower.setStartingPose(new Pose(68.3008759378, -111.056875942, Math.toRadians(35.8)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -239,87 +239,87 @@ public class BlueNeutral {
         public Paths (Follower follower){
             SHOOT_PRELOAD = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(60.000, -116.000), // 84 -> 60
-                                    new Pose(48.000, -96.000)   // 96 -> 48
+                                    new Pose(68.3008759378, -111.056875942),
+                                    new Pose(48.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144.2), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(35.8), Math.toRadians(180))
                     .build()
             );
             TAKE_FIRST = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(48.000, -96.000),  // 96 -> 48
-                                    new Pose(39.000, -88.000),  // 105 -> 39
-                                    new Pose(17.000, -84.000)   // 127 -> 17
+                                    new Pose(48.000, -96.000),
+                                    new Pose(39.000, -88.000),
+                                    new Pose(17.000, -84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             SHOOT_FIRST = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(17.000, -84.000),  // 127 -> 17
-                                    new Pose(48.000, -84.000)   // 96 -> 48
+                                    new Pose(17.000, -84.000),
+                                    new Pose(48.000, -84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             TAKE_SECOND = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(48.000, -84.000),  // 96 -> 48
-                                    new Pose(39.000, -66.000),  // 105 -> 39
-                                    new Pose(17.000, -60.000)   // 127 -> 17
+                                    new Pose(48.000, -84.000),
+                                    new Pose(39.000, -66.000),
+                                    new Pose(17.000, -60.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             SHOOT_SECOND = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(17.000, -60.000),  // 127 -> 17
-                                    new Pose(39.000, -105.000), // 105 -> 39
-                                    new Pose(48.000, -72.000)   // 96 -> 48
+                                    new Pose(17.000, -60.000),
+                                    new Pose(39.000, -105.000),
+                                    new Pose(48.000, -72.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-90))
                     .build()
             );
             TAKE_THIRD = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(48.000, -72.000),  // 96 -> 48
-                                    new Pose(39.000, -50.000),  // 105 -> 39
-                                    new Pose(17.000, -36.000)   // 127 -> 17
+                                    new Pose(48.000, -72.000),
+                                    new Pose(39.000, -50.000),
+                                    new Pose(17.000, -36.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(180))
                     .build()
             );
             SHOOT_THIRD = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(17.000, -36.000),  // 127 -> 17
-                                    new Pose(48.000, -72.000)   // 96 -> 48
+                                    new Pose(17.000, -36.000),
+                                    new Pose(48.000, -72.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             TAKE_RANDOM = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(48.000, -72.000),  // 96 -> 48
-                                    new Pose(19.000, -122.000), // 125 -> 19
-                                    new Pose(7.500, -135.000)   // 136.5 -> 7.5
+                                    new Pose(48.000, -72.000),
+                                    new Pose(19.000, -122.000),
+                                    new Pose(7.500, -135.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
                     .build()
             );
             SHOOT_RANDOM = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(7.500, -135.000),  // 136.5 -> 7.5
-                                    new Pose(48.000, -96.000)   // 96 -> 48
+                                    new Pose(7.500, -135.000),
+                                    new Pose(48.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
                     .build()
             );
             PARK = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(48.000, -96.000),  // 96 -> 48
-                                    new Pose(19.000, -88.000)   // 125 -> 19
+                                    new Pose(48.000, -96.000),
+                                    new Pose(19.000, -88.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
         }

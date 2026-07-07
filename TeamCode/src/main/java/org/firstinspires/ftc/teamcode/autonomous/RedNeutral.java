@@ -52,7 +52,7 @@ public class RedNeutral {
 
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(84.000, -116.000, Math.toRadians(144.2)));
+        follower.setStartingPose(new Pose(75.69912406215, -111.056875942, Math.toRadians(144.2)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -238,7 +238,7 @@ public class RedNeutral {
         public Paths (Follower follower){
             SHOOT_PRELOAD = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(84.000, -116.000),
+                                    new Pose(75.69912406215, -111.056875942),
                                     new Pose(96.000, -96.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(144.2), Math.toRadians(0))

@@ -255,7 +255,7 @@ public class TeleOp extends OpMode {
         if(gamepad2.right_trigger > 0.2){
             tick = 100;
         }else if (gamepad2.left_trigger > 0.2){
-            tick = -120;
+            tick = 180;
         }else{
             tick = 0;
         }
