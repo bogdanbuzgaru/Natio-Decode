@@ -8,6 +8,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import java.io.File;
 
 @Autonomous
-public class RedNeutral {
+public class RedNeutral extends OpMode {
     public enum AutoStates {
         SHOOT_PRELOAD,
         TAKE_FIRST,
@@ -52,7 +53,7 @@ public class RedNeutral {
 
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(75.69912406215, -111.056875942, Math.toRadians(144.2)));
+        follower.setStartingPose(new Pose(75.69912406215, -111.056875942, Math.toRadians(-144.2)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -72,9 +73,14 @@ public class RedNeutral {
         fsm.update();
         pos.update(follower.getPose());
         index.normalIndex();
-        turret.angleToPos(120);     //TODO change angle
-        shooter.setTicks(1180, false, false);   //TODO change ticks
+//        turret.angleToPos(120);     //TODO change angle
+        turret.setTargetAngle(pos.target()); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+        turret.update();
+        shooter.setTicks(1230, false, false);   //TODO change ticks
         shooter.update();
+
+        telemetry.addData("Angle", turret.getPosition1());
     }
     public void stop() {
         String xPose, yPose, heading;
@@ -82,7 +88,6 @@ public class RedNeutral {
         xPose = Double.toString(pose.getX());
         yPose = Double.toString(pose.getY());
         heading = Double.toString(Math.toDegrees(pose.getHeading()));
-
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         ReadWriteFile.writeFile(file, 1 + "\n" + xPose + "\n" + yPose + "\n" + heading);
 
@@ -241,7 +246,7 @@ public class RedNeutral {
                                     new Pose(75.69912406215, -111.056875942),
                                     new Pose(96.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144.2), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-144.2), Math.toRadians(0))
                     .build()
             );
             TAKE_FIRST = (follower.pathBuilder().addPath(
@@ -276,7 +281,7 @@ public class RedNeutral {
                                     new Pose(105.000, -105.000),
                                     new Pose(96.000, -72.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
             );
             TAKE_THIRD = (follower.pathBuilder().addPath(
@@ -285,7 +290,7 @@ public class RedNeutral {
                                     new Pose(105.000, -50.000),
                                     new Pose(127.000, -36.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
             );
             SHOOT_THIRD = (follower.pathBuilder().addPath(
@@ -297,20 +302,19 @@ public class RedNeutral {
                     .build()
             );
             TAKE_RANDOM = (follower.pathBuilder().addPath(
-                            new BezierCurve(
+                            new BezierLine(
                                     new Pose(96.000, -72.000),
-                                    new Pose(125.000, -122.000),
-                                    new Pose(136.500, -135.000)
+                                    new Pose(125.500, -131.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-90))
                     .build()
             );
             SHOOT_RANDOM = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(136.500, -135.000),
+                                    new Pose(125.500, -131.000),
                                     new Pose(96.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(0))
                     .build()
             );
             PARK = (follower.pathBuilder().addPath(

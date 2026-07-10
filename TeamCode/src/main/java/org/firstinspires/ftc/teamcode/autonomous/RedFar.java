@@ -365,15 +365,15 @@ public class RedFar extends OpMode {
             TAKE_RANDOM = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(92.000, 16.000),
-                            new Pose (120.900, 2.500),
-                            new Pose(134.000, -6.000)
+                            new Pose (120.900, -2.500),
+                            new Pose(134.000, -8.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(134.000, -6.000),
+                            new Pose(134.000, -8.000),
                             new Pose(89.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))

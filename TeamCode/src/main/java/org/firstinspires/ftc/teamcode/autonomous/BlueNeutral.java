@@ -8,6 +8,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import java.io.File;
 
 @Autonomous
-public class BlueNeutral {
+public class BlueNeutral extends OpMode {
     public enum AutoStates {
         SHOOT_PRELOAD,
         TAKE_FIRST,

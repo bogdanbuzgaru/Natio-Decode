@@ -124,16 +124,16 @@ public class Position {
                 targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(pose.getX())));  //was 136 for y
             }else {
                 if(pose.getX() < 72){
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)));      //TODO is 144 + getY because of negative sign
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
                 }else{
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)));      //TODO is 144 + getY because of negative sign
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
                 }
             }
         }else{
             if(pose.getX() < 72){
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)));      //TODO is 144 + getY because of negative sign
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
             }else{
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)));      //TODO is 144 + getY because of negative sign
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
             }
         }
         double error = targetHead - heading;
@@ -141,10 +141,30 @@ public class Position {
     }
     public double target(){
         double targetHead = 0;
-        if(red){
-            targetHead = Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(144 - pose.getX())));
+        if(pose.getY() > 35){
+            changeOrientation = false;
+        }
+        if(pose.getY() < -48){
+            changeOrientation = true;
+        }
+        if(!changeOrientation) {
+            if (pose.getY() > - 48 && red) {
+                targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(146 - pose.getX())));
+            } else if (pose.getY() > - 48 && !red){
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(pose.getX())));  //was 136 for y
+            }else {
+                if(pose.getX() < 72){
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                }else{
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                }
+            }
         }else{
-            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(pose.getX())));
+            if(pose.getX() < 72){
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
+            }else{
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
+            }
         }
         double error = targetHead - heading;
         return error;

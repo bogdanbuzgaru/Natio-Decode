@@ -109,7 +109,7 @@ public class BlueFar extends OpMode {
         heading = Double.toString(Math.toDegrees(pose.getHeading()));
 
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
-        ReadWriteFile.writeFile(file, 1 + "\n" + xPose + "\n" + yPose + "\n" + heading);
+        ReadWriteFile.writeFile(file, 0 + "\n" + xPose + "\n" + yPose + "\n" + heading);
     }
 
     // Cleaned up unused boolean parameter, updated to use shootTimer

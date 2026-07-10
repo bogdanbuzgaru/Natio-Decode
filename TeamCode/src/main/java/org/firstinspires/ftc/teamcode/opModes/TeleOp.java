@@ -64,6 +64,7 @@ public class TeleOp extends OpMode {
     private ElapsedTime checkArt = new ElapsedTime();
     private PathChain autoPark;
     public double distance, distance2, distance3;
+    public boolean useDistSens = true;
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
@@ -135,10 +136,12 @@ public class TeleOp extends OpMode {
         hasBalls();
         intake.take(gamepad1);
         index.feed(gamepad1);
-        pos.chooseAlliance(gamepad2);
         resetPosition(gamepad2, gamepad1);        //TODO Make it Gamepad2
 //        pos.whereToShoot(gamepad2);
         // Lift Toggle
+        if(gamepad2.rightBumperWasPressed()){
+            useDistSens = !useDistSens;
+        }
         if (gamepad1.dpadDownWasPressed()) {
             if (park == true)
                 lift.lift();
@@ -269,11 +272,15 @@ public class TeleOp extends OpMode {
 //            else{
 //                return State.BOMB;
 //            }
-            if(checkArt.milliseconds() >= 75) {
+            if(checkArt.milliseconds() >= 75 && useDistSens) {
                 distance = distanceSensor.getDistance(DistanceUnit.CM);
                 distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 checkArt.reset();
+            }else if (!useDistSens){
+                if(gamepad2.leftBumperWasPressed()){
+                    return State.E_BILE;
+                }
             }
             if(gamepad2.squareWasPressed()){
                 return State.E_BILE;
@@ -302,15 +309,15 @@ public class TeleOp extends OpMode {
 //            else{
 //                return State.BOMB;
 //            }
-            if (timer.milliseconds() >= 300) {
+            if (timer.milliseconds() >= 300 && useDistSens) {
                 double distance = distanceSensor.getDistance(DistanceUnit.CM);
                 double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
                 double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-                if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed()
-                )
+                if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
                     return State.NU_E_BILE;
                 timer.reset();
-            }
+            }else if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
+                return State.NU_E_BILE;
             return null;
         });
         fsm.onStateUpdate(State.BOMB, () ->{

@@ -58,7 +58,7 @@ public class RedClose extends OpMode {
     private int goalCyclesDone = 0;
     private int GOAL_CYCLES = 2;
     private ElapsedTime auto;
-    private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 700;
+    private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 900;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(106.07, 132.1935, Math.toRadians(0)));
@@ -346,7 +346,8 @@ public class RedClose extends OpMode {
                                         new Pose(84.000, 84.000),
                                         new Pose(95.000, 65.000),
                                         new Pose (124.200, 62.000),
-                                        new Pose(127.000, 60.000)
+                                        new Pose (125.800, 61.000),
+                                        new Pose(127.500, 60.000)
                                 )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(15.9))
                             .build()
@@ -354,7 +355,7 @@ public class RedClose extends OpMode {
 
             SHOOT_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(127.000, 60.000),
+                                            new Pose(127.500, 60.000),
                                             new Pose(100.255, 67.783),
                                             new Pose(84.000, 84.000)
                                     )
