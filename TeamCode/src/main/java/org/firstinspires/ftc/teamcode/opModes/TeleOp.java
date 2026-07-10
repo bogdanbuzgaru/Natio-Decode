@@ -197,19 +197,23 @@ public class TeleOp extends OpMode {
                 shooter.setTicks(pos.getTicks(6.89911, redBase), follower.getPose().getY() < 50, false);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+//                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && !add) {
                 shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + 120, follower.getPose().getY() < 50, true);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+//                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
             }
             if (pos.isRed() && add) {
                 shooter.setTicks(pos.getTicks(6.89911, redBase) + addOn, follower.getPose().getY() < 50, false);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+//                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && add) {
                 shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + addOn + 120, follower.getPose().getY() < 50, true);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+//                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
             }
             shooter.update();
 //        }else if (parking && isRed == 1){

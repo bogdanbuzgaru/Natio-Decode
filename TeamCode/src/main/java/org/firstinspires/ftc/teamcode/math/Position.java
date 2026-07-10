@@ -244,10 +244,10 @@ public class Position {
     public boolean shootHigh(){
         return isCenterInSmallTriangle() || isTangentToSmallTriangle();
     }
-    public double getOffetAngle(double robotVelocityX, double robotVelocityY){
+    public double getOffetAngle(double robotVelocityX, double robotVelocityY, boolean red){
         if(red) {
-            double dx = 132 - pose.getX();
-            double dy = 132 - pose.getY();
+            double dx = 140 - pose.getX();
+            double dy = 140 - pose.getY();
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));
@@ -272,9 +272,9 @@ public class Position {
             double turretOffsetAngle = Math.toDegrees(Math.atan2(vTangential, vxCompensatedRadial));
 
             return turretOffsetAngle;
-        }else if (blue){
-            double dx = Math.abs(pose.getX() - 12);
-            double dy = Math.abs(132 - pose.getY());
+        }else if (!red){
+            double dx = Math.abs(pose.getX() - 4);
+            double dy = Math.abs(140 - pose.getY());
             double distanceToGoal = hypot(dy, dx);
 
             double alpha = Math.atan((2.0 * goalHeight / distanceToGoal) - Math.tan(goalEntryAngle));

@@ -91,7 +91,7 @@ public class BlueFar extends OpMode {
         fsm.update();
 //        turret.angleToPos(85.82);
         turret.setTargetAngle(pos.target()); //+ angle if needed
-        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
+        turret.setHeading(Math.toDegrees(follower.getHeading()), false);
         turret.update();
         shooter.setTicks(1590, false, false);
         shooter.updateMotor();
@@ -169,13 +169,13 @@ public class BlueFar extends OpMode {
             intake.autoTake();
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
-            } else if (!follower.isBusy() && skip) {
+            }else if (!follower.isBusy() && skip){
                 if (number < 6 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                } else if (number < 6) {
+                }else if (number < 6) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
-                } else { // Fixed redundant !follower.isBusy() check
+                }else if (!follower.isBusy()){
                     return handleShoot(AutoStates.PARK, 600);
                 }
             }
@@ -186,7 +186,7 @@ public class BlueFar extends OpMode {
             follower.followPath(paths.CENTER_LAST_ROW);
             shooter.lowerBarrier();
             skip = true;
-            if (add) { // Cleaned up (add == true)
+            if (add == true){
                 number++;
             }
             return null;
@@ -224,7 +224,7 @@ public class BlueFar extends OpMode {
             intake.autoTake();
             if (!follower.isBusy() && number < 5) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 500);
-            } else if (!follower.isBusy()) {
+            }else if (!follower.isBusy()){
                 return AutoStates.PARK;
             }
             return null;
@@ -236,9 +236,12 @@ public class BlueFar extends OpMode {
             number++;
             return null;
         });
-
         fsm.onStateUpdate(AutoStates.REPEAT, () -> {
             intake.autoTake();
+//            int choice = limelight.choice(limelight.getSelectedPath(), true);
+//            if(autoTimer.seconds() > 24){
+//                return AutoStates.WAIT;
+//            }
             if (!follower.isBusy()) {
                 return AutoStates.GO_SHOOT_HU;
             }
@@ -283,13 +286,13 @@ public class BlueFar extends OpMode {
             intake.autoTake();
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
-            } else if (!follower.isBusy() && skip) {
+            }else if (!follower.isBusy() && skip){
                 if (number < 6 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                } else if (number < 6) {
+                }else if (number < 6) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
-                } else { // Fixed redundant !follower.isBusy() check
+                }else if (!follower.isBusy()){
                     return handleShoot(AutoStates.PARK, 600);
                 }
             }
@@ -306,7 +309,7 @@ public class BlueFar extends OpMode {
 
     public static class Paths {
         public PathChain TAKE_HUMAN, GO_SHOOT_HU, PARK, CENTER_LAST_ROW, TAKE_LAST_ROW, GO_SHOOT_LAST_ROW,
-                REPEAT, TAKE_RANDOM, SHOOT_RANDOM;
+                REPEAT, TAKE_RANDOM, SHOOT_RANDOM ;
 
         public Paths(Follower follower) {
             TAKE_HUMAN = follower.pathBuilder()
@@ -360,15 +363,15 @@ public class BlueFar extends OpMode {
             TAKE_RANDOM = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(52.000, 16.000),
-                            new Pose (23.100, 2.500),
-                            new Pose(10.000, -6.000)
+                            new Pose (23.100, -2.500),
+                            new Pose(10.000, -8.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, -6.000),
+                            new Pose(10.000, -8.000),
                             new Pose(55.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))

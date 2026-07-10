@@ -58,17 +58,17 @@ public class BlueClose extends OpMode {
     private int goalCyclesDone = 0;
     private int GOAL_CYCLES = 2;
     private ElapsedTime auto;
-    private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 700;
+    private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 900;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(37.93, 132.1935, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(37.930, 132.1935, Math.toRadians(180)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         intake = new Intake (hardwareMap);
         index = new Index(hardwareMap);
         pos = new Position(follower.getPose());
-        pos.setBlue();
+        pos.setRed();
         auto = new ElapsedTime();
 //        position = new Position(new Pose2D(DistanceUnit.INCH,120.000 - 9.7322834608,
 //                144.000 - 6.67322833945, AngleUnit.DEGREES, 0));
@@ -88,9 +88,13 @@ public class BlueClose extends OpMode {
 //                AngleUnit.DEGREES,
 //                Math.toDegrees(follower.getHeading())));
 
+
 //        turret.setAuto();
         pos.update(follower.getPose());
-        turret.angleToPos(-49.5);
+        index.normalIndex();
+        turret.angleToPos(54.5);
+//        turret.setTargetAngle(pos.target()); //+ angle if needed
+//        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         shooter.setTicks(1180, false, false);
         shooter.update();
         if(auto.seconds() > 31.9){
@@ -298,8 +302,8 @@ public class BlueClose extends OpMode {
 
 //            PREPARE_SECOND = (follower.pathBuilder().addPath(
 //                            new BezierLine(
-//                                    new Pose(90.000, 90.000),
-//                                    new Pose(100.000, 67.000)
+//                                    new Pose(54.000, 90.000),
+//                                    new Pose(44.000, 67.000)
 //                            )
 //                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 //                    .build()
@@ -307,13 +311,13 @@ public class BlueClose extends OpMode {
 
             SECOND_ROW = (follower.pathBuilder().addPath(
 //                            new BezierLine(
-//                                    new Pose(100.000,67.000),
-//                                    new Pose(134.000, 65.000)
+//                                    new Pose(44.000,67.000),
+//                                    new Pose(10.000, 65.000)
 //                            )
                             new BezierCurve(
                                     new Pose(60.000, 84.000),
                                     new Pose(59.678, 51.681),
-                                    new Pose(29.566, 60.000)
+                                    new Pose(28.566, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
@@ -321,7 +325,7 @@ public class BlueClose extends OpMode {
 
             SHOOT_SECOND = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(29.566, 60.000),
+                                    new Pose(28.566, 60.000),
                                     new Pose(29.000, 62.000),
                                     new Pose(45.000, 65.000),
                                     new Pose(50.000, 72.000),
@@ -335,21 +339,23 @@ public class BlueClose extends OpMode {
 
             GO_TO_GOAL = (follower.pathBuilder().addPath(
 //                                    new BezierLine(
-//                                            new Pose(90.000, 90.000),
-//                                            new Pose(103.000, 59.000)
+//                                            new Pose(54.000, 90.000),
+//                                            new Pose(41.000, 59.000)
 //                                    )
                             new BezierCurve(
                                     new Pose(60.000, 84.000),
-                                    new Pose(27.000, 65.000),
-                                    new Pose (13.700, 60.300)
-                                    )
+                                    new Pose(49.000, 65.000),
+                                    new Pose (19.800, 62.000),
+                                    new Pose (18.200, 61.000),
+                                    new Pose(16.500, 60.000)
+                            )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(164.1))
                     .build()
             );
 
             SHOOT_GOAL = (follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(13.700, 60.300),
+                                    new Pose(16.500, 60.000),
                                     new Pose(43.745, 67.783),
                                     new Pose(60.000, 84.000)
                             )
@@ -358,20 +364,20 @@ public class BlueClose extends OpMode {
             );
 //            PREPARE_LAST_ROW = follower.pathBuilder().addPath(
 //                            new BezierLine(
-//                                    new Pose(90.000, 90.000),
-//                                    new Pose(106.000, 40.000)
+//                                    new Pose(54.000, 90.000),
+//                                    new Pose(38.000, 40.000)
 //                            )
 //                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 //                    .build();
             LAST_ROW = (follower.pathBuilder().addPath(
 //                                    new BezierLine(
-//                                            new Pose (106.000, 40.000),
-//                                            new Pose(134.000, 40.000)
+//                                            new Pose (38.000, 40.000),
+//                                            new Pose(10.000, 40.000)
 //                                    )
                             new BezierCurve(
                                     new Pose(60.000, 84.000),
                                     new Pose(55.367, 23.549),
-                                    new Pose(25.100, 36.000)
+                                    new Pose(16.100, 36.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
@@ -379,7 +385,7 @@ public class BlueClose extends OpMode {
 
             SHOOT_LAST = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(25.100,36.000),
+                                    new Pose(17.000, 36.000),
                                     new Pose(60.000, 84.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -388,7 +394,7 @@ public class BlueClose extends OpMode {
 
             FIRST_ROW = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(84.000, 84.000),
+                                    new Pose(60.000, 84.000),
                                     new Pose(19.000, 84.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -413,6 +419,4 @@ public class BlueClose extends OpMode {
             );
         }
     }
-
-
 }

@@ -53,8 +53,7 @@ public class BlueNeutral extends OpMode {
 
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        // 84.000 -> 144 - 84 = 60.000
-        follower.setStartingPose(new Pose(68.3008759378, -111.056875942, Math.toRadians(35.8)));
+        follower.setStartingPose(new Pose(68.3008759378, -111.056875942, Math.toRadians(-35.8)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -243,7 +242,7 @@ public class BlueNeutral extends OpMode {
                                     new Pose(68.3008759378, -111.056875942),
                                     new Pose(48.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(35.8), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-35.8), Math.toRadians(180))
                     .build()
             );
             TAKE_FIRST = (follower.pathBuilder().addPath(
@@ -278,7 +277,7 @@ public class BlueNeutral extends OpMode {
                                     new Pose(39.000, -105.000),
                                     new Pose(48.000, -72.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             TAKE_THIRD = (follower.pathBuilder().addPath(
@@ -287,7 +286,7 @@ public class BlueNeutral extends OpMode {
                                     new Pose(39.000, -50.000),
                                     new Pose(17.000, -36.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()
             );
             SHOOT_THIRD = (follower.pathBuilder().addPath(
@@ -302,17 +301,17 @@ public class BlueNeutral extends OpMode {
                             new BezierCurve(
                                     new Pose(48.000, -72.000),
                                     new Pose(19.000, -122.000),
-                                    new Pose(7.500, -135.000)
+                                    new Pose(11.500, -128.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-90))
                     .build()
             );
             SHOOT_RANDOM = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(7.500, -135.000),
+                                    new Pose(11.500, -128.000),
                                     new Pose(48.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(180))
                     .build()
             );
             PARK = (follower.pathBuilder().addPath(
