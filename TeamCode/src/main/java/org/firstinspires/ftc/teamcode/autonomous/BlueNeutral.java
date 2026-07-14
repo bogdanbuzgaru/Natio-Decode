@@ -48,7 +48,8 @@ public class BlueNeutral extends OpMode {
     private boolean isShooting = false;
     private ElapsedTime pathTimer = new ElapsedTime();
     private Paths paths;
-
+    private int times = 3;
+    private int when = 0;
     private final long SHOOT_FIRST_MS = 560, SHOOT_MS = 620;
 
     public void init() {
@@ -178,6 +179,7 @@ public class BlueNeutral extends OpMode {
         fsm.onStateEnter(AutoStates.TAKE_RANDOM, () -> {
             follower.followPath(paths.TAKE_RANDOM);
             shooter.lowerBarrier();
+            when++;
             return null;
         });
         fsm.onStateUpdate(AutoStates.TAKE_RANDOM, () -> {
@@ -194,7 +196,9 @@ public class BlueNeutral extends OpMode {
         });
         fsm.onStateUpdate(AutoStates.SHOOT_RANDOM, () -> {
             intake.autoTake();
-            if (!follower.isBusy()) {
+            if (!follower.isBusy() && when >= times) {
+                return handleShoot(AutoStates.TAKE_RANDOM, SHOOT_MS);
+            }else if (!follower.isBusy()){
                 return handleShoot(AutoStates.PARK, SHOOT_MS);
             }
             return null;

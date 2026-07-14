@@ -126,8 +126,23 @@ public class TeleOp extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
+        turret.addForOffset(gamepad2);
 //        turret.setRed(pos.isRed());
         increaseDecrease();
+        if(isRed == 1){
+            pos.setRed();
+            turret.setBlue(false);
+        }else if (isRed == 0){
+            pos.setBlue();
+            turret.setBlue(true);
+        }
+        if(gamepad2.leftBumperWasPressed()) {
+            if (isRed == 1) {
+                isRed = 0;
+            } else if (isRed == 0) {
+                isRed = 1;
+            }
+        }
         if(!fieldCentric)
             movement.movementLoop(gamepad1);
         else
@@ -182,7 +197,7 @@ public class TeleOp extends OpMode {
         if(parking){
             turret.angleToPos(90);
         }
-        if (pos.activateOrientation() && !manual && !parking)
+        if (pos.activateOrientation() && !manual && !parking || follower.getPose().getY() < 0)
             turret.update();
         if (manual) {
             turret.goNeutral();
@@ -206,7 +221,7 @@ public class TeleOp extends OpMode {
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && !add) {
-                shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + 120, follower.getPose().getY() < 50, true);
+                shooter.setTicks(pos.getTicksBlue(6.89911, redBase) + 120, follower.getPose().getY() < 50, true);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
@@ -217,7 +232,7 @@ public class TeleOp extends OpMode {
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && add) {
-                shooter.setTicks(pos.getTicksBlue(6.89911, 690.04194) + addOn + 120, follower.getPose().getY() < 50, true);
+                shooter.setTicks(pos.getTicksBlue(6.89911, redBase) + addOn + 120, follower.getPose().getY() < 50, true);
                 turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
@@ -260,6 +275,7 @@ public class TeleOp extends OpMode {
         telemetry.addData("Second servo position", turret.getPosition2());
         telemetry.addData("Third servo position", turret.getPosition3());
         telemetry.addData("hood target", shooter.getTargetHood());
+        telemetry.addData("adauga sau nu", turret.isAddAngle());
         telemetry.update();
     }
     private void hasBalls(){

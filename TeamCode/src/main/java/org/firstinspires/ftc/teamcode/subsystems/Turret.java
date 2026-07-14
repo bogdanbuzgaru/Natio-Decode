@@ -15,6 +15,7 @@ public class Turret {
     private double heading;
     private boolean blue = false;
     private double increaseAngle = 0;
+    private boolean addAngle = false;
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
@@ -51,7 +52,11 @@ public class Turret {
             increaseAngle = 0;
         }
     }
-
+    public void addForOffset(Gamepad gamepad){
+        if(gamepad.leftBumperWasPressed()){
+            addAngle = !addAngle;
+        }
+    }
     private double getFinalAngle() {
         double finalAngle = targetAngle + offsetAngle;
         if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1){
@@ -59,16 +64,27 @@ public class Turret {
         }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
             targetAngle -= (targetAngle - 30) * 0.125;
         }
-        if(isRed && Math.abs(heading) < 90){
-            finalAngle += 7.5;
-        }else if (!isRed){
-            finalAngle += 0.5;
+        if(!isRed && (heading > 160 || heading < -60)){
+            finalAngle -= 30;
         }
-        if(add(heading, blue)){
-            finalAngle += 7;
-        }
+//        if(isRed && Math.abs(heading) < 90){
+//            finalAngle += 7.5;
+//        }else if (!isRed){
+//            finalAngle += 0.5;
+//        }
+//        if(add(heading, blue)){
+//            finalAngle += 7;
+//        }
+//        if(addAngle && !isRed){
+//            finalAngle -= 20;
+//        }
         return normalizeAngle(finalAngle);
     }
+
+    public boolean isAddAngle() {
+        return addAngle;
+    }
+
     public void angleToPos(double angle){
         double pos = 0.5 * (angle / 190.1785714285714);
         turretServo1.setPosition(0.5 - pos);
