@@ -319,7 +319,7 @@ public class Position {
     }
     public int getTicks(double slope, double extra){
         double hypo = Math.hypot(Math.abs(130 - pose.getX()), Math.abs(130 - pose.getY()));
-        double neu = Math.hypot(Math.abs(72 - pose.getX()), Math.abs(-120 + pose.getY()));
+        double neu = Math.hypot(Math.abs(72 - pose.getX()), Math.abs(134 + pose.getY()));
 //        double add = hypo / 3 * (180 - Math.abs(Math.toDegrees(pose.getHeading())));
         if(!changeOrientation)
             return (int)((int) slope * hypo + extra);

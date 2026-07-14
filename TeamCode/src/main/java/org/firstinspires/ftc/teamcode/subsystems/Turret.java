@@ -14,6 +14,7 @@ public class Turret {
     private boolean isRed;
     private double heading;
     private boolean blue = false;
+    private double increaseAngle = 0;
     public Turret(HardwareMap hardwareMap){
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
@@ -35,6 +36,20 @@ public class Turret {
     }
     public void setOffsetAngle(double offsetAngle) {
         this.offsetAngle = offsetAngle;
+    }
+
+    public void setIncreaseAngle(boolean isPressed, double isRed, double sign) {
+        if(isRed == 1 && isPressed && sign == 1){
+            increaseAngle = 5;
+        }else if(isRed == 1 && isPressed && sign == -1){
+            increaseAngle = -5;
+        }else if(isRed == 0 && isPressed && sign == 1){
+            increaseAngle = 5;
+        }else if(isRed == 0 && isPressed && sign == -1){
+            increaseAngle = -5;
+        }else {
+            increaseAngle = 0;
+        }
     }
 
     private double getFinalAngle() {
@@ -80,8 +95,8 @@ public class Turret {
     }
 
     private double normalizeAngle(double degrees) {
-        while (degrees > 180) degrees -= 360;
-        while (degrees < -180) degrees += 360;
+        while (degrees > 165) degrees -= 330;
+        while (degrees < -165) degrees += 330;
         return degrees;
     }
 

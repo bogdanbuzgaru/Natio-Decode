@@ -65,6 +65,8 @@ public class TeleOp extends OpMode {
     private PathChain autoPark;
     public double distance, distance2, distance3;
     public boolean useDistSens = true;
+    private ElapsedTime toPark = new ElapsedTime();
+    private boolean stopRumbling = true;
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
@@ -117,6 +119,7 @@ public class TeleOp extends OpMode {
         shooter.lowerHood();
         shooter.middleBar();
         checkArt.reset();
+        toPark.reset();
     }
 
     public void loop() {
@@ -134,6 +137,10 @@ public class TeleOp extends OpMode {
             fieldCentric = !fieldCentric;
         }
         hasBalls();
+        if(toPark.seconds() >= 115 && stopRumbling){
+            gamepad1.rumble(500);
+            stopRumbling = false;
+        }
         intake.take(gamepad1);
         index.feed(gamepad1);
         resetPosition(gamepad2, gamepad1);        //TODO Make it Gamepad2
@@ -282,7 +289,7 @@ public class TeleOp extends OpMode {
                 distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 checkArt.reset();
             }else if (!useDistSens){
-                if(gamepad2.leftBumperWasPressed()){
+                if(gamepad2.squareWasPressed()){
                     return State.E_BILE;
                 }
             }
@@ -293,7 +300,6 @@ public class TeleOp extends OpMode {
                 if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
                         && (distance < 6 && distance2 < 6 && distance3 < 15))
                 {
-                    gamepad1.rumble(200);
                     return State.E_BILE;
                 }
                 if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
@@ -304,6 +310,10 @@ public class TeleOp extends OpMode {
                 }
                 timer.reset();
             }
+            return null;
+        });
+        fsm.onStateEnter(State.E_BILE, () -> {
+            gamepad1.rumble(200);
             return null;
         });
         fsm.onStateUpdate(State.E_BILE, () -> {
