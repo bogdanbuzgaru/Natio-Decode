@@ -198,7 +198,7 @@ public class BlueNeutral extends OpMode {
             intake.autoTake();
             if (!follower.isBusy() && when >= times) {
                 return handleShoot(AutoStates.TAKE_RANDOM, SHOOT_MS);
-            }else if (!follower.isBusy()){
+            }else if (!follower.isBusy() && when < times){
                 return handleShoot(AutoStates.PARK, SHOOT_MS);
             }
             return null;

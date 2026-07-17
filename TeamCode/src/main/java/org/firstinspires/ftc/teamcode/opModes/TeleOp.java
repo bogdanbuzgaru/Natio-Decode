@@ -67,6 +67,7 @@ public class TeleOp extends OpMode {
     public boolean useDistSens = true;
     private ElapsedTime toPark = new ElapsedTime();
     private boolean stopRumbling = true;
+    private boolean stopTurret = false;
     public void init() {
         File file = AppUtil.getInstance().getSettingsFile("FinalPos.txt");
         try {
@@ -171,6 +172,10 @@ public class TeleOp extends OpMode {
                 lift.lower();
             park = !park;
         }
+        if (gamepad2.triangleWasPressed()){
+            stopTurret = !stopTurret;
+            turret.goNeutral();
+        }
         redBase = tick + 790.04194;
         if (lowerSpeed){
             index.setValue(0.59);
@@ -197,7 +202,7 @@ public class TeleOp extends OpMode {
         if(parking){
             turret.angleToPos(90);
         }
-        if (pos.activateOrientation() && !manual && !parking || follower.getPose().getY() < 0)
+        if (pos.activateOrientation() && !stopTurret && !parking || follower.getPose().getY() < 0)
             turret.update();
         if (manual) {
             turret.goNeutral();

@@ -121,7 +121,7 @@ public class Position {
             if (pose.getY() > - 48 && red) {
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(146 - pose.getX())));
             } else if (pose.getY() > - 48 && !red){
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(pose.getX())));  //was 136 for y
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - 8)));
             }else {
                 if(pose.getX() < 72){
                     targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
@@ -151,7 +151,7 @@ public class Position {
             if (pose.getY() > - 48 && red) {
                 targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(146 - pose.getX())));
             } else if (pose.getY() > - 48 && !red){
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(140 - pose.getY()), Math.abs(0 - pose.getX())));  //was 136 for y
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(pose.getX() + 2)));  //was 136 for y
             }else {
                 if(pose.getX() < 72){
                     targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign

@@ -64,8 +64,11 @@ public class Turret {
         }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
             targetAngle -= (targetAngle - 30) * 0.125;
         }
-        if(!isRed && (heading > 160 || heading < -60)){
-            finalAngle -= 30;
+        if (!isRed){
+            finalAngle += 0.5;
+        }
+        if(add(heading, !isRed)){
+            finalAngle += 7;
         }
 //        if(isRed && Math.abs(heading) < 90){
 //            finalAngle += 7.5;
@@ -111,7 +114,7 @@ public class Turret {
     }
 
     private double normalizeAngle(double degrees) {
-        while (degrees > 165) degrees -= 330;
+        while (degrees > 165) degrees -= 330;           //TODO change parameters if needed
         while (degrees < -165) degrees += 330;
         return degrees;
     }
