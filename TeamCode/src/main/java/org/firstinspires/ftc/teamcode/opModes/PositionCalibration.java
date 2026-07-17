@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.movement.Movement;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 
 @TeleOp
@@ -22,19 +23,22 @@ public class PositionCalibration  extends OpMode {
     private Movement movement;
     private Lift lift;
     private Limelight limelight;
+    private Turret turret;
     public void init(){
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(7.2440944808 + 1.968504, 7.08661417, Math.toRadians(90)));
         limelight = new Limelight(hardwareMap, "limelight");
         movement = new Movement(hardwareMap);
         lift = new Lift(hardwareMap);
+        turret = new Turret(hardwareMap);
         follower.update();
     }
     public void loop(){
         follower.update();
-        limelight.update();
-        movement.movementLoop(gamepad1);
-        movement.movementFieldCentric(gamepad2, follower.getPose().getHeading(), true);
+//        limelight.update();
+        turret.goNeutral();
+//        movement.movementLoop(gamepad1);
+//        movement.movementFieldCentric(gamepad2, follower.getPose().getHeading(), true);
         telemetry.addData("X: ", follower.getPose().getX());
         telemetry.addData("Y: ", follower.getPose().getY());
         telemetry.addData("Yaw: ", Math.toDegrees(follower.getPose().getHeading()));

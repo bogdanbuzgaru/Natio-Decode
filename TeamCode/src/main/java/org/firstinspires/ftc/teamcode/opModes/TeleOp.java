@@ -298,39 +298,39 @@ public class TeleOp extends OpMode {
     private void setUp() {
         fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
         fsm.onStateUpdate(State.NU_E_BILE, () -> {
-            index.normalIndex();
+//            index.normalIndex();
 //            if(bombTimer.seconds() < 110)
                 rgbLed.setPosition(0.7);
 //            else{
 //                return State.BOMB;
 //            }
-            if(checkArt.milliseconds() >= 75 && useDistSens) {
-                distance = distanceSensor.getDistance(DistanceUnit.CM);
-                distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-                distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-                checkArt.reset();
-            }else if (!useDistSens){
-                if(gamepad2.squareWasPressed()){
-                    return State.E_BILE;
-                }
-            }
+//            if(checkArt.milliseconds() >= 75 && useDistSens) {
+//                distance = distanceSensor.getDistance(DistanceUnit.CM);
+//                distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+//                distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+//                checkArt.reset();
+//            }else if (!useDistSens){
+//                if(gamepad2.squareWasPressed()){
+//                    return State.E_BILE;
+//                }
+//            }
             if(gamepad2.squareWasPressed()){
                 return State.E_BILE;
             }
-            if (timer.milliseconds() >= 450) {
-                if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-                        && (distance < 6 && distance2 < 6 && distance3 < 15))
-                {
-                    return State.E_BILE;
-                }
-                if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-                        && (distance < 6 && distance2 < 6 && distance3 > 8)){
-                    rgbLed.setPosition(0.9);
-                }else{
-                    rgbLed.setPosition(0.7);
-                }
-                timer.reset();
-            }
+//            if (timer.milliseconds() >= 450) {
+//                if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+//                        && (distance < 6 && distance2 < 6 && distance3 < 15))
+//                {
+//                    return State.E_BILE;
+//                }
+//                if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+//                        && (distance < 6 && distance2 < 6 && distance3 > 8)){
+//                    rgbLed.setPosition(0.9);
+//                }else{
+//                    rgbLed.setPosition(0.7);
+//                }
+//                timer.reset();
+//            }
             return null;
         });
         fsm.onStateEnter(State.E_BILE, () -> {
@@ -344,23 +344,15 @@ public class TeleOp extends OpMode {
 //            else{
 //                return State.BOMB;
 //            }
-            if (timer.milliseconds() >= 300 && useDistSens) {
-                double distance = distanceSensor.getDistance(DistanceUnit.CM);
-                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+//            if (timer.milliseconds() >= 300 && useDistSens) {
+//                double distance = distanceSensor.getDistance(DistanceUnit.CM);
+//                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+//                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
                 if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
                     return State.NU_E_BILE;
-                timer.reset();
-            }else if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
-                return State.NU_E_BILE;
-            return null;
-        });
-        fsm.onStateUpdate(State.BOMB, () ->{
-            if(bombTimer.seconds() < 115){
-                rgbLed.setPosition(0.7);
-            }else if (blink(bombTimer.milliseconds())){
-                rgbLed.setPosition(0.7);
-            }
+//                timer.reset();
+//            }else if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
+//                return State.NU_E_BILE;
             return null;
         });
         fsm.init();

@@ -20,6 +20,7 @@ public class Turret {
         turretServo1 = hardwareMap.get(Servo.class, "turretServo1");
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
+//        goNeutral();
     }
     public void setBlue(boolean blue){
         this.blue = blue;
@@ -64,14 +65,11 @@ public class Turret {
         }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
             targetAngle -= (targetAngle - 30) * 0.125;
         }
-        if (!isRed){
-            finalAngle += 0.5;
-        }
-        if(add(heading, !isRed)){
-            finalAngle += 7;
-        }
-//        if(isRed && Math.abs(heading) < 90){
+//        if(isRed && Math.abs(heading) < 90 && Math.signum(heading) == 1) {
 //            finalAngle += 7.5;
+//        }else if(isRed && Math.abs(heading) < 90 && Math.signum(heading) == -1) {
+//            finalAngle += 12.5;
+//        }
 //        }else if (!isRed){
 //            finalAngle += 0.5;
 //        }
@@ -117,6 +115,7 @@ public class Turret {
         while (degrees > 165) degrees -= 330;           //TODO change parameters if needed
         while (degrees < -165) degrees += 330;
         return degrees;
+
     }
 
     public double getTargetAngle() {

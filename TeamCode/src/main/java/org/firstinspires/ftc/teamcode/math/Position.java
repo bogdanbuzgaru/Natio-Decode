@@ -124,50 +124,55 @@ public class Position {
                 targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - 8)));
             }else {
                 if(pose.getX() < 72){
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
                 }else{
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
                 }
             }
         }else{
             if(pose.getX() < 72){
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
             }else{
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
+                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
             }
         }
         double error = targetHead - heading;
         return error;
     }
-    public double target(){
-        double targetHead = 0;
-        if(pose.getY() > 35){
+    public double target() {
+        double targetX = 0;
+        double targetY = 0;
+        boolean changeOrientation = false;
+
+        // 1. Determine State
+        if (pose.getY() > 35) {
             changeOrientation = false;
-        }
-        if(pose.getY() < -48){
+        } else if (pose.getY() < -48) {
             changeOrientation = true;
         }
-        if(!changeOrientation) {
-            if (pose.getY() > - 48 && red) {
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(146 - pose.getX())));
-            } else if (pose.getY() > - 48 && !red){
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(pose.getX() + 2)));  //was 136 for y
-            }else {
-                if(pose.getX() < 72){
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
-                }else{
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
+
+        // 2. Set Absolute Target Coordinates
+        if (!changeOrientation) {
+            if (pose.getY() > -48) {
+                if (red) {
+                    targetX = 130;
+                    targetY = 138;
+                } else {
+                    targetX = 14;
+                    targetY = 138;
                 }
+            } else {
+                targetX = 72;
+                targetY = -144;
             }
-        }else{
-            if(pose.getX() < 72){
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 94)) + Math.PI);      //TODO is 144 + getY because of negative sign
-            }else{
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 50)) + Math.PI);      //TODO is 144 + getY because of negative sign
-            }
+        } else {
+            targetX = 72;
+            targetY = -144;
         }
-        double error = targetHead - heading;
-        return error;
+        double deltaY = targetY - pose.getY();
+        double deltaX = targetX - pose.getX();
+        double targetHead = Math.toDegrees(Math.atan2(deltaY, deltaX));
+        return targetHead - heading;
     }
     public void setBlue(){
         this.blue = true;
