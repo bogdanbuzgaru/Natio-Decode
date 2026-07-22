@@ -92,10 +92,10 @@ public class BlueClose extends OpMode {
 //        turret.setAuto();
         pos.update(follower.getPose());
         index.normalIndex();
-        turret.angleToPos(-54.5);
+        turret.angleToPos(-46.2);
 //        turret.setTargetAngle(pos.target()); //+ angle if needed
 //        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
-        shooter.setTicks(1220, false, false);
+        shooter.setTicks(1240, false, false);
         shooter.update();
         if(auto.seconds() > 31.9){
             stop();
@@ -344,10 +344,10 @@ public class BlueClose extends OpMode {
 //                                    )
                             new BezierCurve(
                                     new Pose(60.000, 84.000),
-                                    new Pose(49.000, 65.000),
-                                    new Pose (18.300, 62.000),
-                                    new Pose (17.200, 61.500),
-                                    new Pose(16.500, 61.000)
+                                    new Pose(49.000, 66.000),
+                                    new Pose (18.300, 59.000),
+                                    new Pose (17.200, 62.700),
+                                    new Pose(16.500, 61.900)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(164.1))
                     .build()
@@ -412,7 +412,7 @@ public class BlueClose extends OpMode {
             PARK = (follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(60.000, 84.000),
-                                    new Pose(22.000, 93.000)
+                                    new Pose(32.000, 86.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build()

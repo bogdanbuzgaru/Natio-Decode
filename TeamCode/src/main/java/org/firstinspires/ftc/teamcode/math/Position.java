@@ -108,20 +108,27 @@ public class Position {
 
     public double getTargetAngle(Gamepad gamepad){
         double targetHead = 0;
-        if(gamepad.rightBumperWasPressed()){
-            changeOrientation = !changeOrientation;
+        double tx = 141;
+        double txB = 8;
+
+        if(gamepad.leftStickButtonWasPressed()){
+            tx -= 7;
+            txB -= 7;
+        }else if (gamepad.rightStickButtonWasPressed()){
+            tx += 10;
+            txB += 10;
         }
-        if(pose.getY() > 35){
+        if(pose.getY() > -5 ){
             changeOrientation = false;
         }
-        if(pose.getY() < -48){
+        if(pose.getY() < -60){
             changeOrientation = true;
         }
         if(!changeOrientation) {
             if (pose.getY() > - 48 && red) {
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(146 - pose.getX())));
+                targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(tx - pose.getX())));
             } else if (pose.getY() > - 48 && !red){
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - 8)));
+                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - txB)));
             }else {
                 if(pose.getX() < 72){
                     targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
@@ -137,6 +144,7 @@ public class Position {
             }
         }
         double error = targetHead - heading;
+
         return error;
     }
     public double target() {
@@ -155,23 +163,28 @@ public class Position {
         if (!changeOrientation) {
             if (pose.getY() > -48) {
                 if (red) {
-                    targetX = 130;
-                    targetY = 138;
-                } else {
-                    targetX = 14;
-                    targetY = 138;
+                    targetX = 127;
+                    targetY = 135;
+                } else{
+                    targetX = 7;
+                    targetY = 135;
                 }
             } else {
                 targetX = 72;
-                targetY = -144;
+                targetY = -130;
             }
         } else {
             targetX = 72;
-            targetY = -144;
+            targetY = -130;
         }
         double deltaY = targetY - pose.getY();
         double deltaX = targetX - pose.getX();
         double targetHead = Math.toDegrees(Math.atan2(deltaY, deltaX));
+        if(red && Math.abs(heading) < 90 && pose.getY() > 40){
+            targetHead += 18;
+        }else if(red && Math.abs(heading) < 90 && pose.getY() < 40){
+            targetHead += 12;
+        }
         return targetHead - heading;
     }
     public void setBlue(){

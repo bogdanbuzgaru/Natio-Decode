@@ -89,10 +89,10 @@ public class BlueFar extends OpMode {
         follower.update();
         pos.update(follower.getPose());
         fsm.update();
-//        turret.angleToPos(85.82);
-        turret.setTargetAngle(pos.target()); //+ angle if needed
-        turret.setHeading(Math.toDegrees(follower.getHeading()), false);
-        turret.update();
+        turret.angleToPos(-75.62);
+//        turret.setTargetAngle(pos.target()); //+ angle if needed
+//        turret.setHeading(Math.toDegrees(follower.getHeading()), false);
+//        turret.update();
         shooter.setTicks(1590, false, false);
         shooter.updateMotor();
         index.normalIndex();

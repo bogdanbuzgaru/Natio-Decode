@@ -46,9 +46,9 @@ public class TeleOp extends OpMode {
     private Movement movement;
     private Rev2mDistanceSensor distanceSensor, distanceSensor2, distanceSensor3;
     private Lift lift;
-    private final StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
+//    private final StateMachine<State> fsm = new StateMachine<>(State.NU_E_BILE);
     private ServoImplEx rgbLed;
-    private boolean fieldCentric = true;
+    private boolean fieldCentric = false;
     private boolean manual = false;
     private boolean park = true;
     private int angle = 0;
@@ -112,7 +112,7 @@ public class TeleOp extends OpMode {
 //        colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
 //        colorSensor2.enableLed(true);
 
-        setUp();
+//        setUp();
     }
     public void start(){
         bombTimer.reset();
@@ -126,7 +126,7 @@ public class TeleOp extends OpMode {
     public void loop() {
         follower.update();
         pos.update(follower.getPose());
-        fsm.update();
+//        fsm.update();
         turret.addForOffset(gamepad2);
 //        turret.setRed(pos.isRed());
         increaseDecrease();
@@ -202,7 +202,7 @@ public class TeleOp extends OpMode {
         if(parking){
             turret.angleToPos(90);
         }
-        if (pos.activateOrientation() && !stopTurret && !parking || follower.getPose().getY() < 0)
+        if ((pos.activateOrientation() && !parking || follower.getPose().getY() < 0) && !stopTurret)
             turret.update();
         if (manual) {
             turret.goNeutral();
@@ -222,23 +222,23 @@ public class TeleOp extends OpMode {
         if(!parking) {
             if (pos.isRed() && !add) {
                 shooter.setTicks(pos.getTicks(6.89911, redBase), follower.getPose().getY() < 50, false);
-                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setTargetAngle(pos.getTargetAngle(gamepad2)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && !add) {
                 shooter.setTicks(pos.getTicksBlue(6.89911, redBase) + 120, follower.getPose().getY() < 50, true);
-                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setTargetAngle(pos.getTargetAngle(gamepad2)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
             }
             if (pos.isRed() && add) {
                 shooter.setTicks(pos.getTicks(6.89911, redBase) + addOn, follower.getPose().getY() < 50, false);
-                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setTargetAngle(pos.getTargetAngle(gamepad2)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), true);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), true));
             } else if (pos.isBlue() && add) {
                 shooter.setTicks(pos.getTicksBlue(6.89911, redBase) + addOn + 120, follower.getPose().getY() < 50, true);
-                turret.setTargetAngle(pos.getTargetAngle(gamepad1)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
+                turret.setTargetAngle(pos.getTargetAngle(gamepad2)); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
                 turret.setHeading(Math.toDegrees(follower.getHeading()), false);
 //                turret.setOffsetAngle(pos.getOffetAngle(follower.getVelocity().getXComponent(), follower.getVelocity().getYComponent(), false));
             }
@@ -295,87 +295,78 @@ public class TeleOp extends OpMode {
             tick = 0;
         }
     }
-    private void setUp() {
-        fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
-        fsm.onStateUpdate(State.NU_E_BILE, () -> {
-//            index.normalIndex();
-//            if(bombTimer.seconds() < 110)
-                rgbLed.setPosition(0.7);
-//            else{
-//                return State.BOMB;
+//    private void setUp() {
+//        fsm.onStateEnter(State.NU_E_BILE, () -> { timer.reset(); return null; });
+//        fsm.onStateUpdate(State.NU_E_BILE, () -> {
+////            index.normalIndex();
+////            if(bombTimer.seconds() < 110)
+//                rgbLed.setPosition(0.7);
+////            else{
+////                return State.BOMB;
+////            }
+////            if(checkArt.milliseconds() >= 75 && useDistSens) {
+////                distance = distanceSensor.getDistance(DistanceUnit.CM);
+////                distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+////                distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+////                checkArt.reset();
+////            }else if (!useDistSens){
+////                if(gamepad2.squareWasPressed()){
+////                    return State.E_BILE;
+////                }
+////            }
+//            if(gamepad2.squareWasPressed()){
+//                return State.E_BILE;
 //            }
-//            if(checkArt.milliseconds() >= 75 && useDistSens) {
-//                distance = distanceSensor.getDistance(DistanceUnit.CM);
-//                distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-//                distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-//                checkArt.reset();
-//            }else if (!useDistSens){
-//                if(gamepad2.squareWasPressed()){
-//                    return State.E_BILE;
-//                }
-//            }
-            if(gamepad2.squareWasPressed()){
-                return State.E_BILE;
-            }
-//            if (timer.milliseconds() >= 450) {
-//                if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-//                        && (distance < 6 && distance2 < 6 && distance3 < 15))
-//                {
-//                    return State.E_BILE;
-//                }
-//                if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
-//                        && (distance < 6 && distance2 < 6 && distance3 > 8)){
-//                    rgbLed.setPosition(0.9);
-//                }else{
-//                    rgbLed.setPosition(0.7);
-//                }
-//                timer.reset();
-//            }
-            return null;
-        });
-        fsm.onStateEnter(State.E_BILE, () -> {
-            gamepad1.rumble(200);
-            return null;
-        });
-        fsm.onStateUpdate(State.E_BILE, () -> {
-            index.lowerIndex();
-//            if(bombTimer.seconds() < 110)
-                rgbLed.setPosition(0.5);
-//            else{
-//                return State.BOMB;
-//            }
-//            if (timer.milliseconds() >= 300 && useDistSens) {
-//                double distance = distanceSensor.getDistance(DistanceUnit.CM);
-//                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
-//                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
-                if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
-                    return State.NU_E_BILE;
-//                timer.reset();
-//            }else if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
-//                return State.NU_E_BILE;
-            return null;
-        });
-        fsm.init();
-    }
+////            if (timer.milliseconds() >= 450) {
+////                if (!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+////                        && (distance < 6 && distance2 < 6 && distance3 < 15))
+////                {
+////                    return State.E_BILE;
+////                }
+////                if(!(Double.isNaN(distance) && Double.isNaN(distance2) && Double.isNaN(distance3))
+////                        && (distance < 6 && distance2 < 6 && distance3 > 8)){
+////                    rgbLed.setPosition(0.9);
+////                }else{
+////                    rgbLed.setPosition(0.7);
+////                }
+////                timer.reset();
+////            }
+//            return null;
+//        });
+//        fsm.onStateEnter(State.E_BILE, () -> {
+//            gamepad1.rumble(200);
+//            return null;
+//        });
+//        fsm.onStateUpdate(State.E_BILE, () -> {
+//            index.lowerIndex();
+////            if(bombTimer.seconds() < 110)
+//                rgbLed.setPosition(0.5);
+////            else{
+////                return State.BOMB;
+////            }
+////            if (timer.milliseconds() >= 300 && useDistSens) {
+////                double distance = distanceSensor.getDistance(DistanceUnit.CM);
+////                double distance2 = distanceSensor2.getDistance(DistanceUnit.CM);
+////                double distance3 = distanceSensor3.getDistance(DistanceUnit.CM);
+//                if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
+//                    return State.NU_E_BILE;
+////                timer.reset();
+////            }else if (gamepad1.leftBumperWasPressed() || gamepad2.crossWasPressed())
+////                return State.NU_E_BILE;
+//            return null;
+//        });
+//        fsm.init();
+//    }
     private boolean blink(double currTime){
         return (currTime % 400) < 200;
     }
     private void resetPosition(Gamepad gamepad, Gamepad driver) {
         if(pos.isRed()) {
-            if(driver.dpadLeftWasPressed()){
-                movement.resetHeading();
-                movement.setOff(0);
-                follower.setPose(new Pose(
-                        121.863, 3.48,        //other human
-                        Math.toRadians(0)
-                ));
-                manual = false;
-            }
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        120.86, 75.2791,        //Gate
+                        126.3842, 79.0778,        //Far shooting
                         Math.toRadians(0)
                 ));
                 manual = false;
@@ -383,8 +374,8 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        116.214, 125.133,    //basket
-                        Math.toRadians(38.4)
+                        116.6359, 128.93,    //basket
+                        Math.toRadians(39.42)
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
@@ -392,8 +383,8 @@ public class TeleOp extends OpMode {
                 movement.setOff(0);
                 {
                     follower.setPose(new Pose(
-                            47.4658, 12.92,    //Shooting zone far
-                            Math.toRadians(-90)
+                            9.5689, -14.5359,    //Shooting zone far
+                            Math.toRadians(180)
                     ));
                     manual = false;
                 }
@@ -402,26 +393,17 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        1.38, 20.934,    //our human player w/ ext
-                        Math.toRadians(180)
+                        25.2353, -115.0025,    //our human player w/ ext
+                        Math.toRadians(-54.3473)
                 ));
                 manual = false;
             }
         }else if(pos.isBlue()){
-            if(driver.dpadLeftWasPressed()){
-                movement.resetHeading();
-                movement.setOff(0);
-                follower.setPose(new Pose(
-                        144 - 121.863, 3.48,        //other human
-                        Math.toRadians(0)
-                ));
-                manual = false;
-            }
             if (gamepad.dpadUpWasPressed()) {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        23.14, 75.2791,        //Far shooting
+                        17.6158, 79.0778,        //Far shooting
                         Math.toRadians(180)
                 ));
                 manual = false;
@@ -429,8 +411,8 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        27.786, 125.133,    //basket
-                        Math.toRadians(141.6)
+                        27.3641, 128.93,    //basket
+                        Math.toRadians(140.58)
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
@@ -438,8 +420,8 @@ public class TeleOp extends OpMode {
                 movement.setOff(0);
                 {
                     follower.setPose(new Pose(
-                            144 - 47.4658, 12.92,    //Shooting zone far
-                            Math.toRadians(-90)
+                            133.2221, -16.7582,    //Shooting zone far
+                            Math.toRadians(0)
                     ));
                     manual = false;
                 }
@@ -448,8 +430,8 @@ public class TeleOp extends OpMode {
                 movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
-                        142.1786, 19.9337,    //our human player w/ ext
-                        Math.toRadians(180)
+                        80.7551, -115.1007,    //our human player w/ ext
+                        Math.toRadians(-125.8996)
                 ));
                 manual = false;
             }

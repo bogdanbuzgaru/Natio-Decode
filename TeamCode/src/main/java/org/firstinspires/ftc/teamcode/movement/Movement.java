@@ -17,7 +17,6 @@ public class Movement {
     private DcMotor rightFront;
     private DcMotor leftRear;
     private DcMotor rightRear;
-    private IMU imu;
     private int off = 0;
     public Movement(HardwareMap hardwareMap) {
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -32,14 +31,7 @@ public class Movement {
         List<DcMotor> movementMotors = Arrays.asList(leftFront, rightFront, leftRear, rightRear);
         movementMotors.forEach(motor -> motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE));
 
-        // Initialize IMU
-        imu = hardwareMap.get(IMU.class, "imu");
 
-        // IMPORTANT: Adjust these parameters to match how your Control Hub is mounted!
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-        imu.initialize(parameters);
     }
 
     public void setOff(int off) {
@@ -76,7 +68,7 @@ public class Movement {
     }
 
     public void resetHeading() {
-//        imu.resetYaw();
+
     }
 
     public void movementLoop(Gamepad gamepad) {

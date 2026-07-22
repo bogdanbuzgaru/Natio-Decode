@@ -9,7 +9,7 @@ public class Turret {
     private double targetAngle;  // Target angle relative to robot
     private double offsetAngle;                // Velocity compensation offset
 
-    private final double HALF_RANGE_DEGREES = 173.1785714285714;       //TODO  173.1785714285714
+    private final double HALF_RANGE_DEGREES = 190.1785714285714;       //TODO  173.1785714285714
     private final double SERVO_CENTER = 0.500000;
     private boolean isRed;
     private double heading;
@@ -60,11 +60,17 @@ public class Turret {
     }
     private double getFinalAngle() {
         double finalAngle = targetAngle + offsetAngle;
-        if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1){
-            targetAngle += (targetAngle - 30) * 0.125;
-        }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
-            targetAngle -= (targetAngle - 30) * 0.125;
+        if(isRed && heading < 70 && heading > -90){
+            finalAngle = finalAngle;
         }
+        if(!isRed && (heading > 110 || heading < -90) ){
+            finalAngle += 3;
+        }
+//        if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == -1){
+//            targetAngle += (targetAngle - 30) * 0.125;
+//        }else if(Math.abs(targetAngle) >= 30 && Math.signum(targetAngle) == 1){
+//            targetAngle -= (targetAngle - 30) * 0.125;
+//        }
 //        if(isRed && Math.abs(heading) < 90 && Math.signum(heading) == 1) {
 //            finalAngle += 7.5;
 //        }else if(isRed && Math.abs(heading) < 90 && Math.signum(heading) == -1) {

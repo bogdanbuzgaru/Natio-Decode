@@ -53,7 +53,7 @@ public class RedNeutral extends OpMode {
 
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(75.69912406215, -115.056875942, Math.toRadians(-125)));
+        follower.setStartingPose(new Pose(75.69912406215, -115.056875942, Math.toRadians(-130)));
         paths = new Paths(follower);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -76,7 +76,7 @@ public class RedNeutral extends OpMode {
         turret.angleToPos(-120);     //TODO change angle
 //        turret.setTargetAngle(pos.target()); //+ angle if needed        //TODO changed from target to getTargetAngle or smth
 //        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
-        turret.update();
+//        turret.update();
         shooter.setTicks(1230, false, false);   //TODO change ticks
         shooter.update();
 
@@ -246,7 +246,7 @@ public class RedNeutral extends OpMode {
                                     new Pose(75.69912406215, -115.056875942),
                                     new Pose(96.000, -96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-125), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-130), Math.toRadians(0))
                     .build()
             );
             TAKE_FIRST = (follower.pathBuilder().addPath(
@@ -269,7 +269,7 @@ public class RedNeutral extends OpMode {
             TAKE_SECOND = (follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(96.000, -84.000),
-                                    new Pose(105.000, -66.000),
+                                    new Pose(115.000, -66.000),
                                     new Pose(127.000, -60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
