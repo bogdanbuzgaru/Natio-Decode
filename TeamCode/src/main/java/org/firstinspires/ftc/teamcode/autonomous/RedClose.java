@@ -36,6 +36,8 @@ public class RedClose extends OpMode {
         GO_TO_GOAL,
 //        GO_BACK,
         SHOOT_GOAL,
+        TAKE_RANDOM,
+        SHOOT_RANDOM,
 //        PREPARE_LAST_ROW,
         LAST_ROW,
         SHOOT_LAST,
@@ -56,7 +58,7 @@ public class RedClose extends OpMode {
     private Paths paths;
     private boolean repeat = true;
     private int goalCyclesDone = 0;
-    private int GOAL_CYCLES = 2;
+    private int GOAL_CYCLES = 7;
     private ElapsedTime auto;
     private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 900;
     public void init(){
@@ -97,7 +99,7 @@ public class RedClose extends OpMode {
 //        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         shooter.setTicks(1220, false, false);
         shooter.update();
-        if(auto.seconds() > 31.9){
+        if(auto.seconds() > 59.8){
             stop();
         }
     }
@@ -199,11 +201,38 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
             intake.leaveGate();
             if (!follower.isBusy()) {
-                if (goalCyclesDone <= GOAL_CYCLES) {
+                if (goalCyclesDone == GOAL_CYCLES - 3) {
+                    return handleShoot(AutoState.TAKE_RANDOM, SHOOT_MS);
+                } else if (goalCyclesDone <= GOAL_CYCLES){
                     return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
-                } else {
+                }else {
                     return handleShoot(AutoState.FIRST_ROW, SHOOT_MS);
                 }
+            }
+            return null;
+        });
+        fsm.onStateEnter(AutoState.TAKE_RANDOM, () -> {
+            follower.followPath(paths.TAKE_RANDOM);
+            shooter.lowerBarrier();
+            return null;
+        });
+        fsm.onStateUpdate(AutoState.TAKE_RANDOM, () -> {
+            intake.autoTake();
+            index.autoFeed();
+            if (!follower.isBusy()) {
+                return AutoState.SHOOT_RANDOM;
+            }
+            return null;
+        });
+        fsm.onStateEnter(AutoState.SHOOT_RANDOM, () -> {
+            follower.followPath(paths.SHOOT_RANDOM);
+            shooter.lowerBarrier();
+            return null;
+        });
+        fsm.onStateUpdate(AutoState.SHOOT_RANDOM, () -> {
+            intake.leaveGate();
+            if (!follower.isBusy()) {
+                return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
             }
             return null;
         });
@@ -278,6 +307,8 @@ public class RedClose extends OpMode {
         public PathChain GO_BACK;
         public PathChain SHOOT_GOAL;
         public PathChain PREPARE_LAST_ROW;
+        public PathChain TAKE_RANDOM;
+        public PathChain SHOOT_RANDOM;
         public PathChain LAST_ROW;
         public PathChain SHOOT_LAST;
         public PathChain FIRST_ROW;
@@ -362,6 +393,25 @@ public class RedClose extends OpMode {
                             ).setLinearHeadingInterpolation(Math.toRadians(15.9), Math.toRadians(0))
                             .build()
             );
+
+            TAKE_RANDOM = (follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(84.000, 84.000),
+                                    new Pose(100.255, 62.000),
+                                    new Pose(126.000, 61.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .build()
+            );
+            SHOOT_RANDOM = (follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(126.000, 61.000),
+                                    new Pose(84.000, 84.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .build()
+            );
+
 //            PREPARE_LAST_ROW = follower.pathBuilder().addPath(
 //                            new BezierLine(
 //                                    new Pose(90.000, 90.000),

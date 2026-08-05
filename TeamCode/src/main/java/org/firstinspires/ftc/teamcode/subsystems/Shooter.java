@@ -51,9 +51,6 @@ public class Shooter {
 //
 //        flywheelMotor2.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
 //        flywheelMotor1.setPower((p_output + ff_ouput) * (nominalVoltage / voltagee));
-        flywheelMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
-        flywheelMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(pCoef,0,0,13.3));
-
         flywheelMotor1.setVelocity(ticks);
         flywheelMotor2.setVelocity(ticks);
         adaptiveHood();
@@ -93,10 +90,10 @@ public class Shooter {
         return targetHood;
     }
     private void adaptiveHood(){
-        double error = Math.abs((flywheelMotor1.getVelocity() - ticks) * 0.0005);
-        if(flywheelMotor1.getVelocity()  <= 950){
+        double currentVelocity = flywheelMotor1.getVelocity();
+        if(currentVelocity  <= 950){
             targetHood = 0.3;
-        }else if (flywheelMotor1.getVelocity() <= 1500) {
+        }else if (currentVelocity <= 1500) {
             targetHood = 0.8 * ((ticks - 950) / 550) + 0.2;
         }else{
             targetHood = 1;
