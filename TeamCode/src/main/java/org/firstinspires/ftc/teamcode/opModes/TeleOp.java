@@ -376,7 +376,6 @@ public class TeleOp extends OpMode {
     private void resetPosition(Gamepad gamepad, Gamepad driver) {
         if(pos.isRed()) {
             if (gamepad.dpadUpWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         126.3842, 79.0778,        //Far shooting
@@ -384,7 +383,6 @@ public class TeleOp extends OpMode {
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         116.6359, 128.93,    //basket
@@ -392,7 +390,6 @@ public class TeleOp extends OpMode {
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 {
                     follower.setPose(new Pose(
@@ -403,7 +400,6 @@ public class TeleOp extends OpMode {
                 }
                 manual = false;
             }else if (gamepad.dpadRightWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         25.2353, -115.0025,    //our human player w/ ext
@@ -413,7 +409,6 @@ public class TeleOp extends OpMode {
             }
         }else if(pos.isBlue()){
             if (gamepad.dpadUpWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         17.6158, 79.0778,        //Far shooting
@@ -421,7 +416,6 @@ public class TeleOp extends OpMode {
                 ));
                 manual = false;
             } else if (gamepad.dpadLeftWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         27.3641, 128.93,    //basket
@@ -429,7 +423,6 @@ public class TeleOp extends OpMode {
                 ));
                 manual = false;
             } else if (gamepad.dpadDownWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 {
                     follower.setPose(new Pose(
@@ -440,7 +433,6 @@ public class TeleOp extends OpMode {
                 }
                 manual = false;
             }else if (gamepad.dpadRightWasPressed()) {
-                movement.resetHeading();
                 movement.setOff(0);
                 follower.setPose(new Pose(
                         80.7551, -115.1007,    //our human player w/ ext

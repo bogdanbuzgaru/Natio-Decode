@@ -95,6 +95,7 @@ public class BlueClose extends OpMode {
 //        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         shooter.setTicks(1240, false, false);
         shooter.update();
+        turret.update();
         if(auto.seconds() > 59.8){
             requestOpModeStop();
         }

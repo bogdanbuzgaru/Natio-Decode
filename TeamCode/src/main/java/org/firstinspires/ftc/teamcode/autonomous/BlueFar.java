@@ -95,6 +95,7 @@ public class BlueFar extends OpMode {
 //        turret.update();
         shooter.setTicks(1590, false, false);
         shooter.updateMotor();
+        turret.update();
         index.normalIndex();
         if (autoTimer.seconds() >= 59.8){
             requestOpModeStop();
