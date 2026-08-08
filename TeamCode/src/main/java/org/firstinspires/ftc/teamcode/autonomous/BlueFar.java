@@ -96,6 +96,9 @@ public class BlueFar extends OpMode {
         shooter.setTicks(1590, false, false);
         shooter.updateMotor();
         index.normalIndex();
+        if (autoTimer.seconds() >= 59.8){
+            requestOpModeStop();
+        }
         telemetry.addData("has target", limelight.hasTarget());
         telemetry.addData("Object", limelight.choice(limelight.getSelectedPath(), true));
     }
@@ -363,15 +366,15 @@ public class BlueFar extends OpMode {
             TAKE_RANDOM = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(52.000, 16.000),
-                            new Pose (23.100, -2.500),
-                            new Pose(10.000, -8.000)
+                            new Pose (23.100, 22.500),
+                            new Pose(10.000, 28.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             SHOOT_RANDOM = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(10.000, -8.000),
+                            new Pose(10.000, 28.000),
                             new Pose(55.000, 15.000)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
