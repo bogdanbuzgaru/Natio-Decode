@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.movement;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,9 +64,6 @@ public class Movement {
         rightRear.setPower(backRightPower / denominator);
     }
 
-    public void resetHeading() {
-
-    }
 
     public void movementLoop(Gamepad gamepad) {
         double x = gamepad.left_stick_x;
@@ -91,25 +85,4 @@ public class Movement {
         rightRear.setPower(backRightPower / denominator);
     }
 
-    public void movementLoopSlow(Gamepad gamepad) {
-        double speedMultiplier = 0.5;
-
-        double x = gamepad.left_stick_x;
-        double y = -gamepad.left_stick_y;
-        double rx = gamepad.right_stick_x;
-
-        x = x * 1.1;
-
-        double frontLeftPower = (y + x + rx) * speedMultiplier;
-        double backLeftPower = (y - x + rx) * speedMultiplier;
-        double frontRightPower = (y - x - rx) * speedMultiplier;
-        double backRightPower = (y + x - rx) * speedMultiplier;
-
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-        leftFront.setPower(frontLeftPower / denominator);
-        rightFront.setPower(frontRightPower / denominator);
-        leftRear.setPower(backLeftPower / denominator);
-        rightRear.setPower(backRightPower / denominator);
-    }
 }

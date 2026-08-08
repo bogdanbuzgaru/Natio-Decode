@@ -94,13 +94,12 @@ public class RedClose extends OpMode {
 //        turret.setAuto();
         pos.update(follower.getPose());
         index.normalIndex();
-        turret.angleToPos(58.2);
 //        turret.setTargetAngle(pos.target()); //+ angle if needed
 //        turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         shooter.setTicks(1220, false, false);
         shooter.update();
         if(auto.seconds() > 59.8){
-            stop();
+            requestOpModeStop();
         }
     }
     public void stop(){
@@ -141,10 +140,12 @@ public class RedClose extends OpMode {
     private void setUp() {
         fsm.onStateEnter(AutoState.SHOOT_FIRST, () -> {
             follower.followPath(paths.SHOOT_FIRST);
+            turret.angleToPos(58.2);
             shooter.lowerBarrier();
             return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_FIRST, () -> {
+            turret.angleToPos(58.2);
             intake.autoTake();
             index.autoFeed();
             if (!follower.isBusy()) {
@@ -155,6 +156,7 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.SECOND_ROW, () -> {
             follower.followPath(paths.SECOND_ROW);
             shooter.lowerBarrier();
+            turret.angleToPos(58.2);
             return null;
         });
         fsm.onStateUpdate(AutoState.SECOND_ROW, () -> {
@@ -181,9 +183,11 @@ public class RedClose extends OpMode {
             follower.followPath(paths.GO_TO_GOAL);
             shooter.lowerBarrier();
             index.normalIndex();
+            turret.angleToPos(56.2);
             return null;
         });
         fsm.onStateUpdate(AutoState.GO_TO_GOAL, () -> {
+            turret.angleToPos(56.2);
             intake.leaveGate();
 //            index.autoFeed();
             if (!follower.isBusy()) {
@@ -202,6 +206,7 @@ public class RedClose extends OpMode {
             intake.leaveGate();
             if (!follower.isBusy()) {
                 if (goalCyclesDone == GOAL_CYCLES - 3) {
+                    turret.angleToPos(55.2);
                     return handleShoot(AutoState.TAKE_RANDOM, SHOOT_MS);
                 } else if (goalCyclesDone <= GOAL_CYCLES){
                     return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
@@ -226,11 +231,13 @@ public class RedClose extends OpMode {
         });
         fsm.onStateEnter(AutoState.SHOOT_RANDOM, () -> {
             follower.followPath(paths.SHOOT_RANDOM);
+            turret.angleToPos(58.2);
             shooter.lowerBarrier();
             return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT_RANDOM, () -> {
             intake.leaveGate();
+            turret.angleToPos(58.2);
             if (!follower.isBusy()) {
                 return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
             }
@@ -264,9 +271,11 @@ public class RedClose extends OpMode {
         fsm.onStateEnter(AutoState.FIRST_ROW, () -> {
             follower.followPath(paths.FIRST_ROW);
             shooter.lowerBarrier();
+            turret.angleToPos(58.2);
             return null;
         });
         fsm.onStateUpdate(AutoState.FIRST_ROW, () -> {
+            turret.angleToPos(58.2);
             intake.autoTake();
             index.autoFeed();
             if (!follower.isBusy()) {
@@ -275,12 +284,14 @@ public class RedClose extends OpMode {
             return null;
         });
         fsm.onStateEnter(AutoState.SHOOT, () -> {
+            turret.angleToPos(58.2);
             follower.followPath(paths.SHOOT);
             shooter.lowerBarrier();
             return null;
         });
         fsm.onStateUpdate(AutoState.SHOOT, () -> {
             intake.autoTake();
+            turret.angleToPos(58.2);
             if (!follower.isBusy()) {
                 return handleShoot(AutoState.PARK, SHOOT_MS);
             }

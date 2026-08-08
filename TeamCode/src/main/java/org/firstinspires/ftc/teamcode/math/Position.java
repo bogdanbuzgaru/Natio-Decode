@@ -48,18 +48,18 @@ public class Position {
     public void update(Pose pose) {
         this.pose = pose;
         heading = Math.toDegrees(pose.getHeading());
-        calculateOffsets();
-        if(Math.abs(heading) > 90){
-            signOrdinate = - 1;
-        } else {
-            signOrdinate = 1;
-        }
-        if(Math.abs(heading) < inRobotAngle / 2){
-            signAbscissa = - 1;
-        } else {
-            signAbscissa = 1;
-        }
-        calculateLinearEquations();
+//        calculateOffsets();
+//        if(Math.abs(heading) > 90){
+//            signOrdinate = - 1;
+//        } else {
+//            signOrdinate = 1;
+//        }
+//        if(Math.abs(heading) < inRobotAngle / 2){
+//            signAbscissa = - 1;
+//        } else {
+//            signAbscissa = 1;
+//        }
+//        calculateLinearEquations();
     }
     private double distanceY(){
         double currentHeading = Math.abs(heading);
