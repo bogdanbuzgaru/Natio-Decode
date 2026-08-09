@@ -17,7 +17,7 @@ public class Turret {
     private final ElapsedTime profileTimer = new ElapsedTime();
 
     // --- Tuning knobs: start conservative, increase until it's fast but not jerky ---
-    private static final double MAX_VELOCITY = 220.0;   // deg/s
+    private static final double MAX_VELOCITY = 345.0;   // deg/s
     private static final double ACCELERATION = 400.0;   // deg/s^2
     private static final double POSITION_DEADBAND = 0.3; // degrees, prevents micro-jitter at target
     private static final double WRITE_THRESHOLD = 0.0015; // servo units, skip redundant writes
@@ -35,9 +35,12 @@ public class Turret {
         turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
         turretServo3 = hardwareMap.get(Servo.class, "turretServo3");
         profileTimer.reset();
+//        goNeutral();
     }
 
-    public void setBlue(boolean blue){ this.blue = blue; }
+    public void setBlue(boolean blue){
+        isRed = !blue;
+    }
 
     public void setTargetAngle(double angleRobotRelative) {
         this.targetAngle = normalizeAngle(angleRobotRelative);
@@ -74,7 +77,9 @@ public class Turret {
     }
 
     public void goNeutral(){
-        setTargetAngle(0.0);
+        turretServo1.setPosition(0.5);
+        turretServo2.setPosition(0.5);
+        turretServo3.setPosition(0.5);
     }
 
     public void update(){

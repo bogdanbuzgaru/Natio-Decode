@@ -106,42 +106,21 @@ public class Position {
     }
 
 
-    public double getTargetAngle(Gamepad gamepad){
+    public double getTargetAngle(Gamepad gamepad) {
         double targetHead = 0;
-        double tx = 141;
-        double txB = 8;
-
-        if(gamepad.leftStickButtonWasPressed()){
+        double tx = 144.35;
+        double txB = 13.5;
+        if (gamepad.leftStickButtonWasPressed()) {
             tx -= 7;
             txB -= 7;
-        }else if (gamepad.rightStickButtonWasPressed()){
+        } else if (gamepad.rightStickButtonWasPressed()) {
             tx += 10;
             txB += 10;
         }
-        if(pose.getY() > -5 ){
-            changeOrientation = false;
-        }
-        if(pose.getY() < -60){
-            changeOrientation = true;
-        }
-        if(!changeOrientation) {
-            if (pose.getY() > - 48 && red) {
-                targetHead = Math.toDegrees(Math.atan2(Math.abs(141 - pose.getY()), Math.abs(tx - pose.getX())));
-            } else if (pose.getY() > - 48 && !red){
-                targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - txB)));
-            }else {
-                if(pose.getX() < 72){
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
-                }else{
-                    targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
-                }
-            }
-        }else{
-            if(pose.getX() < 72){
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
-            }else{
-                targetHead = Math.toDegrees(Math.atan2(144 + pose.getY(),Math.abs(pose.getX() - 72)) + Math.PI);      //TODO is 144 + getY because of negative sign
-            }
+        if (red) {
+            targetHead = Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(tx - pose.getX())));
+        } else {
+            targetHead = 180 - Math.toDegrees(Math.atan2(Math.abs(136 - pose.getY()), Math.abs(pose.getX() - txB)));
         }
         double error = targetHead - heading;
 

@@ -131,7 +131,7 @@ public class Shooter {
         }
     }
     public void setAutoFarHood(){
-        hood.setPosition(1);
+        hood.setPosition(0.92);
     }
     public void lowerHood(){
             ticks = 0;

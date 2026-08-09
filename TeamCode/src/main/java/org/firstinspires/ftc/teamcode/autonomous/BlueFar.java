@@ -174,9 +174,9 @@ public class BlueFar extends OpMode {
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
             }else if (!follower.isBusy() && skip){
-                if (number < 6 && number % 4 == 0) {
+                if (number < 13 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                }else if (number < 6) {
+                }else if (number < 13) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
                 }else if (!follower.isBusy()){
@@ -291,9 +291,9 @@ public class BlueFar extends OpMode {
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
             }else if (!follower.isBusy() && skip){
-                if (number < 6 && number % 4 == 0) {
+                if (number < 13 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                }else if (number < 6) {
+                }else if (number < 13) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
                 }else if (!follower.isBusy()){

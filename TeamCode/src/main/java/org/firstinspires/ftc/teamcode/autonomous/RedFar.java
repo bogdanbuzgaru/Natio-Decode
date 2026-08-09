@@ -95,7 +95,7 @@ public class RedFar extends OpMode {
         turret.setTargetAngle(pos.target()); //+ angle if needed
         turret.setHeading(Math.toDegrees(follower.getHeading()), true);
         turret.update();
-        shooter.setTicks(1590, false, false);
+        shooter.setTicks(1530, false, false);
         shooter.updateMotor();
         index.normalIndex();
         if (autoTimer.seconds() >= 59.8) {
@@ -175,9 +175,9 @@ public class RedFar extends OpMode {
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
             }else if (!follower.isBusy() && skip){
-                if (number < 6 && number % 4 == 0) {
+                if (number < 13 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                }else if (number < 6) {
+                }else if (number < 13) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
                 }else if (!follower.isBusy()){
@@ -227,7 +227,7 @@ public class RedFar extends OpMode {
 
         fsm.onStateUpdate(AutoStates.GO_SHOOT_LAST_ROW, () -> {
             intake.autoTake();
-            if (!follower.isBusy() && number < 5) {
+            if (!follower.isBusy() && number < 10) {
                 return handleShoot(AutoStates.TAKE_HUMAN, 500);
             }else if (!follower.isBusy()){
                 return AutoStates.PARK;
@@ -292,9 +292,9 @@ public class RedFar extends OpMode {
             if (!follower.isBusy() && !skip) {
                 return handleShoot(AutoStates.CENTER_LAST_ROW, 600);
             }else if (!follower.isBusy() && skip){
-                if (number < 6 && number % 4 == 0) {
+                if (number < 13 && number % 4 == 0) {
                     return handleShoot(AutoStates.REPEAT, 600);
-                }else if (number < 6) {
+                }else if (number < 13) {
                     add = true;
                     return handleShoot(AutoStates.TAKE_RANDOM, 600);
                 }else if (!follower.isBusy()){

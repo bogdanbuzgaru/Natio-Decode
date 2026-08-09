@@ -58,7 +58,7 @@ public class RedClose extends OpMode {
     private Paths paths;
     private boolean repeat = true;
     private int goalCyclesDone = 0;
-    private int GOAL_CYCLES = 7;
+    private int GOAL_CYCLES = 6;
     private ElapsedTime auto;
     private final int SHOOT_FIRST_MS = 600, SHOOT_MS = 650, WAIT_MS = 900;
     public void init(){
@@ -176,7 +176,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_SECOND, () -> {
             intake.leaveGate();
             if (!follower.isBusy()) {
-                return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
+                return handleShoot(AutoState.LAST_ROW, SHOOT_MS);
             }
             return null;
         });
@@ -206,9 +206,9 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_GOAL, () -> {
             intake.leaveGate();
             if (!follower.isBusy()) {
-                if (goalCyclesDone == GOAL_CYCLES - 3) {
+                if (goalCyclesDone == 2) {
                     turret.angleToPos(55.2);
-                    return handleShoot(AutoState.TAKE_RANDOM, SHOOT_MS);
+                    return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
                 } else if (goalCyclesDone <= GOAL_CYCLES){
                     return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
                 }else {
@@ -265,7 +265,7 @@ public class RedClose extends OpMode {
         fsm.onStateUpdate(AutoState.SHOOT_LAST, () -> {
             intake.autoTake();
             if (!follower.isBusy()) {
-                return handleShoot(AutoState.FIRST_ROW, SHOOT_MS);
+                return handleShoot(AutoState.GO_TO_GOAL, SHOOT_MS);
             }
             return null;
         });
@@ -390,7 +390,7 @@ public class RedClose extends OpMode {
                                         new Pose(95.000, 65.000),
                                         new Pose (124.200, 62.000),
                                         new Pose (125.800, 61.000),
-                                        new Pose(127.580, 60.000)
+                                        new Pose(127.880, 60.000)
                                 )
                             ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(15.9))
                             .build()
@@ -398,7 +398,7 @@ public class RedClose extends OpMode {
 
             SHOOT_GOAL = (follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(127.580, 60.000),
+                                            new Pose(127.880, 60.000),
                                             new Pose(100.255, 67.783),
                                             new Pose(84.000, 84.000)
                                     )
@@ -409,15 +409,15 @@ public class RedClose extends OpMode {
             TAKE_RANDOM = (follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(84.000, 84.000),
-                                    new Pose(100.255, 62.000),
-                                    new Pose(126.000, 61.000)
+                                    new Pose(100.255, 48.000),
+                                    new Pose(126.000, 41.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build()
             );
             SHOOT_RANDOM = (follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(126.000, 61.000),
+                                    new Pose(126.000, 41.000),
                                     new Pose(84.000, 84.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
